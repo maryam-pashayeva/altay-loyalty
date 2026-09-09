@@ -1,0 +1,19 @@
+{
+  "name": "Altaywash Loyalty",
+  "short_name": "Altaywash",
+  "description": "Altaywash loyalliq proqrami",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#f1f5f9",
+  "lang": "az",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

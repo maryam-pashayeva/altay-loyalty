@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Altaywash Loyalty — Mobil Web App
 
-## Getting Started
+Altaywash müştəriləri üçün mobil-first loyallıq tətbiqi (PWA). Bonus balansı,
+QR loyallıq kartı, kampaniyalar, yuma paketləri, əməliyyat tarixçəsi və filiallar.
 
-First, run the development server:
+## Texnologiya
+
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS v4 (dizayn tokenləri `src/app/globals.css` içindədir)
+- `qrcode` — kart QR-ının generasiyası
+- PWA manifest (`public/manifest.webmanifest`) — telefonda "ana ekrana əlavə et"
+
+## İşə salma
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 → `/login` səhifəsinə yönləndirir.
+**Demo rejimdə OTP kodu: `1234`** (istənilən 9 rəqəmli nömrə ilə).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ERP inteqrasiyası
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Tətbiq `NEXT_PUBLIC_ERP_API_URL` təyin olunmayıbsa **mock data** ilə işləyir.
+Real ERP qoşmaq üçün:
 
-## Learn More
+1. `.env.local` yaradın:
+   ```
+   NEXT_PUBLIC_ERP_API_URL=https://erp.altaywash.az/api/loyalty
+   ```
+2. `src/lib/api/index.ts` içindəki yol adlarını ERP-nin real endpoint-ləri ilə
+   uzlaşdırın. Hazırda gözlənilən müqavilə:
 
-To learn more about Next.js, take a look at the following resources:
+   | Metod | Endpoint | Cavab |
+   |---|---|---|
+   | `POST` | `/auth/otp` | `{ sent: true }` |
+   | `POST` | `/auth/verify` | `Session` (`token` + `customer`) |
+   | `GET` | `/me` | `Customer` |
+   | `GET` | `/me/transactions` | `Transaction[]` |
+   | `GET` | `/campaigns` | `Campaign[]` |
+   | `GET` | `/packages` | `WashPackage[]` |
+   | `GET` | `/branches` | `Branch[]` |
+   | `POST` | `/orders` | `{ redirectUrl?: string }` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   Cavab tipləri: [`src/lib/types.ts`](src/lib/types.ts).
+   Autentifikasiya: `Authorization: Bearer <token>` (bax `src/lib/api/client.ts`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Kod dəyişikliyi yalnız bu iki fayla toxunur — UI qatı ERP-dən asılı deyil.
 
-## Deploy on Vercel
+## Struktur
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/
+    login/            OTP ilə giriş (2 addım)
+    (app)/            Autentifikasiya tələb edən bölmə (AuthGuard + BottomNav)
+      page.tsx        Ana səhifə — balans, səviyyə, kampaniyalar, son əməliyyatlar
+      qr/             Kassada oxudulan QR loyallıq kartı
+      campaigns/      Aktiv kampaniyalar
+      history/        Filtrli əməliyyat tarixçəsi
+      packages/       Yuma paketləri və alış
+      branches/       Filiallar, zəng və marşrut
+      profile/        Profil, avtomobillər, çıxış
+  components/         UI komponentləri (BottomNav, BalanceCard, QrCard, ...)
+  lib/
+    api/              ERP qatı — client.ts, index.ts (fasad), mock-data.ts
+    session.tsx       Sessiya konteksti (token localStorage-da)
+    types.ts          Domen tipləri
+    tier.ts           Səviyyə (Silver/Gold/Platinum) hesablaması
+    format.ts         Məbləğ, tarix və telefon formatı
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Loyallıq qaydaları (hazırkı fərz)
+
+| Səviyyə | İllik xərc | Bonus |
+|---|---|---|
+| Silver | 0 ₼-dən | 3% |
+| Gold | 300 ₼-dən | 5% |
+| Platinum | 800 ₼-dən | 8% |
+
+Bu hədlər `src/lib/api/mock-data.ts` içindəki `TIERS`-də saxlanılır və ERP-dən
+gələn dəyərlərlə əvəzlənməlidir.
+
+## Növbəti addımlar
+
+- Real ERP endpoint-lərinin qoşulması və müqavilənin dəqiqləşdirilməsi
+- Ödəniş provayderi (paket alışı) inteqrasiyası
+- Push bildirişlər (kampaniya, yuma hazır olduqda)
+- Onlayn növbə/rezervasiya bölməsi

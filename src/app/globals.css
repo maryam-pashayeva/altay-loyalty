@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Altaywash Loyalty — ALTAY ERP dizayn dili.
+   Royal mavi brend + yumşaq açıq boz-mavi fon + ağ kartlar.
+   Vurğular: müsbət üçün yaşıl, bonus üçün kəhrəba, kateqoriyalar üçün
+   çoxrəngli qradiyentlər (şəkillərdəki tarif kartlarına istinadən). */
+@theme {
+  /* Neytrallar — slate tonları (yumşaq, göz yormayan) */
+  --color-ink-50: #f8fafc;
+  --color-ink-100: #f1f5f9;
+  --color-ink-200: #e6ecf4;
+  --color-ink-300: #cbd5e1;
+  --color-ink-400: #94a3b8;
+  --color-ink-500: #64748b;
+  --color-ink-700: #334155;
+  --color-ink-900: #1e293b; /* əsas mətn — slate-800 */
+  --color-ink-950: #0f172a; /* ən tünd başlıqlar */
+
+  /* Brend — ALTAY royal mavi */
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  /* Köhnə "aqua-*" adları brend maviyə yönləndirilir (geriyə uyğunluq) */
+  --color-aqua-400: #60a5fa;
+  --color-aqua-500: #3b82f6;
+  --color-aqua-600: #2563eb;
+
+  /* Müsbət / uğur — yaşıl (ERP trend rozetkaları kimi) */
+  --color-mint-100: #d1fae5;
+  --color-mint-500: #10b981;
+  --color-mint-600: #059669;
+
+  /* Bonus / səviyyə — kəhrəba */
+  --color-sun-400: #fbbf24;
+  --color-sun-500: #f59e0b;
+  --color-sun-600: #b45309;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+  background: var(--color-ink-100);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Yumşaq açıq fon — böyük ağ sahələr gözü daha az yorur */
+  background: var(--color-ink-100);
+  color: var(--color-ink-900);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Mobil ekran çərçivəsi: desktopda da telefon eni saxlanılır */
+.app-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 30rem;
+  min-height: 100dvh;
+}
+
+.safe-bottom {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+.card {
+  border-radius: 1.25rem;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--color-ink-200) 60%, transparent);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 12px 30px -20px rgba(15, 23, 42, 0.14);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
 }
