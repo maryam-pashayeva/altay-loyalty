@@ -15,17 +15,20 @@ export class ApiError extends Error {
   }
 }
 
-const TOKEN_KEY = "altaywash.token";
+/**
+ * Sessiya token-i YALNIZ yaddaşda (in-memory) saxlanılır — localStorage-də yox.
+ * Beləliklə hər dəfə link təzə açılanda istifadəçi giriş etməmiş sayılır və
+ * ondan yenidən nömrə soruşulur. Cari ziyarət ərzində (səhifələr arası keçid)
+ * token qalır; tam yeniləmə (F5) və ya linkin yenidən açılması onu sıfırlayır.
+ */
+let currentToken: string | null = null;
 
 export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(TOKEN_KEY);
+  return currentToken;
 }
 
 export function setToken(token: string | null) {
-  if (typeof window === "undefined") return;
-  if (token) window.localStorage.setItem(TOKEN_KEY, token);
-  else window.localStorage.removeItem(TOKEN_KEY);
+  currentToken = token;
 }
 
 export async function request<T>(
