@@ -13,7 +13,7 @@ import {
 const items = [
   { href: "/", label: "Ana səhifə", Icon: HomeIcon },
   { href: "/campaigns", label: "Kampaniya", Icon: GiftIcon },
-  { href: "/qr", label: "QR kart", Icon: QrIcon, primary: true },
+  { href: "/qr", label: "Skan et", Icon: QrIcon, primary: true },
   { href: "/history", label: "Tarixçə", Icon: HistoryIcon },
   { href: "/profile", label: "Profil", Icon: UserIcon },
 ];

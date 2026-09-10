@@ -169,6 +169,26 @@ export const api = {
       body: JSON.stringify({ packageId }),
     });
   },
+
+  /**
+   * Terminalın QR kodu oxunduqda çağırılır — ERP həmin terminalı/əməliyyatı
+   * tapıb müştərinin hesabına xal yazır və nəticəni qaytarır.
+   */
+  async scanTerminal(
+    code: string,
+  ): Promise<{ points: number; title: string; branchName: string }> {
+    if (USE_MOCK) {
+      await delay(700);
+      if (!code || code.trim().length < 4) {
+        throw new Error("QR kod tanınmadı. Yenidən cəhd edin.");
+      }
+      return { points: 5, title: "Kompleks yuma", branchName: "Altaywash Xətai" };
+    }
+    return request("/scan", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    });
+  },
 };
 
 export { USE_MOCK };

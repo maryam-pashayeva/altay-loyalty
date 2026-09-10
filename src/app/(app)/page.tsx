@@ -36,7 +36,7 @@ export default function HomePage() {
         <Link
           href="/qr"
           className="grid size-11 place-items-center rounded-2xl bg-ink-100 text-aqua-600"
-          aria-label="QR kartı aç"
+          aria-label="QR skan et"
         >
           <QrIcon className="size-6" />
         </Link>
