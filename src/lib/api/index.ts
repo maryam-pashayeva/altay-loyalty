@@ -23,14 +23,57 @@ const USE_MOCK = !process.env.NEXT_PUBLIC_ERP_API_URL;
 
 const delay = (ms = 350) => new Promise((r) => setTimeout(r, ms));
 
+/* --- Mock rejim üçün lokal müştəri reyestri ---
+   Real ERP qoşulanda bu hissə istifadə olunmur. */
+const REGISTRY_KEY = "altaywash.customers";
+
+function readRegistry(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(REGISTRY_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeRegistry(map: Record<string, string>) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(REGISTRY_KEY, JSON.stringify(map));
+}
+
+/** Demo üçün öncədən qeydiyyatlı nömrə (köhnə müştəri) */
+const SEEDED_PHONE = mockCustomer.phone.replace(/\D/g, "");
+
 export const api = {
-  /** Telefon nömrəsi ilə giriş edir və sessiya qaytarır */
-  async login(phone: string): Promise<Session> {
+  /** Nömrənin sistemdə mövcud olub-olmadığını yoxlayır.
+   *  Yenidirsə ad-soyad tələb olunacaq, köhnədirsə yalnız telefon kifayətdir. */
+  async checkCustomer(phone: string): Promise<{ exists: boolean }> {
+    if (USE_MOCK) {
+      await delay(300);
+      const digits = phone.replace(/\D/g, "");
+      const exists =
+        digits === SEEDED_PHONE || digits in readRegistry();
+      return { exists };
+    }
+    return request("/auth/check", {
+      method: "POST",
+      body: JSON.stringify({ phone }),
+    });
+  },
+
+  /** Köhnə müştəri — yalnız telefon nömrəsi ilə giriş */
+  async signIn(phone: string): Promise<Session> {
     if (USE_MOCK) {
       await delay();
+      const digits = phone.replace(/\D/g, "");
+      const savedName = readRegistry()[digits];
       const session: Session = {
         token: "mock-token",
-        customer: { ...mockCustomer, phone },
+        customer: {
+          ...mockCustomer,
+          phone,
+          ...(savedName ? { fullName: savedName } : {}),
+        },
       };
       setToken(session.token);
       return session;
@@ -38,6 +81,38 @@ export const api = {
     const session = await request<Session>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ phone }),
+    });
+    setToken(session.token);
+    return session;
+  },
+
+  /** Yeni müştəri — ad-soyad və telefon nömrəsi ilə qeydiyyat */
+  async signUp(phone: string, fullName: string): Promise<Session> {
+    if (USE_MOCK) {
+      await delay(500);
+      const digits = phone.replace(/\D/g, "");
+      const registry = readRegistry();
+      registry[digits] = fullName;
+      writeRegistry(registry);
+      const session: Session = {
+        token: "mock-token",
+        customer: {
+          ...mockCustomer,
+          phone,
+          fullName,
+          // Yeni müştəri sıfır balansla başlayır
+          bonusBalance: 0,
+          walletBalance: 0,
+          yearlySpend: 0,
+          tier: "silver",
+        },
+      };
+      setToken(session.token);
+      return session;
+    }
+    const session = await request<Session>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ phone, fullName }),
     });
     setToken(session.token);
     return session;

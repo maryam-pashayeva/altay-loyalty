@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-/** Giriş etməmiş istifadəçini /login-ə yönləndirir. */
+/** Giriş etməmiş istifadəçini qarşılama (onboarding) ekranına yönləndirir. */
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { customer, loading } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !customer) router.replace("/login");
+    if (!loading && !customer) router.replace("/welcome");
   }, [loading, customer, router]);
 
   if (loading || !customer) {
