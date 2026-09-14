@@ -2,6 +2,7 @@ import type {
   Branch,
   Campaign,
   Customer,
+  ScanResult,
   Session,
   Transaction,
   WashPackage,
@@ -172,33 +173,53 @@ export const api = {
   },
 
   /**
-   * Terminalın QR kodu oxunduqda çağırılır — ERP həmin terminalı/əməliyyatı
-   * tapıb müştərinin hesabına xal yazır və nəticəni qaytarır.
+   * Terminalın QR kodu oxunduqda çağırılır. ERP QR-ın məzmununa görə
+   * əməliyyatın "bonus qazanma", yoxsa "loyallıqla ödəniş" olduğunu qaytarır.
+   * (Mock: kodda "pay" varsa ödəniş, əks halda bonus qazanma.)
    */
   async scanTerminal(
     code: string,
     vehiclePlate?: string,
-  ): Promise<{
-    points: number;
-    title: string;
-    branchName: string;
-    vehiclePlate?: string;
-  }> {
+  ): Promise<ScanResult> {
     if (USE_MOCK) {
       await delay(700);
       if (!code || code.trim().length < 4) {
         throw new Error("QR kod tanınmadı. Yenidən cəhd edin.");
       }
+      if (/pay|öd|redeem/i.test(code)) {
+        return {
+          type: "pay",
+          amount: 5,
+          title: "Standart yuma",
+          branchName: "Altaywash Nərimanov",
+          ref: code,
+        };
+      }
       return {
+        type: "earn",
         points: 5,
         title: "Kompleks yuma",
         branchName: "Altaywash Xətai",
-        vehiclePlate,
       };
     }
     return request("/scan", {
       method: "POST",
       body: JSON.stringify({ code, vehiclePlate }),
+    });
+  },
+
+  /** Loyallıqla ödənişi təsdiqləyir — balansdan çıxım burada baş verir. */
+  async confirmPayment(
+    ref: string,
+    vehiclePlate?: string,
+  ): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(600);
+      return { ok: true };
+    }
+    return request("/scan/pay", {
+      method: "POST",
+      body: JSON.stringify({ ref, vehiclePlate }),
     });
   },
 };

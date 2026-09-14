@@ -19,6 +19,8 @@ interface SessionValue {
   /** Hazırda seçili (aktiv) avtomobil — skan/əməliyyat bu maşına yazılır */
   activeVehicle: Vehicle | null;
   setActiveVehicleId: (id: string) => void;
+  /** Balans və s. sahələri lokal (optimistik) yeniləyir */
+  updateCustomer: (partial: Partial<Customer>) => void;
   signIn: (customer: Customer) => void;
   signOut: () => void;
   refresh: () => Promise<void>;
@@ -72,6 +74,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     router.replace("/login");
   }, [router, applyCustomer]);
 
+  const updateCustomer = useCallback((partial: Partial<Customer>) => {
+    setCustomer((c) => (c ? { ...c, ...partial } : c));
+  }, []);
+
   const activeVehicle = useMemo(
     () =>
       customer?.vehicles.find((v) => v.id === activeVehicleId) ??
@@ -86,11 +92,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       loading,
       activeVehicle,
       setActiveVehicleId,
+      updateCustomer,
       signIn,
       signOut,
       refresh,
     }),
-    [customer, loading, activeVehicle, signIn, signOut, refresh],
+    [
+      customer,
+      loading,
+      activeVehicle,
+      updateCustomer,
+      signIn,
+      signOut,
+      refresh,
+    ],
   );
 
   return (

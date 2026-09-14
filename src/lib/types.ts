@@ -94,3 +94,18 @@ export interface Session {
   token: string;
   customer: Customer;
 }
+
+/**
+ * Terminaldakı QR oxunduqda alınan nəticə.
+ * "earn" — yuma bitib, bonus qazanılır (dərhal tətbiq olunur).
+ * "pay" — istifadəçi terminalda loyallıqla ödəməyi seçib; təsdiq tələb olunur.
+ */
+export type ScanResult =
+  | { type: "earn"; points: number; title: string; branchName: string }
+  | {
+      type: "pay";
+      amount: number;
+      title: string;
+      branchName: string;
+      ref: string;
+    };
