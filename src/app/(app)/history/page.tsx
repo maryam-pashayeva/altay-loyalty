@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/session";
 import type { Transaction, TransactionKind } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { TransactionItem } from "@/components/TransactionItem";
@@ -16,26 +17,37 @@ const filters: { key: "all" | TransactionKind; label: string }[] = [
 ];
 
 export default function HistoryPage() {
+  const { customer } = useSession();
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [active, setActive] = useState<"all" | TransactionKind>("all");
+  const [vehicle, setVehicle] = useState<string>("all");
 
   useEffect(() => {
     void api.getTransactions().then(setTransactions);
   }, []);
 
+  const vehicles = customer?.vehicles ?? [];
+  const showVehicleFilter = vehicles.length >= 2;
+
   const visible = useMemo(() => {
     if (!transactions) return null;
-    if (active === "all") return transactions;
-    if (active === "bonus_spent")
-      return transactions.filter((t) => t.kind.startsWith("bonus"));
-    return transactions.filter((t) => t.kind === active);
-  }, [transactions, active]);
+    return transactions.filter((t) => {
+      const byKind =
+        active === "all"
+          ? true
+          : active === "bonus_spent"
+            ? t.kind.startsWith("bonus")
+            : t.kind === active;
+      const byVehicle = vehicle === "all" ? true : t.vehiclePlate === vehicle;
+      return byKind && byVehicle;
+    });
+  }, [transactions, active, vehicle]);
 
   return (
     <main>
       <PageHeader title="Tarixçə" subtitle="Bütün əməliyyatlarınız" />
 
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-5 pb-4 no-scrollbar">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-5 pb-3 no-scrollbar">
         {filters.map((f) => (
           <button
             key={f.key}
@@ -50,6 +62,34 @@ export default function HistoryPage() {
           </button>
         ))}
       </div>
+
+      {showVehicleFilter && (
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-5 pb-4 no-scrollbar">
+          <button
+            onClick={() => setVehicle("all")}
+            className={`shrink-0 rounded-full px-4 py-2 text-xs transition ${
+              vehicle === "all"
+                ? "bg-ink-900 font-semibold text-white"
+                : "bg-ink-100 text-ink-500"
+            }`}
+          >
+            Bütün maşınlar
+          </button>
+          {vehicles.map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setVehicle(v.plate)}
+              className={`shrink-0 rounded-full px-4 py-2 text-xs transition ${
+                vehicle === v.plate
+                  ? "bg-ink-900 font-semibold text-white"
+                  : "bg-ink-100 text-ink-500"
+              }`}
+            >
+              {v.plate}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="px-5">
         {visible ? (

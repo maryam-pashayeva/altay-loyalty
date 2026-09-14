@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
+import { distanceKm } from "@/lib/geo";
 import type { Branch } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -9,22 +10,43 @@ import { PinIcon } from "@/components/Icons";
 
 export default function BranchesPage() {
   const [branches, setBranches] = useState<Branch[] | null>(null);
+  const [me, setMe] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     void api.getBranches().then(setBranches);
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => setMe({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+    );
   }, []);
+
+  const sorted = useMemo(() => {
+    if (!branches) return null;
+    if (!me) return branches;
+    return [...branches].sort(
+      (a, b) => distanceKm(me, a) - distanceKm(me, b),
+    );
+  }, [branches, me]);
 
   return (
     <main>
       <PageHeader title="Filiallar" subtitle="Sizə ən yaxın Altaywash" />
       <div className="space-y-3 px-5">
-        {branches
-          ? branches.map((b) => (
+        {sorted
+          ? sorted.map((b) => (
               <article key={b.id} className="card p-4">
                 <div className="flex items-start gap-3">
                   <PinIcon className="mt-0.5 size-5 shrink-0 text-aqua-600" />
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold">{b.name}</h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-sm font-semibold">{b.name}</h3>
+                      {me && (
+                        <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+                          {distanceKm(me, b).toFixed(1)} km
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-0.5 text-xs text-ink-500">{b.address}</p>
                     <p className="mt-1 text-[11px] text-ink-400">
                       {b.workingHours}

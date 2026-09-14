@@ -58,6 +58,8 @@ export interface Campaign {
   imageUrl?: string;
   badge?: string;
   validUntil: string;
+  /** Detal pəncərəsindəki hərəkət düyməsinin adı, məs. "İndi vaxt təyin et" */
+  ctaLabel?: string;
 }
 
 export interface WashPackage {

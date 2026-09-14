@@ -6,16 +6,22 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import type { Campaign, Transaction } from "@/lib/types";
 import { BalanceCard } from "@/components/BalanceCard";
+import { BranchesQuickCard } from "@/components/BranchesQuickCard";
 import { CampaignCard } from "@/components/CampaignCard";
+import { CampaignSheet } from "@/components/CampaignSheet";
 import { TransactionItem } from "@/components/TransactionItem";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { CarIcon, ChevronIcon, PinIcon, QrIcon } from "@/components/Icons";
+import { CarIcon, ChevronIcon, QrIcon } from "@/components/Icons";
 
 export default function HomePage() {
   const { customer } = useSession();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [selected, setSelected] = useState<{
+    campaign: Campaign;
+    index: number;
+  } | null>(null);
 
   useEffect(() => {
     void api.getCampaigns().then(setCampaigns);
@@ -45,12 +51,7 @@ export default function HomePage() {
       <BalanceCard customer={customer} />
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <Link href="/branches" className="card flex items-center gap-3 p-4">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-teal-500 to-cyan-500 text-white shadow-sm">
-            <PinIcon className="size-5" />
-          </span>
-          <span className="text-sm font-medium">Filiallar</span>
-        </Link>
+        <BranchesQuickCard />
         <Link href="/packages" className="card flex items-center gap-3 p-4">
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-violet-500 to-purple-500 text-white shadow-sm">
             <CarIcon className="size-5" />
@@ -63,18 +64,28 @@ export default function HomePage() {
         <SectionTitle
           title="Kampaniyalar"
           action={
-            <Link href="/campaigns" className="flex items-center gap-0.5 text-xs text-aqua-600">
+            <Link
+              href="/campaigns"
+              className="flex items-center gap-0.5 text-xs text-aqua-600"
+            >
               Hamısı <ChevronIcon className="size-4" />
             </Link>
           }
         />
         {campaigns ? (
-          <div className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-1 no-scrollbar">
-            {campaigns.map((c, i) => (
-              <div key={c.id} className="w-[85%] shrink-0 snap-start">
-                <CampaignCard campaign={c} index={i} />
-              </div>
-            ))}
+          <div className="relative -mx-5">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 no-scrollbar">
+              {campaigns.map((c, i) => (
+                <div key={c.id} className="w-[88%] shrink-0 snap-start">
+                  <CampaignCard
+                    campaign={c}
+                    index={i}
+                    onClick={() => setSelected({ campaign: c, index: i })}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-linear-to-l from-ink-100 to-transparent" />
           </div>
         ) : (
           <Skeleton className="h-28 w-full" />
@@ -85,7 +96,10 @@ export default function HomePage() {
         <SectionTitle
           title="Son əməliyyatlar"
           action={
-            <Link href="/history" className="flex items-center gap-0.5 text-xs text-aqua-600">
+            <Link
+              href="/history"
+              className="flex items-center gap-0.5 text-xs text-aqua-600"
+            >
               Hamısı <ChevronIcon className="size-4" />
             </Link>
           }
@@ -102,6 +116,12 @@ export default function HomePage() {
           <Skeleton className="h-40 w-full" />
         )}
       </section>
+
+      <CampaignSheet
+        campaign={selected?.campaign ?? null}
+        index={selected?.index ?? 0}
+        onClose={() => setSelected(null)}
+      />
     </main>
   );
 }

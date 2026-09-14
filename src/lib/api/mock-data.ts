@@ -94,6 +94,7 @@ export const mockCampaigns: Campaign[] = [
       "Bazar ertəsi–cümə saat 09:00–13:00 arası bütün kompleks yumalara 20% endirim tətbiq olunur.",
     badge: "20%",
     validUntil: "2026-10-31T23:59:59Z",
+    ctaLabel: "İndi vaxt təyin et",
   },
   {
     id: "cmp_2",
@@ -102,6 +103,7 @@ export const mockCampaigns: Campaign[] = [
       "Ardıcıl 5 kompleks yumadan sonra 6-cı yuma tam pulsuzdur. Sayğac tətbiqdə avtomatik işləyir.",
     badge: "5+1",
     validUntil: "2026-12-31T23:59:59Z",
+    ctaLabel: "Kampaniyaya qoşul",
   },
   {
     id: "cmp_3",
@@ -110,6 +112,7 @@ export const mockCampaigns: Campaign[] = [
       "Dəvət etdiyin dost ilk yumasını etdikdə hər ikinizin balansına 10 AZN bonus əlavə olunur.",
     badge: "10 ₼",
     validUntil: "2026-11-30T23:59:59Z",
+    ctaLabel: "Dostunu dəvət et",
   },
 ];
 
