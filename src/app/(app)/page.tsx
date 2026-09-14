@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { currentMonthName, isThisMonth } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import type { Campaign, Transaction } from "@/lib/types";
 import { BalanceCard } from "@/components/BalanceCard";
@@ -46,12 +47,8 @@ export default function HomePage() {
     .slice(0, 2)
     .join("");
 
-  // Ana səhifədə yalnız son 1 ayın əməliyyatları
-  const recent = transactions?.filter((t) => {
-    const cutoff = new Date();
-    cutoff.setMonth(cutoff.getMonth() - 1);
-    return new Date(t.createdAt) >= cutoff;
-  });
+  // Ana səhifədə yalnız cari təqvim ayının əməliyyatları
+  const recent = transactions?.filter((t) => isThisMonth(t.createdAt));
 
   return (
     <main className="px-5 pt-6">
@@ -65,7 +62,7 @@ export default function HomePage() {
               {initials}
             </span>
             <span className="leading-tight">
-              <span className="block text-xs text-ink-500">Xoş gəldin</span>
+              <span className="block text-xs text-ink-500">Xoş gəldiniz</span>
               <span className="block text-base font-bold tracking-tight text-ink-900">
                 {firstName}
               </span>
@@ -141,7 +138,7 @@ export default function HomePage() {
       </section>
 
       <section className="mt-8">
-        <SectionTitle title="Son əməliyyatlar (son 1 ay)" />
+        <SectionTitle title={`Son əməliyyatlar · ${currentMonthName()}`} />
         {recent ? (
           recent.length ? (
             <>
@@ -163,7 +160,7 @@ export default function HomePage() {
           ) : (
             <Card className="py-8 text-center">
               <p className="text-sm text-ink-500">
-                Son 1 ayda əməliyyat yoxdur.
+                Bu ay əməliyyat yoxdur.
               </p>
               <Link
                 href="/history"

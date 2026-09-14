@@ -67,3 +67,20 @@ export function isOpenNow(workingHours: string): boolean | null {
   const end = +m[3] * 60 + +m[4];
   return end > start ? cur >= start && cur < end : cur >= start || cur < end;
 }
+
+const MONTHS_FULL = [
+  "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
+  "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr",
+];
+
+/** Cari ayın adı (məs. "Sentyabr") */
+export function currentMonthName() {
+  return MONTHS_FULL[new Date().getMonth()];
+}
+
+/** Verilən tarix cari təqvim ayına aiddirmi */
+export function isThisMonth(iso: string) {
+  const d = new Date(iso);
+  const now = new Date();
+  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}

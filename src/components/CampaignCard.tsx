@@ -31,21 +31,21 @@ export function CampaignCard({
           {campaign.description}
         </p>
         {campaign.stamps ? (
-          <div className="mt-2.5 flex items-center gap-1">
+          <div className="mt-2.5 flex items-center gap-1.5">
             {Array.from({ length: campaign.stamps.total }).map((_, i) => (
               <svg
                 key={i}
                 viewBox="0 0 24 24"
-                className={`size-4 ${
+                className={`size-[22px] ${
                   i < campaign.stamps!.done ? "text-blue-600" : "text-ink-300"
                 }`}
                 fill="currentColor"
                 aria-hidden
               >
-                <path d="M12 3c-3.2 4.2-5.2 6.9-5.2 9.4a5.2 5.2 0 0 0 10.4 0C17.2 9.9 15.2 7.2 12 3Z" />
+                <path d="M12 2.5c-4 5.2-6.3 8.4-6.3 11.3a6.3 6.3 0 0 0 12.6 0c0-2.9-2.3-6.1-6.3-11.3Z" />
               </svg>
             ))}
-            <GiftIcon className="ml-1 size-4 text-amber-500" />
+            <GiftIcon className="ml-1 size-[22px] text-amber-500" />
           </div>
         ) : (
           <span className="mt-2 inline-block rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-medium text-ink-500">
