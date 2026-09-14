@@ -59,7 +59,9 @@ export function BranchesQuickCard() {
             : "Bütün filiallara və marşruta bax"}
         </span>
       </span>
-      <ArrowUpRightIcon className="size-5 shrink-0 text-ink-400" />
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-600">
+        <ArrowUpRightIcon className="size-4" />
+      </span>
     </Link>
   );
 }
