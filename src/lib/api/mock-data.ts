@@ -50,11 +50,11 @@ export const mockTransactions: Transaction[] = [
   },
   {
     id: "trx_9008",
-    kind: "topup",
-    title: "Balans artımı",
-    branchName: "Mobil tətbiq",
-    amount: 50,
-    bonusDelta: 0,
+    kind: "bonus_earned",
+    title: "Qeydiyyat bonusu",
+    branchName: "Altaywash",
+    amount: 0,
+    bonusDelta: 50,
     createdAt: "2026-09-02T10:05:00Z",
   },
   {
@@ -98,16 +98,6 @@ export const mockCampaigns: Campaign[] = [
     badge: "20%",
     validUntil: "2026-10-31T23:59:59Z",
     ctaLabel: "İndi vaxt təyin et",
-  },
-  {
-    id: "cmp_2",
-    title: "5 yumaya 1 hədiyyə",
-    description:
-      "Ardıcıl 5 kompleks yumadan sonra 6-cı yuma tam pulsuzdur. Sayğac tətbiqdə avtomatik işləyir.",
-    badge: "5+1",
-    validUntil: "2026-12-31T23:59:59Z",
-    ctaLabel: "Kampaniyaya qoşul",
-    stamps: { done: 3, total: 5 },
   },
   {
     id: "cmp_3",

@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { azn } from "@/lib/format";
-import { tierOf, tierProgress } from "@/lib/tier";
+import { tierOf } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
-import { DropIcon, PlusIcon } from "@/components/Icons";
+import { ChevronIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
-/** Səviyyə rozetkasının rəngi — səviyyəyə uyğun */
+/** Səviyyə düyməsinin rəngi — səviyyəyə uyğun */
 const tierBadge: Record<string, string> = {
   bronze: "bg-amber-600 text-white",
   silver: "bg-slate-200 text-slate-800",
@@ -17,98 +16,40 @@ const tierBadge: Record<string, string> = {
 };
 
 /**
- * Balans məzmunu — öz kart fonu YOXDUR. Ana səhifədəki full-bleed gradient
- * header-in üzərində göstərilir (ağ mətn).
+ * Hero balans məzmunu — YALNIZ balans + səviyyə düyməsi (təmiz fokus).
+ * Progress və paket ayrıca yerlərdədir. Kart fonu yoxdur — gradient header
+ * üzərində göstərilir.
  */
 export function BalanceCard({ customer }: { customer: Customer }) {
   const [tierOpen, setTierOpen] = useState(false);
   const tier = tierOf(customer.tier);
-  const { next, remaining, percent } = tierProgress(
-    customer.tier,
-    customer.yearlySpend,
-  );
 
   return (
     <>
       <div className="text-white">
-        {/* Balans + status */}
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[13px] text-white/90">Bonus balansı</p>
-            <p className="mt-1 text-4xl font-semibold tracking-tight">
-              {azn(customer.bonusBalance)}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setTierOpen(true)}
-            className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold shadow-sm transition active:scale-95 ${
-              tierBadge[tier.code] ?? "bg-white/25 text-white"
-            }`}
-          >
-            {tier.name} · {tier.cashbackPercent}%
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="size-3.5"
-              aria-hidden
-            >
-              <path d="M12 17v-6M12 8h.01" strokeLinecap="round" />
-              <circle cx="12" cy="12" r="9" />
-            </svg>
-          </button>
-        </div>
+        <p className="text-[13px] text-white/90">Bonus balansı</p>
+        <p className="mt-1 text-[2.75rem] font-bold leading-none tracking-tight">
+          {azn(customer.bonusBalance)}
+        </p>
 
-        {/* Səviyyə irəliləyişi */}
-        {next && (
-          <div className="mt-5">
-            <div className="mb-1.5 flex items-end justify-between">
-              <span className="text-[13px] text-white">
-                {next.name} səviyyəsinə
-              </span>
-              <span className="text-[13px] font-bold text-white">
-                {azn(remaining)} qalıb
-              </span>
-            </div>
-            <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/40">
-              <div
-                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)] transition-[width] duration-700"
-                style={{ width: `${Math.max(6, percent)}%` }}
-              />
-            </div>
-            <p className="mt-1 text-right text-xs font-semibold text-white">
-              {percent}%
-            </p>
-          </div>
-        )}
-
-        {/* Paket */}
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/20 pt-4">
-          <div className="min-w-0">
-            <p className="text-[11px] text-white/80">Paketim</p>
-            <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
-              <DropIcon className="size-4 shrink-0" />
-              {customer.washesLeft > 0
-                ? `${customer.washesLeft} yuma qalıb`
-                : "Aktiv paket yoxdur"}
-            </p>
-          </div>
-          <Link
-            href="/packages"
-            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 shadow-sm transition active:scale-95"
-          >
-            <PlusIcon className="size-4" />
-            Paket al
-          </Link>
-        </div>
+        <button
+          type="button"
+          onClick={() => setTierOpen(true)}
+          className={`mt-4 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold shadow-sm transition active:scale-95 ${
+            tierBadge[tier.code] ?? "bg-white/25 text-white"
+          }`}
+        >
+          <span aria-hidden>👑</span>
+          {tier.name} səviyyə
+          <ChevronIcon className="size-4 opacity-70" />
+        </button>
       </div>
 
       <TierSheet
         open={tierOpen}
         onClose={() => setTierOpen(false)}
         current={customer.tier}
+        yearlySpend={customer.yearlySpend}
       />
     </>
   );
