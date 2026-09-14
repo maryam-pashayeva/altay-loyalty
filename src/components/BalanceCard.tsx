@@ -8,6 +8,10 @@ import type { Customer } from "@/lib/types";
 import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
+/**
+ * Balans məzmunu — öz kart fonu YOXDUR. Ana səhifədəki full-bleed gradient
+ * header-in üzərində göstərilir (ağ mətn).
+ */
 export function BalanceCard({ customer }: { customer: Customer }) {
   const [tierOpen, setTierOpen] = useState(false);
   const tier = tierOf(customer.tier);
@@ -18,13 +22,8 @@ export function BalanceCard({ customer }: { customer: Customer }) {
 
   return (
     <>
-      <div className="rise relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-600 to-blue-500 p-5 text-white shadow-[0_18px_40px_-22px_rgba(37,99,235,0.65)]">
-        <div
-          className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-white/15 blur-2xl"
-          aria-hidden
-        />
-
-        {/* Zona 1 — balans + status */}
+      <div className="text-white">
+        {/* Balans + status */}
         <div className="flex items-start justify-between">
           <div>
             <p className="text-[13px] text-white/90">Bonus balansı</p>
@@ -52,7 +51,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </button>
         </div>
 
-        {/* Zona 2 — səviyyə irəliləyişi */}
+        {/* Səviyyə irəliləyişi */}
         {next && (
           <div className="mt-5">
             <div className="mb-1.5 flex items-end justify-between">
@@ -75,7 +74,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
         )}
 
-        {/* Zona 3 — paket (ayrıca, ikincili) */}
+        {/* Paket */}
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/20 pt-4">
           <div className="min-w-0">
             <p className="text-[11px] text-white/80">Paketim</p>

@@ -28,6 +28,7 @@ export const mockCustomer: Customer = {
   bonusBalance: 42.5,
   walletBalance: 85,
   washesLeft: 3,
+  washStreak: { current: 3, goal: 5 },
   yearlySpend: 465,
   createdAt: "2024-03-12T09:00:00Z",
   vehicles: [

@@ -25,6 +25,8 @@ export interface Customer {
   walletBalance: number;
   /** Alınmış paketlərdən qalan yuma sayı — müştəriyə bu göstərilir */
   washesLeft: number;
+  /** Ardıcıl yuma seriyası — hədəfə çatanda pulsuz yuma */
+  washStreak: { current: number; goal: number };
   /** Cari il ərzində xərclənən məbləğ — səviyyə hesablaması üçün */
   yearlySpend: number;
   vehicles: Vehicle[];

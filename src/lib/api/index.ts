@@ -106,6 +106,7 @@ export const api = {
           bonusBalance: 0,
           walletBalance: 0,
           washesLeft: 0,
+          washStreak: { current: 0, goal: 5 },
           yearlySpend: 0,
           tier: "bronze",
         },
