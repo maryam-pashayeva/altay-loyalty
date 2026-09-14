@@ -103,6 +103,32 @@ export const BellIcon = (p: P) => (
   </S>
 );
 
+export const FlashIcon = (p: P) => (
+  <S {...p}>
+    <path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z" />
+  </S>
+);
+
+export const FlashOffIcon = (p: P) => (
+  <S {...p}>
+    <path d="M13 2 8.2 8.5M10 22l1-8.5H4.5l3-4M3 3l18 18" />
+  </S>
+);
+
+export const CopyIcon = (p: P) => (
+  <S {...p}>
+    <rect x="9" y="9" width="12" height="12" rx="2.5" />
+    <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+  </S>
+);
+
+export const KeyboardIcon = (p: P) => (
+  <S {...p}>
+    <rect x="2.5" y="6" width="19" height="12" rx="2.5" />
+    <path d="M7 10h.01M11 10h.01M15 10h.01M17 10h.01M7 14h10" />
+  </S>
+);
+
 export const ChevronIcon = (p: P) => (
   <S {...p}>
     <path d="m9 5 7 7-7 7" />

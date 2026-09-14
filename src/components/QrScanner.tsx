@@ -2,18 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
+import { FlashIcon, FlashOffIcon } from "@/components/Icons";
 
 /**
- * Kamera ilə QR skaneri. Terminaldakı QR kod oxunanda `onResult` çağırılır.
- * Komponent yalnız skan aktiv olanda mount olunur → mount = kamera açılır.
- * iOS Safari üçün kamera istifadəçi toxunuşundan sonra açıldığından, bu
- * komponent "Skan et" düyməsindən sonra render olunur.
+ * Kamera ilə QR skaneri. Mount olan kimi kamera avtomatik açılır (əlavə düymə
+ * yoxdur). Terminaldakı QR oxunanda `onResult` çağırılır. Cihaz dəstəkləyirsə
+ * fənər (torch) düyməsi göstərilir.
  */
 export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const trackRef = useRef<MediaStreamTrack | null>(null);
   const [status, setStatus] = useState<"starting" | "scanning" | "denied">(
     "starting",
   );
+  const [torch, setTorch] = useState({ available: false, on: false });
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +63,13 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
           return;
         }
         stream = s;
+        const track = s.getVideoTracks()[0];
+        trackRef.current = track;
+        const caps = track.getCapabilities?.() as
+          | { torch?: boolean }
+          | undefined;
+        if (caps?.torch) setTorch({ available: true, on: false });
+
         const video = videoRef.current;
         if (!video) return;
         video.srcObject = s;
@@ -75,6 +84,20 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
     return cleanup;
   }, [onResult]);
 
+  async function toggleTorch() {
+    const track = trackRef.current;
+    if (!track) return;
+    const next = !torch.on;
+    try {
+      await track.applyConstraints({
+        advanced: [{ torch: next } as MediaTrackConstraintSet],
+      });
+      setTorch((t) => ({ ...t, on: next }));
+    } catch {
+      // cihaz fənəri dəstəkləmir
+    }
+  }
+
   if (status === "denied") {
     return (
       <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-100 p-6 text-center">
@@ -82,7 +105,7 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
           Kameraya icazə verilmədi
           <span className="mt-1 block text-xs font-normal leading-relaxed text-ink-500">
             Skan üçün brauzer parametrlərindən kameraya icazə verin. Alternativ
-            olaraq aşağıdakı kart nömrənizi operatora deyə bilərsiniz.
+            olaraq aşağıdan kodu əllə daxil edə bilərsiniz.
           </span>
         </p>
       </div>
@@ -112,6 +135,23 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
         <div className="absolute inset-0 grid place-items-center bg-ink-950/60 text-sm text-white/80">
           Kamera açılır…
         </div>
+      )}
+
+      {torch.available && status === "scanning" && (
+        <button
+          type="button"
+          onClick={toggleTorch}
+          aria-label="Fənər"
+          className={`absolute bottom-4 left-1/2 grid size-12 -translate-x-1/2 place-items-center rounded-full backdrop-blur transition ${
+            torch.on ? "bg-white text-ink-900" : "bg-white/20 text-white"
+          }`}
+        >
+          {torch.on ? (
+            <FlashIcon className="size-6" />
+          ) : (
+            <FlashOffIcon className="size-6" />
+          )}
+        </button>
       )}
     </div>
   );
