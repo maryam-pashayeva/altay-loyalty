@@ -21,7 +21,6 @@ import {
   CarIcon,
   ChevronDownIcon,
   ChevronIcon,
-  DropIcon,
 } from "@/components/Icons";
 
 export default function HomePage() {
@@ -67,9 +66,13 @@ export default function HomePage() {
   return (
     <main>
       {/* Full-bleed gradient header */}
-      <div className="relative overflow-hidden bg-linear-to-br from-blue-600 to-blue-500 px-5 pb-14 pt-[calc(env(safe-area-inset-top)+1.5rem)] text-white">
+      <div className="relative overflow-hidden bg-linear-to-br from-blue-700 via-blue-600 to-blue-500 px-5 pb-16 pt-[calc(env(safe-area-inset-top)+1.5rem)] text-white">
         <div
           className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-white/15 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-16 -left-16 size-56 rounded-full bg-cyan-400/20 blur-3xl"
           aria-hidden
         />
 
@@ -125,29 +128,8 @@ export default function HomePage() {
       </div>
 
       {/* Ağ məzmun vərəqi — gradientin üstünə qıvrılır */}
-      <div className="content-sheet relative -mt-6 rounded-t-[28px] bg-ink-100 px-5 pt-5">
+      <div className="content-sheet relative -mt-8 rounded-t-[28px] bg-ink-100 px-5 pt-6">
         <StreakCard />
-
-        {/* Paketim — ayrıca widget */}
-        <div className="card mt-3 flex items-center gap-3 p-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600">
-            <DropIcon className="size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Paketim</p>
-            <p className="text-xs text-ink-500">
-              {customer.washesLeft > 0
-                ? `${customer.washesLeft} yuma qalıb`
-                : "Aktiv paket yoxdur"}
-            </p>
-          </div>
-          <Link
-            href="/packages"
-            className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
-          >
-            Paket al
-          </Link>
-        </div>
 
         <div className="mt-3">
           <BranchesQuickCard />
