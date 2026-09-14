@@ -10,14 +10,21 @@ import { BranchesQuickCard } from "@/components/BranchesQuickCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { CampaignSheet } from "@/components/CampaignSheet";
 import { TransactionItem } from "@/components/TransactionItem";
+import { VehicleSheet } from "@/components/VehicleSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { CarIcon, ChevronIcon, QrIcon } from "@/components/Icons";
+import {
+  CarIcon,
+  ChevronDownIcon,
+  ChevronIcon,
+  QrIcon,
+} from "@/components/Icons";
 
 export default function HomePage() {
-  const { customer } = useSession();
+  const { customer, activeVehicle } = useSession();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [vehicleOpen, setVehicleOpen] = useState(false);
   const [selected, setSelected] = useState<{
     campaign: Campaign;
     index: number;
@@ -34,18 +41,37 @@ export default function HomePage() {
 
   return (
     <main className="px-5 pt-6">
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <p className="text-xs text-ink-400">Xoş gəldiniz</p>
-          <p className="text-lg font-semibold tracking-tight">{firstName}</p>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-ink-500">Xoş gəldiniz</p>
+            <p className="text-lg font-semibold tracking-tight">{firstName}</p>
+          </div>
+          <Link
+            href="/qr"
+            className="grid size-11 place-items-center rounded-2xl bg-ink-100 text-aqua-600"
+            aria-label="QR skan et"
+          >
+            <QrIcon className="size-6" />
+          </Link>
         </div>
-        <Link
-          href="/qr"
-          className="grid size-11 place-items-center rounded-2xl bg-ink-100 text-aqua-600"
-          aria-label="QR skan et"
-        >
-          <QrIcon className="size-6" />
-        </Link>
+
+        {activeVehicle && (
+          <button
+            type="button"
+            onClick={() => customer.vehicles.length >= 2 && setVehicleOpen(true)}
+            className="mt-3 flex max-w-full items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-xs shadow-sm transition active:scale-[0.98]"
+          >
+            <CarIcon className="size-4 shrink-0 text-blue-600" />
+            <span className="truncate font-medium text-ink-900">
+              {activeVehicle.plate}
+            </span>
+            <span className="truncate text-ink-500">{activeVehicle.model}</span>
+            {customer.vehicles.length >= 2 && (
+              <ChevronDownIcon className="size-4 shrink-0 text-ink-400" />
+            )}
+          </button>
+        )}
       </div>
 
       <BalanceCard customer={customer} />
@@ -122,6 +148,7 @@ export default function HomePage() {
         index={selected?.index ?? 0}
         onClose={() => setSelected(null)}
       />
+      <VehicleSheet open={vehicleOpen} onClose={() => setVehicleOpen(false)} />
     </main>
   );
 }

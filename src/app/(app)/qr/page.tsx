@@ -7,30 +7,40 @@ import { azn } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { QrScanner } from "@/components/QrScanner";
 import { Button } from "@/components/ui/Button";
+import { CarIcon } from "@/components/Icons";
 
 type Phase =
   | { kind: "idle" }
   | { kind: "scanning" }
   | { kind: "loading" }
-  | { kind: "success"; points: number; title: string; branchName: string }
+  | {
+      kind: "success";
+      points: number;
+      title: string;
+      branchName: string;
+      vehiclePlate?: string;
+    }
   | { kind: "error"; message: string };
 
 export default function QrPage() {
-  const { customer } = useSession();
+  const { customer, activeVehicle } = useSession();
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
 
-  const handleResult = useCallback(async (code: string) => {
-    setPhase({ kind: "loading" });
-    try {
-      const res = await api.scanTerminal(code);
-      setPhase({ kind: "success", ...res });
-    } catch (e) {
-      setPhase({
-        kind: "error",
-        message: e instanceof Error ? e.message : "Xəta baş verdi",
-      });
-    }
-  }, []);
+  const handleResult = useCallback(
+    async (code: string) => {
+      setPhase({ kind: "loading" });
+      try {
+        const res = await api.scanTerminal(code, activeVehicle?.plate);
+        setPhase({ kind: "success", ...res });
+      } catch (e) {
+        setPhase({
+          kind: "error",
+          message: e instanceof Error ? e.message : "Xəta baş verdi",
+        });
+      }
+    },
+    [activeVehicle],
+  );
 
   if (!customer) return null;
 
@@ -42,6 +52,16 @@ export default function QrPage() {
       />
 
       <div className="px-5">
+        {activeVehicle && (
+          <div className="mb-3 flex items-center gap-2 rounded-2xl border border-ink-200 bg-white px-4 py-2.5 text-xs">
+            <CarIcon className="size-4 shrink-0 text-blue-600" />
+            <span className="text-ink-500">Skan bu maşına yazılacaq:</span>
+            <span className="ml-auto font-semibold text-ink-900">
+              {activeVehicle.plate}
+            </span>
+          </div>
+        )}
+
         {/* Skan sahəsi / nəticə */}
         {phase.kind === "success" ? (
           <div className="rise grid aspect-square w-full place-items-center rounded-3xl bg-linear-to-br from-blue-600 to-blue-500 p-6 text-center text-white">
@@ -62,9 +82,14 @@ export default function QrPage() {
               </div>
               <p className="mt-4 text-3xl font-bold">+{azn(phase.points)}</p>
               <p className="mt-1 text-sm text-white/80">hesabınıza yazıldı</p>
-              <p className="mt-3 text-xs text-white/70">
+              <p className="mt-3 text-xs text-white/80">
                 {phase.title} · {phase.branchName}
               </p>
+              {phase.vehiclePlate && (
+                <p className="mt-1 text-xs font-medium text-white/90">
+                  🚗 {phase.vehiclePlate}
+                </p>
+              )}
             </div>
           </div>
         ) : phase.kind === "error" ? (

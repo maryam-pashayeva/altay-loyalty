@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { distanceKm } from "@/lib/geo";
-import { PinIcon } from "@/components/Icons";
+import { ArrowUpRightIcon, PinIcon } from "@/components/Icons";
 
 /** Ana səhifədəki "Filiallar" qısayolu — icazə verilərsə ən yaxın filialı və
  *  məsafəni göstərir; əks halda sadəcə "Filiallar" qalır. */
@@ -47,18 +47,19 @@ export function BranchesQuickCard() {
   }, []);
 
   return (
-    <Link href="/branches" className="card flex items-center gap-3 p-4">
+    <Link href="/branches" className="card relative flex items-center gap-3 p-4">
       <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-teal-500 to-cyan-500 text-white shadow-sm">
         <PinIcon className="size-5" />
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium">Filiallar</span>
         {nearest && (
-          <span className="block truncate text-[11px] text-ink-500">
+          <span className="block truncate text-[11px] text-ink-600">
             Ən yaxın: {nearest.name} · {nearest.km.toFixed(1)} km
           </span>
         )}
       </span>
+      <ArrowUpRightIcon className="absolute right-3 top-3 size-4 text-ink-400" />
     </Link>
   );
 }

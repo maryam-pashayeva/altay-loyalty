@@ -30,11 +30,29 @@ export function CampaignCard({
         <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-500">
           {campaign.description}
         </p>
-        <p className="mt-2 text-[11px] text-ink-400">
-          {shortDate(campaign.validUntil)} tarixinədək
-        </p>
+        {campaign.stamps ? (
+          <div className="mt-2 flex items-center gap-1.5">
+            <div className="flex gap-1">
+              {Array.from({ length: campaign.stamps.total }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`size-2 rounded-full ${
+                    i < campaign.stamps!.done ? "bg-blue-600" : "bg-ink-200"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] font-medium text-ink-600">
+              {campaign.stamps.done}/{campaign.stamps.total}
+            </span>
+          </div>
+        ) : (
+          <p className="mt-2 text-[11px] text-ink-500">
+            {shortDate(campaign.validUntil)} tarixinədək
+          </p>
+        )}
       </div>
-      <ChevronIcon className="size-4 shrink-0 text-ink-300" />
+      <ChevronIcon className="size-4 shrink-0 text-ink-400" />
     </button>
   );
 }

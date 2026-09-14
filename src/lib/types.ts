@@ -21,8 +21,10 @@ export interface Customer {
   tier: TierCode;
   /** Bonus balansı (AZN) */
   bonusBalance: number;
-  /** Depozit/paket balansı (AZN) */
+  /** Depozit/paket balansı (AZN) — daxili uçot üçün */
   walletBalance: number;
+  /** Alınmış paketlərdən qalan yuma sayı — müştəriyə bu göstərilir */
+  washesLeft: number;
   /** Cari il ərzində xərclənən məbləğ — səviyyə hesablaması üçün */
   yearlySpend: number;
   vehicles: Vehicle[];
@@ -60,6 +62,10 @@ export interface Campaign {
   validUntil: string;
   /** Detal pəncərəsindəki hərəkət düyməsinin adı, məs. "İndi vaxt təyin et" */
   ctaLabel?: string;
+  /** Möhür-kart tipli kampaniya üçün irəliləyiş (məs. 5+1) */
+  stamps?: { done: number; total: number };
+  /** Dəvət/referral kampaniyası — paylaşılacaq kod */
+  share?: { code: string };
 }
 
 export interface WashPackage {

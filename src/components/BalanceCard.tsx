@@ -5,7 +5,7 @@ import { useState } from "react";
 import { azn } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
-import { PlusIcon, QrIcon } from "@/components/Icons";
+import { DropIcon, PlusIcon, QrIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
 export function BalanceCard({ customer }: { customer: Customer }) {
@@ -26,7 +26,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
 
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-white/70">Bonus balansı</p>
+            <p className="text-xs text-white/80">Bonus balansı</p>
             <p className="mt-1 text-4xl font-semibold tracking-tight">
               {azn(customer.bonusBalance)}
             </p>
@@ -63,20 +63,20 @@ export function BalanceCard({ customer }: { customer: Customer }) {
         {next && (
           <div className="mt-5">
             <div className="mb-1.5 flex items-end justify-between">
-              <span className="text-[11px] text-white/75">
+              <span className="text-xs text-white/85">
                 {next.name} səviyyəsinə
               </span>
-              <span className="text-[11px] font-semibold text-white">
+              <span className="text-xs font-semibold text-white">
                 {azn(remaining)} qalıb
               </span>
             </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-white/20">
+            <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/35">
               <div
-                className="h-full rounded-full bg-white transition-[width] duration-700"
+                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.6)] transition-[width] duration-700"
                 style={{ width: `${Math.max(6, percent)}%` }}
               />
             </div>
-            <p className="mt-1 text-right text-[10px] text-white/60">
+            <p className="mt-1 text-right text-[11px] font-medium text-white/85">
               {percent}%
             </p>
           </div>
@@ -84,15 +84,18 @@ export function BalanceCard({ customer }: { customer: Customer }) {
 
         <div className="mt-4 flex items-center gap-3">
           <div className="flex-1 rounded-2xl bg-white/10 px-3 py-2.5 backdrop-blur">
-            <p className="text-[11px] text-white/70">Paket balansı</p>
-            <p className="text-base font-medium">
-              {azn(customer.walletBalance)}
+            <p className="text-[11px] text-white/80">Paket</p>
+            <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
+              <DropIcon className="size-4 shrink-0" />
+              {customer.washesLeft > 0
+                ? `${customer.washesLeft} yuma qalıb`
+                : "Paket yoxdur"}
             </p>
           </div>
           <Link
             href="/packages"
             className="grid size-12 place-items-center rounded-2xl bg-white text-blue-600 shadow-sm transition active:scale-95"
-            aria-label="Balansı artır"
+            aria-label="Paket al"
           >
             <PlusIcon className="size-6" />
           </Link>

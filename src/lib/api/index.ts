@@ -103,6 +103,7 @@ export const api = {
           // Yeni müştəri sıfır balansla başlayır
           bonusBalance: 0,
           walletBalance: 0,
+          washesLeft: 0,
           yearlySpend: 0,
           tier: "silver",
         },
@@ -176,17 +177,28 @@ export const api = {
    */
   async scanTerminal(
     code: string,
-  ): Promise<{ points: number; title: string; branchName: string }> {
+    vehiclePlate?: string,
+  ): Promise<{
+    points: number;
+    title: string;
+    branchName: string;
+    vehiclePlate?: string;
+  }> {
     if (USE_MOCK) {
       await delay(700);
       if (!code || code.trim().length < 4) {
         throw new Error("QR kod tanınmadı. Yenidən cəhd edin.");
       }
-      return { points: 5, title: "Kompleks yuma", branchName: "Altaywash Xətai" };
+      return {
+        points: 5,
+        title: "Kompleks yuma",
+        branchName: "Altaywash Xətai",
+        vehiclePlate,
+      };
     }
     return request("/scan", {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, vehiclePlate }),
     });
   },
 };

@@ -26,6 +26,7 @@ export const mockCustomer: Customer = {
   tier: "gold",
   bonusBalance: 42.5,
   walletBalance: 85,
+  washesLeft: 3,
   yearlySpend: 465,
   createdAt: "2024-03-12T09:00:00Z",
   vehicles: [
@@ -104,6 +105,7 @@ export const mockCampaigns: Campaign[] = [
     badge: "5+1",
     validUntil: "2026-12-31T23:59:59Z",
     ctaLabel: "Kampaniyaya qoşul",
+    stamps: { done: 3, total: 5 },
   },
   {
     id: "cmp_3",
@@ -113,6 +115,7 @@ export const mockCampaigns: Campaign[] = [
     badge: "10 ₼",
     validUntil: "2026-11-30T23:59:59Z",
     ctaLabel: "Dostunu dəvət et",
+    share: { code: "ALTAY-ELVIN10" },
   },
 ];
 

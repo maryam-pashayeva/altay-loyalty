@@ -77,6 +77,25 @@ export const CarIcon = (p: P) => (
   </S>
 );
 
+export const DropIcon = (p: P) => (
+  <S {...p}>
+    <path d="M12 3c-3.2 4.2-5.2 6.9-5.2 9.4a5.2 5.2 0 0 0 10.4 0C17.2 9.9 15.2 7.2 12 3Z" />
+    <path d="M10 13.5a2.2 2.2 0 0 0 2.2 2.2" />
+  </S>
+);
+
+export const ChevronDownIcon = (p: P) => (
+  <S {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </S>
+);
+
+export const ArrowUpRightIcon = (p: P) => (
+  <S {...p}>
+    <path d="M7 17 17 7M8 7h9v9" />
+  </S>
+);
+
 export const ChevronIcon = (p: P) => (
   <S {...p}>
     <path d="m9 5 7 7-7 7" />

@@ -21,7 +21,7 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
             {badge.text}
           </span>
         </div>
-        <p className="mt-0.5 truncate text-xs text-ink-400">
+        <p className="mt-0.5 truncate text-xs text-ink-600">
           {trx.branchName}
           {trx.vehiclePlate ? ` · ${trx.vehiclePlate}` : ""} ·{" "}
           {dateTime(trx.createdAt)}
