@@ -5,7 +5,7 @@ import { useState } from "react";
 import { azn } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
-import { DropIcon, PlusIcon, QrIcon } from "@/components/Icons";
+import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
 export function BalanceCard({ customer }: { customer: Customer }) {
@@ -31,33 +31,24 @@ export function BalanceCard({ customer }: { customer: Customer }) {
               {azn(customer.bonusBalance)}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTierOpen(true)}
-              className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
+          <button
+            type="button"
+            onClick={() => setTierOpen(true)}
+            className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
+          >
+            {tier.name} · {tier.cashbackPercent}%
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              className="size-3.5 opacity-80"
+              aria-hidden
             >
-              {tier.name} · {tier.cashbackPercent}%
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                className="size-3.5 opacity-80"
-                aria-hidden
-              >
-                <path d="M12 17v-6M12 8h.01" strokeLinecap="round" />
-                <circle cx="12" cy="12" r="9" />
-              </svg>
-            </button>
-            <Link
-              href="/qr"
-              aria-label="QR skan et"
-              className="grid size-9 place-items-center rounded-full bg-white/20 text-white backdrop-blur transition active:scale-95"
-            >
-              <QrIcon className="size-5" />
-            </Link>
-          </div>
+              <path d="M12 17v-6M12 8h.01" strokeLinecap="round" />
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+          </button>
         </div>
 
         {next && (
@@ -82,8 +73,8 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
         )}
 
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 rounded-2xl bg-white/10 px-3 py-2.5 backdrop-blur">
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/15 pt-4">
+          <div className="min-w-0">
             <p className="text-[11px] text-white/80">Paket</p>
             <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
               <DropIcon className="size-4 shrink-0" />
@@ -94,10 +85,10 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
           <Link
             href="/packages"
-            className="grid size-12 place-items-center rounded-2xl bg-white text-blue-600 shadow-sm transition active:scale-95"
-            aria-label="Paket al"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 shadow-sm transition active:scale-95"
           >
-            <PlusIcon className="size-6" />
+            <PlusIcon className="size-4" />
+            Paket al
           </Link>
         </div>
       </div>

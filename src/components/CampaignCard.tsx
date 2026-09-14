@@ -16,7 +16,7 @@ export function CampaignCard({
     <button
       type="button"
       onClick={onClick}
-      className="card flex w-full items-center gap-4 p-4 text-left transition active:scale-[0.99]"
+      className="card flex w-full items-center gap-3 p-4 pr-3 text-left transition active:scale-[0.99]"
     >
       <div
         className={`grid size-14 shrink-0 place-items-center rounded-2xl bg-linear-to-br ${accentAt(
@@ -25,25 +25,27 @@ export function CampaignCard({
       >
         {campaign.badge ?? "AW"}
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 pr-1">
         <h3 className="text-sm font-semibold">{campaign.title}</h3>
         <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-500">
           {campaign.description}
         </p>
         {campaign.stamps ? (
-          <div className="mt-2 flex items-center gap-1.5">
-            <div className="flex gap-1">
+          <div className="mt-2.5 flex items-center gap-2">
+            <div className="flex gap-1.5">
               {Array.from({ length: campaign.stamps.total }).map((_, i) => (
                 <span
                   key={i}
-                  className={`size-2 rounded-full ${
-                    i < campaign.stamps!.done ? "bg-blue-600" : "bg-ink-200"
+                  className={`size-2.5 rounded-full ${
+                    i < campaign.stamps!.done
+                      ? "bg-blue-600"
+                      : "bg-ink-200 ring-1 ring-inset ring-ink-300"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-[11px] font-medium text-ink-600">
-              {campaign.stamps.done}/{campaign.stamps.total}
+            <span className="text-[11px] font-medium text-ink-500">
+              {Math.max(0, campaign.stamps.total - campaign.stamps.done)} qaldı
             </span>
           </div>
         ) : (
@@ -52,7 +54,7 @@ export function CampaignCard({
           </p>
         )}
       </div>
-      <ChevronIcon className="size-4 shrink-0 text-ink-400" />
+      <ChevronIcon className="size-5 shrink-0 self-center text-ink-300" />
     </button>
   );
 }

@@ -51,11 +51,11 @@ export function BranchesQuickCard() {
       <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-teal-500 to-cyan-500 text-white shadow-sm">
         <PinIcon className="size-5" />
       </span>
-      <span className="min-w-0">
+      <span className="min-w-0 pr-4">
         <span className="block text-sm font-medium">Filiallar</span>
         {nearest && (
-          <span className="block truncate text-[11px] text-ink-600">
-            Ən yaxın: {nearest.name} · {nearest.km.toFixed(1)} km
+          <span className="block whitespace-nowrap text-[10px] font-medium text-ink-600">
+            {nearest.name} · {nearest.km.toFixed(1)} km
           </span>
         )}
       </span>

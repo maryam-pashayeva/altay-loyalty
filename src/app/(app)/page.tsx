@@ -11,13 +11,14 @@ import { CampaignCard } from "@/components/CampaignCard";
 import { CampaignSheet } from "@/components/CampaignSheet";
 import { TransactionItem } from "@/components/TransactionItem";
 import { VehicleSheet } from "@/components/VehicleSheet";
+import { NotificationsSheet } from "@/components/NotificationsSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import {
+  BellIcon,
   CarIcon,
   ChevronDownIcon,
   ChevronIcon,
-  QrIcon,
 } from "@/components/Icons";
 
 export default function HomePage() {
@@ -25,6 +26,7 @@ export default function HomePage() {
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [vehicleOpen, setVehicleOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [selected, setSelected] = useState<{
     campaign: Campaign;
     index: number;
@@ -47,13 +49,15 @@ export default function HomePage() {
             <p className="text-xs text-ink-500">Xoş gəldiniz</p>
             <p className="text-lg font-semibold tracking-tight">{firstName}</p>
           </div>
-          <Link
-            href="/qr"
-            className="grid size-11 place-items-center rounded-2xl bg-ink-100 text-aqua-600"
-            aria-label="QR skan et"
+          <button
+            type="button"
+            onClick={() => setNotifOpen(true)}
+            className="relative grid size-11 place-items-center rounded-2xl bg-ink-100 text-ink-700 transition active:scale-95"
+            aria-label="Bildirişlər"
           >
-            <QrIcon className="size-6" />
-          </Link>
+            <BellIcon className="size-6" />
+            <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-red-500 ring-2 ring-ink-100" />
+          </button>
         </div>
 
         {activeVehicle && (
@@ -100,9 +104,9 @@ export default function HomePage() {
         />
         {campaigns ? (
           <div className="relative -mx-5">
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 no-scrollbar">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 pr-8 no-scrollbar">
               {campaigns.map((c, i) => (
-                <div key={c.id} className="w-[88%] shrink-0 snap-start">
+                <div key={c.id} className="w-[85%] shrink-0 snap-start">
                   <CampaignCard
                     campaign={c}
                     index={i}
@@ -111,7 +115,7 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-linear-to-l from-ink-100 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-5 bg-linear-to-l from-ink-100 to-transparent" />
           </div>
         ) : (
           <Skeleton className="h-28 w-full" />
@@ -149,6 +153,10 @@ export default function HomePage() {
         onClose={() => setSelected(null)}
       />
       <VehicleSheet open={vehicleOpen} onClose={() => setVehicleOpen(false)} />
+      <NotificationsSheet
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+      />
     </main>
   );
 }
