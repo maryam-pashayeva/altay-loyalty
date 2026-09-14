@@ -1,7 +1,7 @@
 import { TIERS } from "@/lib/api/mock-data";
 import type { Tier, TierCode } from "@/lib/types";
 
-const ORDER: TierCode[] = ["silver", "gold", "platinum"];
+const ORDER: TierCode[] = ["bronze", "silver", "gold", "platinum"];
 
 export function tierOf(code: TierCode): Tier {
   return TIERS[code];
@@ -14,6 +14,7 @@ export function allTiers(): Tier[] {
 
 /** Hər səviyyənin üstünlükləri — modal pəncərədə göstərilir */
 export const TIER_BENEFITS: Record<TierCode, string[]> = {
+  bronze: ["Hər yumada 2% bonus", "Kampaniyalara giriş"],
   silver: ["Hər yumada 3% bonus", "Doğum günündə hədiyyə"],
   gold: [
     "Hər yumada 5% bonus",

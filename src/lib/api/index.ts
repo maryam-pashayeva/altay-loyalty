@@ -5,6 +5,7 @@ import type {
   ScanResult,
   Session,
   Transaction,
+  Vehicle,
   WashPackage,
 } from "@/lib/types";
 import { request, setToken } from "./client";
@@ -106,7 +107,7 @@ export const api = {
           walletBalance: 0,
           washesLeft: 0,
           yearlySpend: 0,
-          tier: "silver",
+          tier: "bronze",
         },
       };
       setToken(session.token);
@@ -206,6 +207,27 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ code, vehiclePlate }),
     });
+  },
+
+  /** Qaraja yeni avtomobil əlavə edir */
+  async addVehicle(vehicle: Omit<Vehicle, "id">): Promise<Vehicle> {
+    if (USE_MOCK) {
+      await delay(400);
+      return { ...vehicle, id: `veh_${Date.now()}` };
+    }
+    return request("/me/vehicles", {
+      method: "POST",
+      body: JSON.stringify(vehicle),
+    });
+  },
+
+  /** Qarajdan avtomobili silir */
+  async removeVehicle(id: string): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(300);
+      return { ok: true };
+    }
+    return request(`/me/vehicles/${id}`, { method: "DELETE" });
   },
 
   /** Loyallıqla ödənişi təsdiqləyir — balansdan çıxım burada baş verir. */

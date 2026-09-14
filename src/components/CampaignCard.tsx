@@ -1,7 +1,7 @@
 import { shortDate } from "@/lib/format";
 import { accentAt } from "@/lib/accents";
 import type { Campaign } from "@/lib/types";
-import { ChevronIcon } from "@/components/Icons";
+import { ChevronIcon, GiftIcon } from "@/components/Icons";
 
 export function CampaignCard({
   campaign,
@@ -31,22 +31,18 @@ export function CampaignCard({
           {campaign.description}
         </p>
         {campaign.stamps ? (
-          <div className="mt-2.5 flex items-center gap-2">
-            <div className="flex gap-1.5">
-              {Array.from({ length: campaign.stamps.total }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`size-2.5 rounded-full ${
-                    i < campaign.stamps!.done
-                      ? "bg-blue-600"
-                      : "bg-ink-200 ring-1 ring-inset ring-ink-300"
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-[11px] font-medium text-ink-500">
-              {Math.max(0, campaign.stamps.total - campaign.stamps.done)} qaldı
-            </span>
+          <div className="mt-2.5 flex items-center gap-1.5">
+            {Array.from({ length: campaign.stamps.total }).map((_, i) => (
+              <span
+                key={i}
+                className={`size-3 rounded-full ${
+                  i < campaign.stamps!.done
+                    ? "bg-blue-600"
+                    : "bg-ink-200 ring-1 ring-inset ring-ink-300"
+                }`}
+              />
+            ))}
+            <GiftIcon className="ml-0.5 size-4 text-amber-500" />
           </div>
         ) : (
           <p className="mt-2 text-[11px] text-ink-500">

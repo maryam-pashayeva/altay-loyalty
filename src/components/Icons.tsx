@@ -129,6 +129,26 @@ export const KeyboardIcon = (p: P) => (
   </S>
 );
 
+export const TrashIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6" />
+  </S>
+);
+
+export const GlobeIcon = (p: P) => (
+  <S {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21C9.5 18.5 8.2 15.3 8.2 12S9.5 5.5 12 3Z" />
+  </S>
+);
+
+export const BellRingIcon = (p: P) => (
+  <S {...p}>
+    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+  </S>
+);
+
 export const ChevronIcon = (p: P) => (
   <S {...p}>
     <path d="m9 5 7 7-7 7" />

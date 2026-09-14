@@ -45,10 +45,15 @@ export default function HomePage() {
     <main className="px-5 pt-6">
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-ink-500">Xoş gəldiniz</p>
-            <p className="text-lg font-semibold tracking-tight">{firstName}</p>
-          </div>
+          <Link href="/profile" className="-m-1 flex items-center rounded-xl p-1">
+            <span>
+              <span className="block text-xs text-ink-500">Xoş gəldiniz</span>
+              <span className="flex items-center gap-1 text-lg font-semibold tracking-tight">
+                {firstName}
+                <ChevronIcon className="size-4 text-ink-300" />
+              </span>
+            </span>
+          </Link>
           <button
             type="button"
             onClick={() => setNotifOpen(true)}
@@ -80,14 +85,8 @@ export default function HomePage() {
 
       <BalanceCard customer={customer} />
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4">
         <BranchesQuickCard />
-        <Link href="/packages" className="card flex items-center gap-3 p-4">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-linear-to-br from-violet-500 to-purple-500 text-white shadow-sm">
-            <CarIcon className="size-5" />
-          </span>
-          <span className="text-sm font-medium">Paketlər</span>
-        </Link>
       </div>
 
       <section className="mt-8">

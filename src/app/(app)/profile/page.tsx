@@ -1,27 +1,110 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { shortDate } from "@/lib/format";
 import { tierOf } from "@/lib/tier";
 import { PageHeader } from "@/components/PageHeader";
+import { AddVehicleSheet } from "@/components/AddVehicleSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import {
   CarIcon,
-  ChevronIcon,
+  GlobeIcon,
   LogoutIcon,
-  PinIcon,
   PlusIcon,
-  GiftIcon,
+  TrashIcon,
 } from "@/components/Icons";
 
-const links = [
-  { href: "/packages", label: "Paketlər və balans", Icon: GiftIcon },
-  { href: "/branches", label: "Filiallar", Icon: PinIcon },
+type Lang = "az" | "ru" | "en";
+const LANGS: { value: Lang; label: string }[] = [
+  { value: "az", label: "AZ" },
+  { value: "ru", label: "RU" },
+  { value: "en", label: "EN" },
 ];
 
+function readBool(key: string, fallback: boolean) {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v === "1";
+  } catch {
+    return fallback;
+  }
+}
+
+function Toggle({
+  on,
+  onChange,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={() => onChange(!on)}
+      className={`relative h-6 w-10 shrink-0 rounded-full transition ${
+        on ? "bg-blue-600" : "bg-ink-300"
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${
+          on ? "left-[1.125rem]" : "left-0.5"
+        }`}
+      />
+    </button>
+  );
+}
+
 export default function ProfilePage() {
-  const { customer, signOut } = useSession();
+  const { customer, updateCustomer, signOut } = useSession();
+  const [addOpen, setAddOpen] = useState(false);
+  const [lang, setLang] = useState<Lang>("az");
+  const [notifCampaigns, setNotifCampaigns] = useState(true);
+  const [notifReminders, setNotifReminders] = useState(true);
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Parametrləri localStorage-dan bərpa edirik (yalnız brauzerdə mövcuddur).
+    /* eslint-disable react-hooks/set-state-in-effect */
+    try {
+      const l = localStorage.getItem("altaywash.lang") as Lang | null;
+      if (l) setLang(l);
+    } catch {}
+    setNotifCampaigns(readBool("altaywash.notif.campaigns", true));
+    setNotifReminders(readBool("altaywash.notif.reminders", true));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  function pickLang(l: Lang) {
+    setLang(l);
+    try {
+      localStorage.setItem("altaywash.lang", l);
+    } catch {}
+  }
+
+  function setNotif(key: string, setter: (v: boolean) => void, v: boolean) {
+    setter(v);
+    try {
+      localStorage.setItem(key, v ? "1" : "0");
+    } catch {}
+  }
+
+  async function removeVehicle(id: string) {
+    if (!customer || customer.vehicles.length <= 1) return;
+    setRemoving(id);
+    try {
+      await api.removeVehicle(id);
+      updateCustomer({
+        vehicles: customer.vehicles.filter((v) => v.id !== id),
+      });
+    } finally {
+      setRemoving(null);
+    }
+  }
+
   if (!customer) return null;
 
   const tier = tierOf(customer.tier);
@@ -32,7 +115,7 @@ export default function ProfilePage() {
 
       <div className="px-5">
         <Card className="flex items-center gap-4">
-          <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-aqua-500/12 text-lg font-semibold text-aqua-600">
+          <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-blue-500/12 text-lg font-semibold text-blue-600">
             {customer.fullName
               .split(" ")
               .map((w) => w[0])
@@ -42,53 +125,122 @@ export default function ProfilePage() {
           <div className="min-w-0">
             <p className="truncate font-semibold">{customer.fullName}</p>
             <p className="text-xs text-ink-500">{customer.phone}</p>
-            <p className="mt-1 text-[11px] text-sun-600">
+            <p className="mt-1 text-[11px] font-medium text-sun-600">
               {tier.name} · {tier.cashbackPercent}% bonus
             </p>
           </div>
         </Card>
 
+        {/* Qaraj */}
         <section className="mt-6">
           <SectionTitle
-            title="Avtomobillərim"
+            title="Qaraj"
             action={
               <button
                 type="button"
-                className="flex items-center gap-1 rounded-full bg-aqua-500/12 px-3 py-1.5 text-xs font-medium text-aqua-600 transition active:scale-95"
+                onClick={() => setAddOpen(true)}
+                className="flex items-center gap-1 rounded-full bg-blue-500/12 px-3 py-1.5 text-xs font-medium text-blue-600 transition active:scale-95"
               >
                 <PlusIcon className="size-4" />
                 Yeni maşın
               </button>
             }
           />
-          <Card className="space-y-3">
+          <Card className="space-y-1 p-2">
             {customer.vehicles.map((v) => (
-              <div key={v.id} className="flex items-center gap-3">
-                <CarIcon className="size-5 text-ink-400" />
-                <div>
+              <div key={v.id} className="flex items-center gap-3 rounded-xl p-2">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600">
+                  <CarIcon className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{v.plate}</p>
-                  <p className="text-[11px] text-ink-400">{v.model}</p>
+                  <p className="truncate text-[11px] text-ink-500">{v.model}</p>
                 </div>
+                {customer.vehicles.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeVehicle(v.id)}
+                    disabled={removing === v.id}
+                    aria-label="Sil"
+                    className="grid size-9 shrink-0 place-items-center rounded-xl text-ink-400 transition active:scale-95 disabled:opacity-40"
+                  >
+                    <TrashIcon className="size-5" />
+                  </button>
+                )}
               </div>
             ))}
           </Card>
         </section>
 
+        {/* Dil */}
         <section className="mt-6">
-          <SectionTitle title="Bölmələr" />
-          <Card className="divide-y divide-ink-200 p-0">
-            {links.map(({ href, label, Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className="flex items-center gap-3 px-4 py-3.5"
-              >
-                <Icon className="size-5 text-ink-400" />
-                <span className="flex-1 text-sm">{label}</span>
-                <ChevronIcon className="size-4 text-ink-400" />
-              </Link>
-            ))}
+          <SectionTitle title="Dil" />
+          <Card className="flex items-center gap-3">
+            <GlobeIcon className="size-5 shrink-0 text-ink-500" />
+            <span className="flex-1 text-sm">Tətbiq dili</span>
+            <div className="flex gap-1 rounded-full bg-ink-100 p-1">
+              {LANGS.map((l) => (
+                <button
+                  key={l.value}
+                  type="button"
+                  onClick={() => pickLang(l.value)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    lang === l.value
+                      ? "bg-white text-ink-900 shadow-sm"
+                      : "text-ink-500"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
           </Card>
+        </section>
+
+        {/* Bildiriş parametrləri */}
+        <section className="mt-6">
+          <SectionTitle title="Bildiriş parametrləri" />
+          <Card className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium">Kampaniya bildirişləri</p>
+                <p className="text-[11px] text-ink-500">
+                  Yeni endirim və təkliflər barədə
+                </p>
+              </div>
+              <Toggle
+                on={notifCampaigns}
+                onChange={(v) =>
+                  setNotif(
+                    "altaywash.notif.campaigns",
+                    setNotifCampaigns,
+                    v,
+                  )
+                }
+              />
+            </div>
+            <div className="flex items-center gap-3 border-t border-ink-200 pt-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium">Yuma xatırlatması</p>
+                <p className="text-[11px] text-ink-500">
+                  Uzun fasilədə yumanı xatırladırıq
+                </p>
+              </div>
+              <Toggle
+                on={notifReminders}
+                onChange={(v) =>
+                  setNotif(
+                    "altaywash.notif.reminders",
+                    setNotifReminders,
+                    v,
+                  )
+                }
+              />
+            </div>
+          </Card>
+          <p className="mt-2 px-1 text-[11px] leading-relaxed text-ink-400">
+            Push bildirişlər ERP inteqrasiyasından sonra aktivləşəcək.
+          </p>
         </section>
 
         <p className="mt-6 text-center text-[11px] text-ink-400">
@@ -103,6 +255,8 @@ export default function ProfilePage() {
           Hesabdan çıx
         </button>
       </div>
+
+      <AddVehicleSheet open={addOpen} onClose={() => setAddOpen(false)} />
     </main>
   );
 }

@@ -8,7 +8,8 @@ import type {
 } from "@/lib/types";
 
 export const TIERS: Record<string, Tier> = {
-  silver: { code: "silver", name: "Silver", cashbackPercent: 3, threshold: 0 },
+  bronze: { code: "bronze", name: "Bronze", cashbackPercent: 2, threshold: 0 },
+  silver: { code: "silver", name: "Silver", cashbackPercent: 3, threshold: 150 },
   gold: { code: "gold", name: "Gold", cashbackPercent: 5, threshold: 300 },
   platinum: {
     code: "platinum",

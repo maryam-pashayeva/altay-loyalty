@@ -13,7 +13,7 @@ import {
 } from "@/components/ScanResultModal";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
-import { CarIcon, ChevronDownIcon, KeyboardIcon } from "@/components/Icons";
+import { CarIcon, ChevronDownIcon } from "@/components/Icons";
 
 type Phase =
   | { kind: "scan" }
@@ -27,8 +27,6 @@ export default function QrPage() {
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
   const [result, setResult] = useState<ScanResultData | null>(null);
   const [vehicleOpen, setVehicleOpen] = useState(false);
-  const [manual, setManual] = useState("");
-  const [manualOpen, setManualOpen] = useState(false);
 
   const handleScan = useCallback(
     async (code: string) => {
@@ -146,48 +144,13 @@ export default function QrPage() {
           <QrScanner onResult={handleScan} />
         )}
 
-        {/* Alt hərəkətlər */}
-        <div className="mt-4">
-          {phase.kind === "error" ? (
+        {phase.kind === "error" && (
+          <div className="mt-4">
             <Button onClick={() => setPhase({ kind: "scan" })}>
               Təkrar cəhd
             </Button>
-          ) : phase.kind === "scan" && !paused ? (
-            manualOpen ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (manual.trim().length >= 4) handleScan(manual.trim());
-                }}
-                className="flex gap-2"
-              >
-                <input
-                  autoFocus
-                  value={manual}
-                  onChange={(e) => setManual(e.target.value)}
-                  placeholder="Terminal kodu"
-                  className="h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm outline-none ring-1 ring-ink-200 focus:ring-blue-500"
-                />
-                <Button
-                  type="submit"
-                  className="w-auto shrink-0 px-5"
-                  disabled={manual.trim().length < 4}
-                >
-                  Təsdiqlə
-                </Button>
-              </form>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setManualOpen(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ink-100 py-3 text-sm font-medium text-ink-700 transition active:scale-[0.98]"
-              >
-                <KeyboardIcon className="size-5" />
-                Kodu əllə daxil et
-              </button>
-            )
-          ) : null}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Ödəniş təsdiqi */}

@@ -6,6 +6,7 @@ import type { TierCode } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 
 const accent: Record<TierCode, string> = {
+  bronze: "from-amber-700 to-orange-800",
   silver: "from-slate-400 to-slate-500",
   gold: "from-amber-400 to-amber-500",
   platinum: "from-blue-500 to-indigo-500",

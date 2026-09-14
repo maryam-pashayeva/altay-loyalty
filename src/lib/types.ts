@@ -1,7 +1,7 @@
 // Altaywash Loyalty — domen tipləri.
 // Bu tiplər ERP tərəfindəki cavab formatı ilə uzlaşdırılmalıdır.
 
-export type TierCode = "silver" | "gold" | "platinum";
+export type TierCode = "bronze" | "silver" | "gold" | "platinum";
 
 export interface Tier {
   code: TierCode;
