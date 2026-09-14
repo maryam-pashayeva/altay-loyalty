@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { azn } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
-import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
 export function BalanceCard({ customer }: { customer: Customer }) {
@@ -26,7 +24,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
 
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-white/80">Bonus balansı</p>
+            <p className="text-[13px] text-white/90">Bonus balansı</p>
             <p className="mt-1 text-4xl font-semibold tracking-tight">
               {azn(customer.bonusBalance)}
             </p>
@@ -34,7 +32,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           <button
             type="button"
             onClick={() => setTierOpen(true)}
-            className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
+            className="flex items-center gap-1 rounded-full bg-white/25 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
           >
             {tier.name} · {tier.cashbackPercent}%
             <svg
@@ -42,7 +40,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
-              className="size-3.5 opacity-80"
+              className="size-3.5"
               aria-hidden
             >
               <path d="M12 17v-6M12 8h.01" strokeLinecap="round" />
@@ -52,45 +50,26 @@ export function BalanceCard({ customer }: { customer: Customer }) {
         </div>
 
         {next && (
-          <div className="mt-5">
+          <div className="mt-6">
             <div className="mb-1.5 flex items-end justify-between">
-              <span className="text-xs text-white/85">
+              <span className="text-[13px] text-white">
                 {next.name} səviyyəsinə
               </span>
-              <span className="text-xs font-semibold text-white">
+              <span className="text-[13px] font-bold text-white">
                 {azn(remaining)} qalıb
               </span>
             </div>
-            <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/35">
+            <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/40">
               <div
-                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.6)] transition-[width] duration-700"
+                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)] transition-[width] duration-700"
                 style={{ width: `${Math.max(6, percent)}%` }}
               />
             </div>
-            <p className="mt-1 text-right text-[11px] font-medium text-white/85">
+            <p className="mt-1 text-right text-xs font-semibold text-white">
               {percent}%
             </p>
           </div>
         )}
-
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/15 pt-4">
-          <div className="min-w-0">
-            <p className="text-[11px] text-white/80">Paket</p>
-            <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
-              <DropIcon className="size-4 shrink-0" />
-              {customer.washesLeft > 0
-                ? `${customer.washesLeft} yuma qalıb`
-                : "Paket yoxdur"}
-            </p>
-          </div>
-          <Link
-            href="/packages"
-            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 shadow-sm transition active:scale-95"
-          >
-            <PlusIcon className="size-4" />
-            Paket al
-          </Link>
-        </div>
       </div>
 
       <TierSheet

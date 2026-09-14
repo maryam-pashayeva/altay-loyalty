@@ -1,43 +1,53 @@
+import type { ComponentType } from "react";
 import { azn, dateTime } from "@/lib/format";
 import type { Transaction } from "@/lib/types";
+import { DropIcon, GiftIcon, PlusIcon } from "@/components/Icons";
 
-const labels: Record<Transaction["kind"], { text: string; tone: string }> = {
-  wash: { text: "Yuma", tone: "bg-ink-100 text-ink-500" },
-  topup: { text: "Artırım", tone: "bg-mint-100 text-mint-600" },
-  bonus_earned: { text: "Bonus", tone: "bg-sun-400/15 text-sun-600" },
-  bonus_spent: { text: "Bonus xərci", tone: "bg-sun-400/10 text-sun-600/80" },
+type Meta = {
+  Icon: ComponentType<{ className?: string }>;
+  tone: string;
+};
+
+const meta: Record<Transaction["kind"], Meta> = {
+  wash: { Icon: DropIcon, tone: "bg-blue-50 text-blue-600" },
+  topup: { Icon: PlusIcon, tone: "bg-mint-100 text-mint-600" },
+  bonus_earned: { Icon: GiftIcon, tone: "bg-sun-400/15 text-sun-600" },
+  bonus_spent: { Icon: GiftIcon, tone: "bg-sun-400/15 text-sun-600" },
 };
 
 export function TransactionItem({ trx }: { trx: Transaction }) {
-  const badge = labels[trx.kind];
+  const { Icon, tone } = meta[trx.kind];
   const primary = trx.amount !== 0 ? trx.amount : trx.bonusDelta;
 
   return (
     <li className="flex items-center gap-3 py-3">
+      <span
+        className={`grid size-10 shrink-0 place-items-center rounded-full ${tone}`}
+      >
+        <Icon className="size-5" />
+      </span>
+
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-medium">{trx.title}</p>
-          <span className={`rounded-md px-1.5 py-0.5 text-[10px] ${badge.tone}`}>
-            {badge.text}
-          </span>
-        </div>
-        <p className="mt-0.5 truncate text-xs text-ink-600">
+        <p className="truncate text-sm font-semibold text-ink-900">
+          {trx.title}
+        </p>
+        <p className="mt-0.5 truncate text-xs text-ink-500">
           {trx.branchName}
           {trx.vehiclePlate ? ` · ${trx.vehiclePlate}` : ""} ·{" "}
           {dateTime(trx.createdAt)}
         </p>
       </div>
 
-      <div className="text-right">
+      <div className="shrink-0 text-right">
         <p
-          className={`text-sm font-semibold ${
+          className={`text-sm font-bold ${
             primary > 0 ? "text-mint-600" : "text-ink-900"
           }`}
         >
           {azn(primary, { sign: true })}
         </p>
         {trx.amount !== 0 && trx.bonusDelta !== 0 && (
-          <p className="text-[11px] text-sun-600">
+          <p className="text-[11px] font-medium text-sun-600">
             {azn(trx.bonusDelta, { sign: true })} bonus
           </p>
         )}

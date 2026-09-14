@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { azn } from "@/lib/format";
+import { tierOf } from "@/lib/tier";
+import { useSession } from "@/lib/session";
 import type { WashPackage } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { GiftIcon } from "@/components/Icons";
 
 export default function PackagesPage() {
+  const { customer } = useSession();
   const [packages, setPackages] = useState<WashPackage[] | null>(null);
   const [pending, setPending] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
@@ -16,6 +20,8 @@ export default function PackagesPage() {
   useEffect(() => {
     void api.getPackages().then(setPackages);
   }, []);
+
+  const cashback = customer ? tierOf(customer.tier).cashbackPercent : 0;
 
   async function buy(pkg: WashPackage) {
     setPending(pkg.id);
@@ -69,8 +75,16 @@ export default function PackagesPage() {
                   </div>
                 </div>
 
+                {cashback > 0 && (
+                  <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
+                    <GiftIcon className="size-4 shrink-0" />
+                    Bu paketlə ~{azn((pkg.price * cashback) / 100)} bonus
+                    qazanacaqsan
+                  </div>
+                )}
+
                 <Button
-                  className="mt-4"
+                  className="mt-3"
                   variant={pkg.popular ? "primary" : "outline"}
                   disabled={pending === pkg.id}
                   onClick={() => buy(pkg)}

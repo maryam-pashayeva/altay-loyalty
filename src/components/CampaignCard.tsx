@@ -26,8 +26,8 @@ export function CampaignCard({
         {campaign.badge ?? "AW"}
       </div>
       <div className="min-w-0 flex-1 pr-1">
-        <h3 className="text-sm font-semibold">{campaign.title}</h3>
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-500">
+        <h3 className="truncate text-sm font-semibold">{campaign.title}</h3>
+        <p className="mt-0.5 line-clamp-1 text-xs text-ink-500">
           {campaign.description}
         </p>
         {campaign.stamps ? (
@@ -45,9 +45,9 @@ export function CampaignCard({
             <GiftIcon className="ml-0.5 size-4 text-amber-500" />
           </div>
         ) : (
-          <p className="mt-2 text-[11px] text-ink-500">
-            {shortDate(campaign.validUntil)} tarixinədək
-          </p>
+          <span className="mt-2 inline-block rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-medium text-ink-500">
+            {shortDate(campaign.validUntil)}-dək
+          </span>
         )}
       </div>
       <ChevronIcon className="size-5 shrink-0 self-center text-ink-300" />

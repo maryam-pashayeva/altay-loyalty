@@ -19,6 +19,7 @@ import {
   CarIcon,
   ChevronDownIcon,
   ChevronIcon,
+  DropIcon,
 } from "@/components/Icons";
 
 export default function HomePage() {
@@ -40,18 +41,25 @@ export default function HomePage() {
   if (!customer) return null;
 
   const firstName = customer.fullName.split(" ")[0];
+  const initials = customer.fullName
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("");
 
   return (
     <main className="px-5 pt-6">
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <Link href="/profile" className="-m-1 flex items-center rounded-xl p-1">
-            <span>
-              <span className="block text-xs text-ink-500">Xoş gəldiniz</span>
-              <span className="flex items-center gap-1 text-lg font-semibold tracking-tight">
-                {firstName}
-                <ChevronIcon className="size-4 text-ink-300" />
-              </span>
+          <Link
+            href="/profile"
+            className="-m-1 flex items-center gap-3 rounded-xl p-1"
+          >
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-500/12 text-sm font-semibold text-blue-600">
+              {initials}
+            </span>
+            <span className="text-base font-semibold tracking-tight">
+              Salam, {firstName} 👋
             </span>
           </Link>
           <button
@@ -85,7 +93,28 @@ export default function HomePage() {
 
       <BalanceCard customer={customer} />
 
-      <div className="mt-4">
+      {/* Paket — hero-dan ayrıca, aydın widget */}
+      <div className="card mt-3 flex items-center gap-3 p-4">
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600">
+          <DropIcon className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">Paketim</p>
+          <p className="text-xs text-ink-500">
+            {customer.washesLeft > 0
+              ? `${customer.washesLeft} yuma qalıb`
+              : "Aktiv paket yoxdur"}
+          </p>
+        </div>
+        <Link
+          href="/packages"
+          className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
+        >
+          Paket al
+        </Link>
+      </div>
+
+      <div className="mt-3">
         <BranchesQuickCard />
       </div>
 

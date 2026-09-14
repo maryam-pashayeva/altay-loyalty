@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { distanceKm } from "@/lib/geo";
+import { isOpenNow } from "@/lib/format";
 import type { Branch } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -48,8 +49,26 @@ export default function BranchesPage() {
                       )}
                     </div>
                     <p className="mt-0.5 text-xs text-ink-500">{b.address}</p>
-                    <p className="mt-1 text-[11px] text-ink-400">
-                      {b.workingHours}
+                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-400">
+                      {(() => {
+                        const open = isOpenNow(b.workingHours);
+                        if (open === null) return null;
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1 font-semibold ${
+                              open ? "text-mint-600" : "text-red-500"
+                            }`}
+                          >
+                            <span
+                              className={`size-1.5 rounded-full ${
+                                open ? "bg-mint-500" : "bg-red-500"
+                              }`}
+                            />
+                            {open ? "Açıqdır" : "Bağlıdır"}
+                          </span>
+                        );
+                      })()}
+                      <span>· {b.workingHours}</span>
                     </p>
                   </div>
                 </div>

@@ -56,3 +56,14 @@ export function formatPhone(raw: string) {
 export function phoneDigits(raw: string) {
   return raw.replace(/\D/g, "").replace(/^994/, "").slice(0, 9);
 }
+
+/** İş saatları mətnindən ("09:00 – 21:00") hazırda açıq olub-olmadığını hesablayır. */
+export function isOpenNow(workingHours: string): boolean | null {
+  const m = workingHours.match(/(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const start = +m[1] * 60 + +m[2];
+  const end = +m[3] * 60 + +m[4];
+  return end > start ? cur >= start && cur < end : cur >= start || cur < end;
+}
