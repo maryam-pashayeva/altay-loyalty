@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { azn } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
@@ -18,11 +18,19 @@ const tierBadge: Record<string, string> = {
 
 export function BalanceCard({ customer }: { customer: Customer }) {
   const [tierOpen, setTierOpen] = useState(false);
+  const [barW, setBarW] = useState(0);
   const tier = tierOf(customer.tier);
   const { next, remaining, percent } = tierProgress(
     customer.tier,
     customer.yearlySpend,
   );
+  const targetW = Math.max(6, percent);
+
+  // Progress bar ilk açılışda soldan sağa dolur
+  useEffect(() => {
+    const t = setTimeout(() => setBarW(targetW), 80);
+    return () => clearTimeout(t);
+  }, [targetW]);
 
   return (
     <>
@@ -71,8 +79,8 @@ export function BalanceCard({ customer }: { customer: Customer }) {
             </div>
             <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/40">
               <div
-                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)] transition-[width] duration-700"
-                style={{ width: `${Math.max(6, percent)}%` }}
+                className="h-full rounded-full bg-linear-to-r from-cyan-300 to-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)] transition-[width] duration-1000 ease-out"
+                style={{ width: `${barW}%` }}
               />
             </div>
             <p className="mt-1 text-right text-xs font-semibold text-white">
@@ -94,7 +102,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
           <Link
             href="/packages"
-            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 shadow-sm transition active:scale-95"
+            className="pulse-glow flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 transition active:scale-95"
           >
             <PlusIcon className="size-4" />
             Paket al

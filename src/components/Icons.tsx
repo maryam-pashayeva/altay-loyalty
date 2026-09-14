@@ -149,6 +149,23 @@ export const BellRingIcon = (p: P) => (
   </S>
 );
 
+export const FlameIcon = ({ className = "size-6" }: P) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12.96 2.29a.75.75 0 0 0-1.07-.14 9.74 9.74 0 0 0-3.54 6.18 7.55 7.55 0 0 1-1.7-1.72.75.75 0 0 0-1.16-.08A9 9 0 1 0 15.68 4.53a7.46 7.46 0 0 1-2.72-2.24Zm2.79 11.96a3.75 3.75 0 1 1-7.31-1.17c.63.46 1.35.81 2.13 1a5.99 5.99 0 0 1 1.93-3.55 3.75 3.75 0 0 1 3.25 3.72Z"
+    />
+  </svg>
+);
+
+export const TrophyIcon = (p: P) => (
+  <S {...p}>
+    <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+    <path d="M17 5h2.5A1.5 1.5 0 0 1 21 6.5C21 9 19 10.5 17 10.5M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 9 5 10.5 7 10.5" />
+  </S>
+);
+
 export const ChevronIcon = (p: P) => (
   <S {...p}>
     <path d="m9 5 7 7-7 7" />

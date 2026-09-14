@@ -36,8 +36,14 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className="flex flex-1 flex-col items-center justify-end gap-1 pb-2"
               >
-                <span className="-mt-6 grid size-14 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_8px_22px_rgba(37,99,235,0.5)]">
-                  <Icon className="size-7" />
+                <span className="relative -mt-6">
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-2xl bg-blue-500 pulse-ring"
+                    aria-hidden
+                  />
+                  <span className="relative grid size-14 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_8px_22px_rgba(37,99,235,0.5)]">
+                    <Icon className="size-7" />
+                  </span>
                 </span>
                 <span className="text-[10px] text-ink-500">{label}</span>
               </Link>

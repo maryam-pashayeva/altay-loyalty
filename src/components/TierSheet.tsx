@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { azn } from "@/lib/format";
 import { allTiers, tierOf, tierProgress, TIER_BENEFITS } from "@/lib/tier";
 import type { TierCode } from "@/lib/types";
@@ -23,28 +24,63 @@ export function TierSheet({
   current: TierCode;
   yearlySpend: number;
 }) {
-  const tier = tierOf(current);
+  const [selected, setSelected] = useState<TierCode>(current);
+
+  // Açılanda cari səviyyəni seç
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (open) setSelected(current);
+  }, [open, current]);
+
+  const sel = tierOf(selected);
+  const isCurrent = selected === current;
   const { next, remaining, percent } = tierProgress(current, yearlySpend);
 
   return (
     <Sheet open={open} onClose={onClose} title="Səviyyə və üstünlüklər">
-      {/* Cari səviyyə — hero */}
+      {/* Tab-lar */}
+      <div className="flex gap-1 rounded-full bg-ink-100 p-1">
+        {allTiers().map((t) => (
+          <button
+            key={t.code}
+            type="button"
+            onClick={() => setSelected(t.code)}
+            className={`relative flex-1 rounded-full py-2 text-xs font-semibold transition ${
+              selected === t.code
+                ? "bg-white text-ink-900 shadow-sm"
+                : "text-ink-500"
+            }`}
+          >
+            {t.name}
+            {t.code === current && (
+              <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-blue-600" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Seçilmiş səviyyə — hero */}
       <div
-        className={`rounded-3xl bg-linear-to-br ${accent[current]} p-5 text-white shadow-sm`}
+        className={`mt-4 rounded-3xl bg-linear-to-br ${accent[selected]} p-5 text-white shadow-sm`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span aria-hidden className="text-xl">
               👑
             </span>
-            <span className="text-lg font-bold">{tier.name}</span>
+            <span className="text-lg font-bold">{sel.name}</span>
+            {isCurrent && (
+              <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-semibold backdrop-blur">
+                Cari
+              </span>
+            )}
           </div>
           <span className="rounded-full bg-white/25 px-3 py-1 text-xs font-semibold backdrop-blur">
-            {tier.cashbackPercent}% bonus
+            {sel.cashbackPercent}% bonus
           </span>
         </div>
 
-        {next ? (
+        {isCurrent && next ? (
           <div className="mt-4">
             <div className="mb-1.5 flex items-end justify-between text-xs">
               <span className="text-white/90">{next.name} səviyyəsinə</span>
@@ -59,77 +95,40 @@ export function TierSheet({
           </div>
         ) : (
           <p className="mt-3 text-xs text-white/90">
-            Ən yüksək səviyyədəsiniz — təbriklər! 🎉
+            {sel.threshold === 0
+              ? "Başlanğıc səviyyə — hamı üçün açıqdır."
+              : `İllik ${azn(sel.threshold)} xərcdən sonra açılır.`}
           </p>
         )}
       </div>
 
-      {/* Bütün səviyyələr + üstünlüklər */}
-      <div className="mt-4 space-y-3">
-        {allTiers().map((t) => {
-          const isCurrent = t.code === current;
-          return (
-            <div
-              key={t.code}
-              className={`rounded-2xl border p-4 ${
-                isCurrent
-                  ? "border-blue-500 bg-blue-50/60 ring-1 ring-blue-500/40"
-                  : "border-ink-200 bg-white"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`grid size-10 place-items-center rounded-xl bg-linear-to-br ${
-                      accent[t.code]
-                    } text-sm font-bold text-white shadow-sm`}
-                  >
-                    {t.cashbackPercent}%
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-ink-900">
-                      {t.name}
-                    </p>
-                    <p className="text-[11px] text-ink-500">
-                      {t.threshold === 0
-                        ? "Başlanğıc səviyyə"
-                        : `İllik ${azn(t.threshold)} xərcdən`}
-                    </p>
-                  </div>
-                </div>
-                {isCurrent && (
-                  <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-semibold text-white">
-                    Cari
-                  </span>
-                )}
-              </div>
-              <ul className="mt-3 space-y-1.5">
-                {TIER_BENEFITS[t.code].map((b) => (
-                  <li
-                    key={b}
-                    className="flex items-center gap-2 text-xs text-ink-600"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2.4}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="size-3.5 shrink-0 text-blue-600"
-                      aria-hidden
-                    >
-                      <path d="m5 12.5 4.5 4.5L19 7" />
-                    </svg>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-      <p className="mt-4 text-center text-[11px] leading-relaxed text-ink-400">
+      {/* Üstünlüklər */}
+      <p className="mb-2 mt-5 text-xs font-semibold text-ink-500">
+        {sel.name} üstünlükləri
+      </p>
+      <ul className="space-y-2.5">
+        {TIER_BENEFITS[selected].map((b) => (
+          <li key={b} className="flex items-center gap-2.5 text-sm text-ink-700">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-blue-100 text-blue-600">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.6}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-3"
+                aria-hidden
+              >
+                <path d="m5 12.5 4.5 4.5L19 7" />
+              </svg>
+            </span>
+            {b}
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-5 text-center text-[11px] leading-relaxed text-ink-400">
         Səviyyə cari ildəki ümumi xərcə görə avtomatik yenilənir.
       </p>
     </Sheet>
