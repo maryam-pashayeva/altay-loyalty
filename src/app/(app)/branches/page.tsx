@@ -80,7 +80,7 @@ export default function BranchesPage() {
                     Zəng et
                   </a>
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${b.lat},${b.lng}`}
+                    href={`https://waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex-1 rounded-xl bg-blue-600 py-2.5 text-center text-xs font-semibold text-white"

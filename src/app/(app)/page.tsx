@@ -109,7 +109,7 @@ export default function HomePage() {
       </div>
 
       {/* Ağ məzmun vərəqi — gradientin üstünə qıvrılır */}
-      <div className="relative -mt-8 rounded-t-[28px] bg-ink-100 px-5 pt-6">
+      <div className="content-sheet relative -mt-8 rounded-t-[28px] bg-ink-100 px-5 pt-6">
         <StreakCard />
 
         <div className="mt-4">

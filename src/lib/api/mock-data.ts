@@ -51,7 +51,7 @@ export const mockTransactions: Transaction[] = [
   {
     id: "trx_9008",
     kind: "topup",
-    title: "Balans artırımı",
+    title: "Balans artımı",
     branchName: "Mobil tətbiq",
     amount: 50,
     bonusDelta: 0,

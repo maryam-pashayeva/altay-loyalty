@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 const filters: { key: "all" | TransactionKind; label: string }[] = [
   { key: "all", label: "Hamısı" },
   { key: "wash", label: "Yumalar" },
-  { key: "topup", label: "Artırımlar" },
+  { key: "topup", label: "Artımlar" },
   { key: "bonus_spent", label: "Bonus" },
 ];
 

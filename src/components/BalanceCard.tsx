@@ -8,6 +8,14 @@ import type { Customer } from "@/lib/types";
 import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
+/** Səviyyə rozetkasının rəngi — səviyyəyə uyğun */
+const tierBadge: Record<string, string> = {
+  bronze: "bg-amber-600 text-white",
+  silver: "bg-slate-200 text-slate-800",
+  gold: "bg-amber-300 text-amber-950",
+  platinum: "bg-indigo-200 text-indigo-900",
+};
+
 /**
  * Balans məzmunu — öz kart fonu YOXDUR. Ana səhifədəki full-bleed gradient
  * header-in üzərində göstərilir (ağ mətn).
@@ -34,7 +42,9 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           <button
             type="button"
             onClick={() => setTierOpen(true)}
-            className="flex items-center gap-1 rounded-full bg-white/25 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
+            className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold shadow-sm transition active:scale-95 ${
+              tierBadge[tier.code] ?? "bg-white/25 text-white"
+            }`}
           >
             {tier.name} · {tier.cashbackPercent}%
             <svg
