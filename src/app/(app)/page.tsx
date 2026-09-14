@@ -19,7 +19,6 @@ import {
   CarIcon,
   ChevronDownIcon,
   ChevronIcon,
-  DropIcon,
 } from "@/components/Icons";
 
 export default function HomePage() {
@@ -47,29 +46,41 @@ export default function HomePage() {
     .slice(0, 2)
     .join("");
 
+  // Ana səhifədə yalnız son 1 ayın əməliyyatları
+  const recent = transactions?.filter((t) => {
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 1);
+    return new Date(t.createdAt) >= cutoff;
+  });
+
   return (
     <main className="px-5 pt-6">
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <Link
             href="/profile"
-            className="-m-1 flex items-center gap-3 rounded-xl p-1"
+            className="-m-1 flex items-center gap-3 rounded-2xl p-1"
           >
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-500/12 text-sm font-semibold text-blue-600">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-linear-to-br from-blue-500 to-indigo-500 text-sm font-bold text-white shadow-sm ring-2 ring-white">
               {initials}
             </span>
-            <span className="text-base font-semibold tracking-tight">
-              Salam, {firstName} 👋
+            <span className="leading-tight">
+              <span className="block text-xs text-ink-500">Xoş gəldin</span>
+              <span className="block text-base font-bold tracking-tight text-ink-900">
+                {firstName}
+              </span>
             </span>
           </Link>
           <button
             type="button"
             onClick={() => setNotifOpen(true)}
-            className="relative grid size-11 place-items-center rounded-2xl bg-ink-100 text-ink-700 transition active:scale-95"
+            className="relative grid size-11 place-items-center rounded-2xl bg-white text-ink-900 shadow-sm ring-1 ring-ink-200 transition active:scale-95"
             aria-label="Bildirişlər"
           >
             <BellIcon className="size-6" />
-            <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-red-500 ring-2 ring-ink-100" />
+            <span className="absolute -right-1 -top-1 grid size-[18px] place-items-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+              1
+            </span>
           </button>
         </div>
 
@@ -93,28 +104,7 @@ export default function HomePage() {
 
       <BalanceCard customer={customer} />
 
-      {/* Paket — hero-dan ayrıca, aydın widget */}
-      <div className="card mt-3 flex items-center gap-3 p-4">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600">
-          <DropIcon className="size-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">Paketim</p>
-          <p className="text-xs text-ink-500">
-            {customer.washesLeft > 0
-              ? `${customer.washesLeft} yuma qalıb`
-              : "Aktiv paket yoxdur"}
-          </p>
-        </div>
-        <Link
-          href="/packages"
-          className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
-        >
-          Paket al
-        </Link>
-      </div>
-
-      <div className="mt-3">
+      <div className="mt-4">
         <BranchesQuickCard />
       </div>
 
@@ -151,25 +141,38 @@ export default function HomePage() {
       </section>
 
       <section className="mt-8">
-        <SectionTitle
-          title="Son əməliyyatlar"
-          action={
-            <Link
-              href="/history"
-              className="flex items-center gap-0.5 text-xs text-aqua-600"
-            >
-              Hamısı <ChevronIcon className="size-4" />
-            </Link>
-          }
-        />
-        {transactions ? (
-          <Card className="py-1">
-            <ul className="divide-y divide-ink-200">
-              {transactions.slice(0, 3).map((t) => (
-                <TransactionItem key={t.id} trx={t} />
-              ))}
-            </ul>
-          </Card>
+        <SectionTitle title="Son əməliyyatlar (son 1 ay)" />
+        {recent ? (
+          recent.length ? (
+            <>
+              <Card className="py-1">
+                <ul className="divide-y divide-ink-200">
+                  {recent.map((t) => (
+                    <TransactionItem key={t.id} trx={t} />
+                  ))}
+                </ul>
+              </Card>
+              <Link
+                href="/history"
+                className="mt-3 flex h-12 w-full items-center justify-center gap-1 rounded-2xl border border-ink-200 bg-white text-sm font-semibold text-blue-600 transition active:scale-[0.99]"
+              >
+                Bütün əməliyyatlar
+                <ChevronIcon className="size-4" />
+              </Link>
+            </>
+          ) : (
+            <Card className="py-8 text-center">
+              <p className="text-sm text-ink-500">
+                Son 1 ayda əməliyyat yoxdur.
+              </p>
+              <Link
+                href="/history"
+                className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-600"
+              >
+                Bütün əməliyyatlar <ChevronIcon className="size-4" />
+              </Link>
+            </Card>
+          )
         ) : (
           <Skeleton className="h-40 w-full" />
         )}

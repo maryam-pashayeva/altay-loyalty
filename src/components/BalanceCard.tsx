@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { azn } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import type { Customer } from "@/lib/types";
+import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
 
 export function BalanceCard({ customer }: { customer: Customer }) {
@@ -22,6 +24,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           aria-hidden
         />
 
+        {/* Zona 1 — balans + status */}
         <div className="flex items-start justify-between">
           <div>
             <p className="text-[13px] text-white/90">Bonus balansı</p>
@@ -49,8 +52,9 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </button>
         </div>
 
+        {/* Zona 2 — səviyyə irəliləyişi */}
         {next && (
-          <div className="mt-6">
+          <div className="mt-5">
             <div className="mb-1.5 flex items-end justify-between">
               <span className="text-[13px] text-white">
                 {next.name} səviyyəsinə
@@ -70,6 +74,26 @@ export function BalanceCard({ customer }: { customer: Customer }) {
             </p>
           </div>
         )}
+
+        {/* Zona 3 — paket (ayrıca, ikincili) */}
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/20 pt-4">
+          <div className="min-w-0">
+            <p className="text-[11px] text-white/80">Paketim</p>
+            <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
+              <DropIcon className="size-4 shrink-0" />
+              {customer.washesLeft > 0
+                ? `${customer.washesLeft} yuma qalıb`
+                : "Aktiv paket yoxdur"}
+            </p>
+          </div>
+          <Link
+            href="/packages"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 shadow-sm transition active:scale-95"
+          >
+            <PlusIcon className="size-4" />
+            Paket al
+          </Link>
+        </div>
       </div>
 
       <TierSheet
