@@ -1,71 +1,62 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
 import { azn } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { QrScanner } from "@/components/QrScanner";
-import { VehicleSheet } from "@/components/VehicleSheet";
+import { AddCardSheet } from "@/components/AddCardSheet";
 import {
   ScanResultModal,
   type ScanResultData,
 } from "@/components/ScanResultModal";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
-import { CarIcon, ChevronDownIcon } from "@/components/Icons";
+import { CardIcon, PlusIcon } from "@/components/Icons";
+
+/** Terminalda seçilə bilən məbləğlər (₼) */
+const AMOUNTS = [0.5, 1, 1.5, 5];
+
+const brandLabel: Record<string, string> = {
+  visa: "VISA",
+  mastercard: "MC",
+  other: "CARD",
+};
+
+type Terminal = {
+  terminalId: string;
+  terminalName: string;
+  branchName: string;
+};
 
 type Phase =
   | { kind: "scan" }
   | { kind: "loading" }
-  | { kind: "confirm"; amount: number; title: string; branchName: string; ref: string }
+  | ({ kind: "terminal" } & Terminal)
   | { kind: "processing" }
   | { kind: "error"; message: string };
 
 export default function QrPage() {
-  const { customer, activeVehicle, updateCustomer } = useSession();
+  const { customer, updateCustomer } = useSession();
   const { t } = useT();
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
   const [result, setResult] = useState<ScanResultData | null>(null);
-  const [vehicleOpen, setVehicleOpen] = useState(false);
+  const [amount, setAmount] = useState<number | null>(null);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const [addCardOpen, setAddCardOpen] = useState(false);
 
   const handleScan = useCallback(
     async (code: string) => {
       if (!customer) return;
       setPhase({ kind: "loading" });
       try {
-        const res = await api.scanTerminal(code, activeVehicle?.plate);
-        if (res.type === "earn") {
-          const from = customer.bonusBalance;
-          const to = from + res.points;
-          // Tamamlanmış yuma — bonusla yanaşı seriyanı da bir addım irəli aparırıq.
-          const streak = customer.washStreak;
-          updateCustomer({
-            bonusBalance: to,
-            washStreak: {
-              ...streak,
-              current: Math.min(streak.goal, streak.current + 1),
-            },
-          });
-          setResult({
-            variant: "earned",
-            amount: res.points,
-            title: res.title,
-            branchName: res.branchName,
-            fromBalance: from,
-            toBalance: to,
-          });
-          setPhase({ kind: "scan" });
-        } else {
-          setPhase({
-            kind: "confirm",
-            amount: res.amount,
-            title: res.title,
-            branchName: res.branchName,
-            ref: res.ref,
-          });
-        }
+        const term = await api.scanTerminal(code);
+        setAmount(null);
+        setCardId(customer.cards[0]?.id ?? null);
+        setPhase({ kind: "terminal", ...term });
       } catch (e) {
         setPhase({
           kind: "error",
@@ -73,38 +64,39 @@ export default function QrPage() {
         });
       }
     },
-    [customer, activeVehicle, updateCustomer, t],
+    [customer, t],
   );
 
   if (!customer) return null;
 
-  const multiCar = customer.vehicles.length >= 2;
-  const paused = result !== null || phase.kind === "confirm";
+  const cards = customer.cards;
+  const effectiveCardId = cards.some((c) => c.id === cardId)
+    ? cardId
+    : (cards[0]?.id ?? null);
+  const paused = result !== null || phase.kind === "terminal";
 
-  async function confirmPay(c: Extract<Phase, { kind: "confirm" }>) {
-    if (customer!.bonusBalance < c.amount) {
-      setPhase({ kind: "error", message: t("qr.insufficient") });
-      return;
-    }
+  async function pay(term: Terminal) {
+    if (!customer || !amount || !effectiveCardId) return;
     setPhase({ kind: "processing" });
     try {
-      await api.confirmPayment(c.ref, activeVehicle?.plate);
-      const from = customer!.bonusBalance;
-      const to = from - c.amount;
+      await api.payTerminal(term.terminalId, amount, effectiveCardId);
+      const bonusEarned = amount; // hər 1 ₼-ə 1 bonus
+      const from = customer.bonusBalance;
+      const to = from + bonusEarned;
       updateCustomer({ bonusBalance: to });
       setResult({
-        variant: "paid",
-        amount: c.amount,
-        title: c.title,
-        branchName: c.branchName,
-        fromBalance: from,
-        toBalance: to,
+        paidAmount: amount,
+        bonusEarned,
+        terminalName: term.terminalName,
+        branchName: term.branchName,
+        fromBonus: from,
+        toBonus: to,
       });
       setPhase({ kind: "scan" });
     } catch (e) {
       setPhase({
         kind: "error",
-        message: e instanceof Error ? e.message : t("qr.error.pay"),
+        message: e instanceof Error ? e.message : t("pay.error"),
       });
     }
   }
@@ -114,30 +106,10 @@ export default function QrPage() {
       <PageHeader title={t("qr.title")} subtitle={t("qr.subtitle")} />
 
       <div className="px-5">
-        {/* İnteraktiv maşın seçimi */}
-        {activeVehicle && (
-          <button
-            type="button"
-            onClick={() => multiCar && setVehicleOpen(true)}
-            className="mb-3 flex w-full items-center gap-2 rounded-2xl border border-ink-200 bg-white px-4 py-3 text-xs"
-          >
-            <CarIcon className="size-4 shrink-0 text-blue-600" />
-            <span className="text-ink-500">{t("qr.writeTo")}</span>
-            <span className="font-semibold text-ink-900">
-              {activeVehicle.plate}
-            </span>
-            {multiCar && (
-              <span className="ml-auto flex items-center gap-0.5 font-semibold text-blue-600">
-                {t("qr.change")} <ChevronDownIcon className="size-4" />
-              </span>
-            )}
-          </button>
-        )}
-
         {/* Skaner sahəsi */}
         {phase.kind === "loading" || phase.kind === "processing" ? (
           <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-950 text-sm text-white/80">
-            {phase.kind === "processing" ? t("qr.paying") : t("qr.checking")}
+            {phase.kind === "processing" ? t("pay.processing") : t("qr.checking")}
           </div>
         ) : phase.kind === "error" ? (
           <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-100 p-6 text-center">
@@ -160,47 +132,118 @@ export default function QrPage() {
         )}
       </div>
 
-      {/* Ödəniş təsdiqi */}
+      {/* Ödəniş vərəqi */}
       <Sheet
-        open={phase.kind === "confirm"}
+        open={phase.kind === "terminal"}
         onClose={() => setPhase({ kind: "scan" })}
-        title={t("qr.confirmTitle")}
+        title={t("pay.title")}
       >
-        {phase.kind === "confirm" && (
+        {phase.kind === "terminal" && (
           <>
-            <div className="rounded-2xl border border-ink-200 p-4 text-sm">
-              <div className="flex justify-between gap-2">
-                <span className="text-ink-500">{t("qr.service")}</span>
-                <span className="font-medium text-ink-900">{phase.title}</span>
+            <div className="flex items-center gap-2 rounded-2xl bg-ink-50 p-3 text-sm">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-500/12 text-blue-600">
+                <CardIcon className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-ink-900">
+                  {phase.terminalName}
+                </p>
+                <p className="text-[11px] text-ink-500">{phase.branchName}</p>
               </div>
-              <div className="mt-2 flex justify-between gap-2">
-                <span className="text-ink-500">{t("qr.branch")}</span>
-                <span className="font-medium text-ink-900">
-                  {phase.branchName}
-                </span>
-              </div>
-              {activeVehicle && (
-                <div className="mt-2 flex justify-between gap-2">
-                  <span className="text-ink-500">{t("qr.vehicle")}</span>
-                  <span className="font-medium text-ink-900">
-                    {activeVehicle.plate}
-                  </span>
-                </div>
-              )}
-              <div className="mt-3 flex items-center justify-between border-t border-ink-200 pt-3">
-                <span className="font-semibold text-ink-900">
-                  {t("qr.amount")}
-                </span>
-                <span className="text-xl font-bold text-blue-600">
-                  {azn(phase.amount)}
-                </span>
-              </div>
-              <p className="mt-1 text-[11px] text-ink-500">
-                {t("qr.fromBonus", { amount: azn(customer.bonusBalance) })}
-              </p>
             </div>
-            <Button className="mt-4" onClick={() => confirmPay(phase)}>
-              {t("qr.confirmPay")}
+
+            {/* Məbləğ */}
+            <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
+              {t("pay.amount")}
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {AMOUNTS.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setAmount(v)}
+                  className={`rounded-xl py-2.5 text-sm font-semibold transition ${
+                    amount === v
+                      ? "bg-blue-600 text-white"
+                      : "bg-ink-100 text-ink-700"
+                  }`}
+                >
+                  {azn(v)}
+                </button>
+              ))}
+            </div>
+
+            {/* Kart */}
+            <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
+              {t("pay.card")}
+            </p>
+            {cards.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-ink-300 p-4 text-center">
+                <p className="text-xs text-ink-500">{t("pay.noCards")}</p>
+                <button
+                  type="button"
+                  onClick={() => setAddCardOpen(true)}
+                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-blue-500/12 px-3 py-1.5 text-xs font-semibold text-blue-600"
+                >
+                  <PlusIcon className="size-4" />
+                  {t("pay.addCard")}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {cards.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCardId(c.id)}
+                    className={`flex w-full items-center justify-between gap-2 rounded-2xl border p-3 text-left text-sm transition ${
+                      effectiveCardId === c.id
+                        ? "border-blue-500 bg-blue-50/60 ring-1 ring-blue-500/30"
+                        : "border-ink-200 bg-white"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="grid h-5 w-8 shrink-0 place-items-center rounded bg-ink-900 text-[9px] font-bold tracking-wide text-white">
+                        {brandLabel[c.brand]}
+                      </span>
+                      <span className="font-semibold text-ink-900">
+                        •••• {c.last4}
+                      </span>
+                    </span>
+                    <span
+                      className={`grid size-5 shrink-0 place-items-center rounded-full border ${
+                        effectiveCardId === c.id
+                          ? "border-blue-600 bg-blue-600"
+                          : "border-ink-300"
+                      }`}
+                    >
+                      {effectiveCardId === c.id && (
+                        <span className="size-2 rounded-full bg-white" />
+                      )}
+                    </span>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setAddCardOpen(true)}
+                  className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-ink-300 p-3 text-left text-sm font-medium text-ink-600"
+                >
+                  <PlusIcon className="size-4 shrink-0" />
+                  {t("pay.addCard")}
+                </button>
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
+              🎁 {t("pay.bonusHint")}
+            </div>
+
+            <Button
+              className="mt-4"
+              disabled={!amount || !effectiveCardId}
+              onClick={() => pay(phase)}
+            >
+              {t("pay.confirm", { amount: amount ? azn(amount) : azn(0) })}
             </Button>
             <Button
               variant="ghost"
@@ -214,7 +257,13 @@ export default function QrPage() {
       </Sheet>
 
       <ScanResultModal data={result} onClose={() => setResult(null)} />
-      <VehicleSheet open={vehicleOpen} onClose={() => setVehicleOpen(false)} />
+      <AddCardSheet open={addCardOpen} onClose={() => setAddCardOpen(false)} />
+
+      <p className="px-5 pt-4 text-center text-[11px] leading-relaxed text-ink-400">
+        <Link href="/profile" className="font-semibold text-blue-600">
+          {t("cards.title")}
+        </Link>
+      </p>
     </main>
   );
 }

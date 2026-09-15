@@ -32,6 +32,8 @@ export interface Customer {
   /** Cari il ərzində xərclənən məbləğ — səviyyə hesablaması üçün */
   yearlySpend: number;
   vehicles: Vehicle[];
+  /** Ödəniş kartları — terminalda ödəniş üçün (tokenləşdirilmiş) */
+  cards: SavedCard[];
   createdAt: string;
 }
 
@@ -41,6 +43,20 @@ export interface Vehicle {
   model: string;
   /** Kuza tipi qiymətə təsir edir */
   bodyType: "sedan" | "suv" | "minivan" | "pickup";
+}
+
+/**
+ * Yadda saxlanmış ödəniş kartı — YALNIZ göstərici (tokenləşdirilmiş) məlumat.
+ * Tam kart nömrəsi (PAN) və CVV heç vaxt saxlanmır; real ERP-də provayder
+ * tokeni saxlanılır.
+ */
+export interface SavedCard {
+  id: string;
+  brand: "visa" | "mastercard" | "other";
+  /** Kartın son 4 rəqəmi (göstərmək üçün) */
+  last4: string;
+  expMonth: number;
+  expYear: number;
 }
 
 export type TransactionKind = "wash" | "topup" | "bonus_earned" | "bonus_spent";
@@ -100,16 +116,11 @@ export interface Session {
 }
 
 /**
- * Terminaldakı QR oxunduqda alınan nəticə.
- * "earn" — yuma bitib, bonus qazanılır (dərhal tətbiq olunur).
- * "pay" — istifadəçi terminalda loyallıqla ödəməyi seçib; təsdiq tələb olunur.
+ * Terminaldakı statik QR oxunduqda alınan nəticə — QR yalnız terminalı
+ * eyniləşdirir (filial/terminal DB-dən). Məbləğ və kart tətbiqdə seçilir.
  */
-export type ScanResult =
-  | { type: "earn"; points: number; title: string; branchName: string }
-  | {
-      type: "pay";
-      amount: number;
-      title: string;
-      branchName: string;
-      ref: string;
-    };
+export interface ScanResult {
+  terminalId: string;
+  terminalName: string;
+  branchName: string;
+}

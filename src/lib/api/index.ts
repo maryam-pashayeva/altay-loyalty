@@ -2,6 +2,7 @@ import type {
   Branch,
   Campaign,
   Customer,
+  SavedCard,
   ScanResult,
   Session,
   Transaction,
@@ -115,6 +116,7 @@ export const api = {
           washStreak: { current: 0, goal: 5 },
           yearlySpend: 0,
           vehicles: [],
+          cards: [],
           createdAt: new Date(now).toISOString(),
         },
       };
@@ -182,39 +184,69 @@ export const api = {
   },
 
   /**
-   * Terminalın QR kodu oxunduqda çağırılır. ERP QR-ın məzmununa görə
-   * əməliyyatın "bonus qazanma", yoxsa "loyallıqla ödəniş" olduğunu qaytarır.
-   * (Mock: kodda "pay" varsa ödəniş, əks halda bonus qazanma.)
+   * Terminaldakı statik QR oxunduqda çağırılır. QR yalnız terminalı
+   * eyniləşdirir — hansı filial/terminal olduğunu ERP DB-dən qaytarır.
+   * Məbləğ və kart tətbiqdə seçilir; sonra `payTerminal` çağırılır.
    */
-  async scanTerminal(
-    code: string,
-    vehiclePlate?: string,
-  ): Promise<ScanResult> {
+  async scanTerminal(code: string): Promise<ScanResult> {
     if (USE_MOCK) {
       await delay(700);
       if (!code || code.trim().length < 4) {
         throw new Error("QR kod tanınmadı. Yenidən cəhd edin.");
       }
-      if (/pay|öd|redeem/i.test(code)) {
-        return {
-          type: "pay",
-          amount: 5,
-          title: "Standart yuma",
-          branchName: "Altaywash Nərimanov",
-          ref: code,
-        };
-      }
       return {
-        type: "earn",
-        points: 5,
-        title: "Kompleks yuma",
+        terminalId: "term_12",
+        terminalName: "Terminal 3",
         branchName: "Altaywash Xətai",
       };
     }
-    return request("/scan", {
+    return request(`/terminals/resolve?code=${encodeURIComponent(code)}`);
+  },
+
+  /**
+   * Terminala kartla ödəniş — terminal balansı bu qədər artır, müştəri
+   * loyallıq bonusu qazanır. Kart yalnız `cardId` (tokeni) ilə göstərilir;
+   * tam kart nömrəsi/CVV heç vaxt göndərilmir.
+   */
+  async payTerminal(
+    terminalId: string,
+    amount: number,
+    cardId: string,
+  ): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(700);
+      return { ok: true };
+    }
+    return request(`/terminals/${terminalId}/pay`, {
       method: "POST",
-      body: JSON.stringify({ code, vehiclePlate }),
+      body: JSON.stringify({ amount, cardId }),
     });
+  },
+
+  /**
+   * Kart əlavə edir. Real ERP-də kart provayderin PCI-uyğun sahələrində daxil
+   * olunur və geri yalnız token + son 4 rəqəm gəlir. Mock: göndərilən göstərici
+   * məlumatdan (brend + son 4 + tarix) tokenləşdirilmiş kart qaytarır — tam
+   * nömrə və CVV saxlanmır.
+   */
+  async addCard(card: Omit<SavedCard, "id">): Promise<SavedCard> {
+    if (USE_MOCK) {
+      await delay(500);
+      return { ...card, id: `card_${Date.now()}` };
+    }
+    return request("/me/cards", {
+      method: "POST",
+      body: JSON.stringify(card),
+    });
+  },
+
+  /** Saxlanmış kartı silir (token provayder tərəfində ləğv olunur). */
+  async removeCard(id: string): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(300);
+      return { ok: true };
+    }
+    return request(`/me/cards/${id}`, { method: "DELETE" });
   },
 
   /** Qaraja yeni avtomobil əlavə edir */
@@ -238,20 +270,6 @@ export const api = {
     return request(`/me/vehicles/${id}`, { method: "DELETE" });
   },
 
-  /** Loyallıqla ödənişi təsdiqləyir — balansdan çıxım burada baş verir. */
-  async confirmPayment(
-    ref: string,
-    vehiclePlate?: string,
-  ): Promise<{ ok: true }> {
-    if (USE_MOCK) {
-      await delay(600);
-      return { ok: true };
-    }
-    return request("/scan/pay", {
-      method: "POST",
-      body: JSON.stringify({ ref, vehiclePlate }),
-    });
-  },
 };
 
 export { USE_MOCK };

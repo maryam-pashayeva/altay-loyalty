@@ -6,12 +6,12 @@ import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
 
 export type ScanResultData = {
-  variant: "earned" | "paid";
-  amount: number;
-  title: string;
+  paidAmount: number;
+  bonusEarned: number;
+  terminalName: string;
   branchName: string;
-  fromBalance: number;
-  toBalance: number;
+  fromBonus: number;
+  toBonus: number;
 };
 
 function useCountUp(from: number, to: number, active: boolean, ms = 700) {
@@ -41,15 +41,9 @@ export function ScanResultModal({
 }) {
   const { t } = useT();
   const open = !!data;
-  const balance = useCountUp(
-    data?.fromBalance ?? 0,
-    data?.toBalance ?? 0,
-    open,
-  );
+  const balance = useCountUp(data?.fromBonus ?? 0, data?.toBonus ?? 0, open);
 
   if (!data) return null;
-
-  const earned = data.variant === "earned";
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-6">
@@ -60,32 +54,29 @@ export function ScanResultModal({
       />
       <div className="pop-in relative w-full max-w-[22rem] rounded-3xl bg-white p-6 text-center shadow-[0_20px_60px_-20px_rgba(15,23,42,0.4)]">
         <div className="mx-auto grid size-16 place-items-center rounded-full bg-mint-100 text-3xl">
-          {earned ? "🎉" : "🚀"}
+          🎉
         </div>
         <h2 className="mt-4 text-lg font-bold tracking-tight text-ink-900">
-          {earned ? t("scanResult.earned") : t("scanResult.paid")}
+          {t("pay.successTitle")}
         </h2>
-        <p
-          className={`mt-1 text-3xl font-bold ${
-            earned ? "text-mint-600" : "text-blue-600"
-          }`}
-        >
-          {earned ? "+" : "−"}
-          {azn(data.amount)}
-        </p>
         <p className="mt-1 text-xs text-ink-500">
-          {data.title} · {data.branchName}
+          {data.terminalName} · {data.branchName}
+        </p>
+
+        <p className="mt-4 text-sm font-medium text-ink-900">
+          {t("pay.terminalCredited", { amount: azn(data.paidAmount) })}
+        </p>
+        <p className="mt-1 text-2xl font-bold text-mint-600">
+          {t("pay.bonusEarned", { bonus: azn(data.bonusEarned) })}
         </p>
 
         <div className="mt-5 rounded-2xl bg-ink-50 py-3">
-          <p className="text-[11px] text-ink-500">
-            {t("scanResult.newBalance")}
-          </p>
+          <p className="text-[11px] text-ink-500">{t("pay.newBonus")}</p>
           <p className="text-xl font-semibold text-ink-900">{azn(balance)}</p>
         </div>
 
         <Button className="mt-5" onClick={onClose}>
-          {earned ? t("scanResult.earnedCta") : t("scanResult.paidCta")}
+          {t("pay.done")}
         </Button>
       </div>
     </div>

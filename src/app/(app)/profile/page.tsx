@@ -8,14 +8,22 @@ import { formatPhone, shortDate } from "@/lib/format";
 import { tierOf } from "@/lib/tier";
 import { PageHeader } from "@/components/PageHeader";
 import { AddVehicleSheet } from "@/components/AddVehicleSheet";
+import { AddCardSheet } from "@/components/AddCardSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import {
+  CardIcon,
   CarIcon,
   GlobeIcon,
   LogoutIcon,
   PlusIcon,
   TrashIcon,
 } from "@/components/Icons";
+
+const cardBrand: Record<"visa" | "mastercard" | "other", string> = {
+  visa: "VISA",
+  mastercard: "MC",
+  other: "CARD",
+};
 
 function readBool(key: string, fallback: boolean) {
   try {
@@ -56,9 +64,11 @@ export default function ProfilePage() {
   const { customer, updateCustomer, signOut } = useSession();
   const { t, lang, setLang } = useT();
   const [addOpen, setAddOpen] = useState(false);
+  const [addCardOpen, setAddCardOpen] = useState(false);
   const [notifCampaigns, setNotifCampaigns] = useState(true);
   const [notifReminders, setNotifReminders] = useState(true);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [removingCard, setRemovingCard] = useState<string | null>(null);
 
   useEffect(() => {
     // Bildiriş parametrlərini localStorage-dan bərpa edirik (yalnız brauzerdə).
@@ -85,6 +95,17 @@ export default function ProfilePage() {
       });
     } finally {
       setRemoving(null);
+    }
+  }
+
+  async function removeCard(id: string) {
+    if (!customer) return;
+    setRemovingCard(id);
+    try {
+      await api.removeCard(id);
+      updateCustomer({ cards: customer.cards.filter((c) => c.id !== id) });
+    } finally {
+      setRemovingCard(null);
     }
   }
 
@@ -156,6 +177,67 @@ export default function ProfilePage() {
               </div>
             ))}
           </Card>
+        </section>
+
+        {/* Mənim kartlarım */}
+        <section className="mt-6">
+          <SectionTitle
+            title={t("cards.title")}
+            action={
+              <button
+                type="button"
+                onClick={() => setAddCardOpen(true)}
+                className="flex items-center gap-1 rounded-full bg-blue-500/12 px-3 py-1.5 text-xs font-medium text-blue-600 transition active:scale-95"
+              >
+                <PlusIcon className="size-4" />
+                {t("cards.add")}
+              </button>
+            }
+          />
+          <Card className="space-y-1 p-2">
+            {customer.cards.length === 0 ? (
+              <p className="px-2 py-6 text-center text-xs text-ink-400">
+                {t("cards.empty")}
+              </p>
+            ) : (
+              customer.cards.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-3 rounded-xl p-2"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600">
+                    <CardIcon className="size-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 text-sm font-medium">
+                      <span className="grid h-5 w-8 shrink-0 place-items-center rounded bg-ink-900 text-[9px] font-bold tracking-wide text-white">
+                        {cardBrand[c.brand]}
+                      </span>
+                      •••• {c.last4}
+                    </p>
+                    <p className="text-[11px] text-ink-500">
+                      {t("cards.expires", {
+                        mm: String(c.expMonth).padStart(2, "0"),
+                        yy: String(c.expYear).padStart(2, "0"),
+                      })}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeCard(c.id)}
+                    disabled={removingCard === c.id}
+                    aria-label={t("profile.delete")}
+                    className="grid size-9 shrink-0 place-items-center rounded-xl text-ink-400 transition active:scale-95 disabled:opacity-40"
+                  >
+                    <TrashIcon className="size-5" />
+                  </button>
+                </div>
+              ))
+            )}
+          </Card>
+          <p className="mt-2 px-1 text-[11px] leading-relaxed text-ink-400">
+            {t("addCard.secureNote")}
+          </p>
         </section>
 
         {/* Dil */}
@@ -249,6 +331,7 @@ export default function ProfilePage() {
       </div>
 
       <AddVehicleSheet open={addOpen} onClose={() => setAddOpen(false)} />
+      <AddCardSheet open={addCardOpen} onClose={() => setAddCardOpen(false)} />
     </main>
   );
 }
