@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { currentMonthName, isThisMonth } from "@/lib/format";
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
+import { UNREAD_NOTIFICATIONS } from "@/lib/notifications";
 import type { Campaign, Transaction } from "@/lib/types";
 import { BalanceCard } from "@/components/BalanceCard";
 import { BranchesQuickCard } from "@/components/BranchesQuickCard";
@@ -25,6 +27,7 @@ import {
 
 export default function HomePage() {
   const { customer, activeVehicle } = useSession();
+  const { t, lang } = useT();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [vehicleOpen, setVehicleOpen] = useState(false);
@@ -86,7 +89,9 @@ export default function HomePage() {
               <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-amber-400 ring-2 ring-blue-600" />
             </span>
             <span className="leading-tight">
-              <span className="block text-xs text-white/80">Xoş gəldiniz</span>
+              <span className="block text-xs text-white/80">
+                {t("home.greeting")}
+              </span>
               <span className="block text-base font-bold tracking-tight">
                 {firstName}
               </span>
@@ -96,12 +101,12 @@ export default function HomePage() {
             type="button"
             onClick={openNotifications}
             className="relative grid size-11 place-items-center rounded-full bg-white/20 text-white backdrop-blur transition active:scale-95"
-            aria-label="Bildirişlər"
+            aria-label={t("home.notifications")}
           >
             <BellIcon className="size-6" />
-            {notifUnread && (
+            {notifUnread && UNREAD_NOTIFICATIONS > 0 && (
               <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-blue-600">
-                1
+                {UNREAD_NOTIFICATIONS}
               </span>
             )}
           </button>
@@ -137,13 +142,13 @@ export default function HomePage() {
 
         <section className="mt-8">
           <SectionTitle
-            title="Kampaniyalar"
+            title={t("home.campaigns")}
             action={
               <Link
                 href="/campaigns"
                 className="flex items-center gap-0.5 text-xs text-blue-600"
               >
-                Hamısı <ChevronIcon className="size-4" />
+                {t("home.seeAll")} <ChevronIcon className="size-4" />
               </Link>
             }
           />
@@ -168,7 +173,9 @@ export default function HomePage() {
         </section>
 
         <section className="mt-8">
-          <SectionTitle title={`Son əməliyyatlar · ${currentMonthName()}`} />
+          <SectionTitle
+            title={`${t("home.recent")} · ${currentMonthName(lang)}`}
+          />
           {recent ? (
             recent.length ? (
               <>
@@ -183,18 +190,18 @@ export default function HomePage() {
                   href="/history"
                   className="mt-3 flex h-12 w-full items-center justify-center gap-1 rounded-2xl border border-ink-200 bg-white text-sm font-semibold text-blue-600 transition active:scale-[0.99]"
                 >
-                  Bütün əməliyyatlar
+                  {t("home.allTransactions")}
                   <ChevronIcon className="size-4" />
                 </Link>
               </>
             ) : (
               <Card className="py-8 text-center">
-                <p className="text-sm text-ink-500">Bu ay əməliyyat yoxdur.</p>
+                <p className="text-sm text-ink-500">{t("home.noneThisMonth")}</p>
                 <Link
                   href="/history"
                   className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-600"
                 >
-                  Bütün əməliyyatlar <ChevronIcon className="size-4" />
+                  {t("home.allTransactions")} <ChevronIcon className="size-4" />
                 </Link>
               </Card>
             )

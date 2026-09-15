@@ -71,7 +71,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => {
     setToken(null);
     applyCustomer(null);
-    router.replace("/login");
+    // AuthGuard sessiyasız istifadəçini onsuz da /welcome-ə yönləndirir; eyni
+    // hədəfə keçirik ki, iki yönləndirmə yarışmasın (əvvəl /login "ölü" idi).
+    router.replace("/welcome");
   }, [router, applyCustomer]);
 
   const updateCustomer = useCallback((partial: Partial<Customer>) => {

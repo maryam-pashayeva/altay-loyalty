@@ -12,22 +12,6 @@ export function allTiers(): Tier[] {
   return ORDER.map((c) => TIERS[c]);
 }
 
-/** Hər səviyyənin üstünlükləri — modal pəncərədə göstərilir */
-export const TIER_BENEFITS: Record<TierCode, string[]> = {
-  bronze: ["Hər yumada 2% bonus", "Kampaniyalara giriş"],
-  silver: ["Hər yumada 3% bonus", "Doğum günündə hədiyyə"],
-  gold: [
-    "Hər yumada 5% bonus",
-    "Növbədən kənar xidmət",
-    "Aylıq xüsusi təkliflər",
-  ],
-  platinum: [
-    "Hər yumada 8% bonus",
-    "Prioritet xidmət",
-    "Aylıq pulsuz salon təmizliyi",
-  ],
-};
-
 /** Növbəti səviyyə və ona çatmaq üçün qalan məbləğ */
 export function tierProgress(code: TierCode, yearlySpend: number) {
   const index = ORDER.indexOf(code);

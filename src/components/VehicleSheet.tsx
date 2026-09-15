@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
 import { Sheet } from "@/components/ui/Sheet";
 import { CarIcon } from "@/components/Icons";
 
@@ -12,9 +13,10 @@ export function VehicleSheet({
   onClose: () => void;
 }) {
   const { customer, activeVehicle, setActiveVehicleId } = useSession();
+  const { t } = useT();
 
   return (
-    <Sheet open={open} onClose={onClose} title="Aktiv avtomobil">
+    <Sheet open={open} onClose={onClose} title={t("vehicleSheet.title")}>
       <div className="space-y-2">
         {customer?.vehicles.map((v) => {
           const active = v.id === activeVehicle?.id;
@@ -61,7 +63,7 @@ export function VehicleSheet({
         })}
       </div>
       <p className="mt-4 text-center text-[11px] leading-relaxed text-ink-400">
-        QR skan edərkən xal seçilmiş avtomobilə yazılır.
+        {t("vehicleSheet.note")}
       </p>
     </Sheet>
   );

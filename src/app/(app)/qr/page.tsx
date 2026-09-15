@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
 import { azn } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { QrScanner } from "@/components/QrScanner";
@@ -24,6 +25,7 @@ type Phase =
 
 export default function QrPage() {
   const { customer, activeVehicle, updateCustomer } = useSession();
+  const { t } = useT();
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
   const [result, setResult] = useState<ScanResultData | null>(null);
   const [vehicleOpen, setVehicleOpen] = useState(false);
@@ -37,7 +39,15 @@ export default function QrPage() {
         if (res.type === "earn") {
           const from = customer.bonusBalance;
           const to = from + res.points;
-          updateCustomer({ bonusBalance: to });
+          // Tamamlanmış yuma — bonusla yanaşı seriyanı da bir addım irəli aparırıq.
+          const streak = customer.washStreak;
+          updateCustomer({
+            bonusBalance: to,
+            washStreak: {
+              ...streak,
+              current: Math.min(streak.goal, streak.current + 1),
+            },
+          });
           setResult({
             variant: "earned",
             amount: res.points,
@@ -59,11 +69,11 @@ export default function QrPage() {
       } catch (e) {
         setPhase({
           kind: "error",
-          message: e instanceof Error ? e.message : "Xəta baş verdi",
+          message: e instanceof Error ? e.message : t("qr.error.generic"),
         });
       }
     },
-    [customer, activeVehicle, updateCustomer],
+    [customer, activeVehicle, updateCustomer, t],
   );
 
   if (!customer) return null;
@@ -73,7 +83,7 @@ export default function QrPage() {
 
   async function confirmPay(c: Extract<Phase, { kind: "confirm" }>) {
     if (customer!.bonusBalance < c.amount) {
-      setPhase({ kind: "error", message: "Bonus balansı kifayət etmir." });
+      setPhase({ kind: "error", message: t("qr.insufficient") });
       return;
     }
     setPhase({ kind: "processing" });
@@ -94,17 +104,14 @@ export default function QrPage() {
     } catch (e) {
       setPhase({
         kind: "error",
-        message: e instanceof Error ? e.message : "Ödəniş alınmadı",
+        message: e instanceof Error ? e.message : t("qr.error.pay"),
       });
     }
   }
 
   return (
     <main>
-      <PageHeader
-        title="Terminalı skan et"
-        subtitle="Terminalın ekranındakı QR kodu telefonunla oxut — sistem əməliyyatı özü tanıyacaq."
-      />
+      <PageHeader title={t("qr.title")} subtitle={t("qr.subtitle")} />
 
       <div className="px-5">
         {/* İnteraktiv maşın seçimi */}
@@ -115,13 +122,13 @@ export default function QrPage() {
             className="mb-3 flex w-full items-center gap-2 rounded-2xl border border-ink-200 bg-white px-4 py-3 text-xs"
           >
             <CarIcon className="size-4 shrink-0 text-blue-600" />
-            <span className="text-ink-500">Skan bu maşına yazılacaq:</span>
+            <span className="text-ink-500">{t("qr.writeTo")}</span>
             <span className="font-semibold text-ink-900">
               {activeVehicle.plate}
             </span>
             {multiCar && (
               <span className="ml-auto flex items-center gap-0.5 font-semibold text-blue-600">
-                Dəyiş <ChevronDownIcon className="size-4" />
+                {t("qr.change")} <ChevronDownIcon className="size-4" />
               </span>
             )}
           </button>
@@ -130,7 +137,7 @@ export default function QrPage() {
         {/* Skaner sahəsi */}
         {phase.kind === "loading" || phase.kind === "processing" ? (
           <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-950 text-sm text-white/80">
-            {phase.kind === "processing" ? "Ödəniş edilir…" : "Yoxlanılır…"}
+            {phase.kind === "processing" ? t("qr.paying") : t("qr.checking")}
           </div>
         ) : phase.kind === "error" ? (
           <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-100 p-6 text-center">
@@ -138,7 +145,7 @@ export default function QrPage() {
           </div>
         ) : paused ? (
           <div className="grid aspect-square w-full place-items-center rounded-3xl border border-dashed border-ink-300 bg-ink-100 text-sm text-ink-400">
-            Kamera dayandırıldı
+            {t("qr.cameraPaused")}
           </div>
         ) : (
           <QrScanner onResult={handleScan} />
@@ -147,7 +154,7 @@ export default function QrPage() {
         {phase.kind === "error" && (
           <div className="mt-4">
             <Button onClick={() => setPhase({ kind: "scan" })}>
-              Təkrar cəhd
+              {t("qr.retry")}
             </Button>
           </div>
         )}
@@ -157,24 +164,24 @@ export default function QrPage() {
       <Sheet
         open={phase.kind === "confirm"}
         onClose={() => setPhase({ kind: "scan" })}
-        title="Ödənişi təsdiqləyin"
+        title={t("qr.confirmTitle")}
       >
         {phase.kind === "confirm" && (
           <>
             <div className="rounded-2xl border border-ink-200 p-4 text-sm">
               <div className="flex justify-between gap-2">
-                <span className="text-ink-500">Xidmət</span>
+                <span className="text-ink-500">{t("qr.service")}</span>
                 <span className="font-medium text-ink-900">{phase.title}</span>
               </div>
               <div className="mt-2 flex justify-between gap-2">
-                <span className="text-ink-500">Filial</span>
+                <span className="text-ink-500">{t("qr.branch")}</span>
                 <span className="font-medium text-ink-900">
                   {phase.branchName}
                 </span>
               </div>
               {activeVehicle && (
                 <div className="mt-2 flex justify-between gap-2">
-                  <span className="text-ink-500">Avtomobil</span>
+                  <span className="text-ink-500">{t("qr.vehicle")}</span>
                   <span className="font-medium text-ink-900">
                     {activeVehicle.plate}
                   </span>
@@ -182,25 +189,25 @@ export default function QrPage() {
               )}
               <div className="mt-3 flex items-center justify-between border-t border-ink-200 pt-3">
                 <span className="font-semibold text-ink-900">
-                  Ödəniş məbləği
+                  {t("qr.amount")}
                 </span>
                 <span className="text-xl font-bold text-blue-600">
                   {azn(phase.amount)}
                 </span>
               </div>
               <p className="mt-1 text-[11px] text-ink-500">
-                Bonus balansınızdan çıxılacaq · Cari: {azn(customer.bonusBalance)}
+                {t("qr.fromBonus", { amount: azn(customer.bonusBalance) })}
               </p>
             </div>
             <Button className="mt-4" onClick={() => confirmPay(phase)}>
-              Ödənişi təsdiqlə
+              {t("qr.confirmPay")}
             </Button>
             <Button
               variant="ghost"
               className="mt-2"
               onClick={() => setPhase({ kind: "scan" })}
             >
-              Ləğv et
+              {t("common.cancel")}
             </Button>
           </>
         )}

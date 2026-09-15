@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { azn } from "@/lib/format";
-import { allTiers, tierOf, tierProgress, TIER_BENEFITS } from "@/lib/tier";
+import { allTiers, tierOf, tierProgress } from "@/lib/tier";
+import { useT, TIER_BENEFITS_I18N } from "@/lib/i18n";
 import type { TierCode } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 
@@ -24,6 +25,7 @@ export function TierSheet({
   current: TierCode;
   yearlySpend: number;
 }) {
+  const { t, lang } = useT();
   const [selected, setSelected] = useState<TierCode>(current);
 
   // Açılanda cari səviyyəni seç
@@ -37,7 +39,7 @@ export function TierSheet({
   const { next, remaining, percent } = tierProgress(current, yearlySpend);
 
   return (
-    <Sheet open={open} onClose={onClose} title="Səviyyə və üstünlüklər">
+    <Sheet open={open} onClose={onClose} title={t("tier.title")}>
       {/* Tab-lar */}
       <div className="flex gap-1 rounded-full bg-ink-100 p-1">
         {allTiers().map((t) => (
@@ -71,20 +73,24 @@ export function TierSheet({
             <span className="text-lg font-bold">{sel.name}</span>
             {isCurrent && (
               <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-semibold backdrop-blur">
-                Cari
+                {t("tier.current")}
               </span>
             )}
           </div>
           <span className="rounded-full bg-white/25 px-3 py-1 text-xs font-semibold backdrop-blur">
-            {sel.cashbackPercent}% bonus
+            {t("tier.bonusBadge", { pct: sel.cashbackPercent })}
           </span>
         </div>
 
         {isCurrent && next ? (
           <div className="mt-4">
             <div className="mb-1.5 flex items-end justify-between text-xs">
-              <span className="text-white/90">{next.name} səviyyəsinə</span>
-              <span className="font-bold">{azn(remaining)} qalıb</span>
+              <span className="text-white/90">
+                {t("tier.toTier", { tier: next.name })}
+              </span>
+              <span className="font-bold">
+                {t("balance.remaining", { amount: azn(remaining) })}
+              </span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-black/20">
               <div
@@ -96,18 +102,18 @@ export function TierSheet({
         ) : (
           <p className="mt-3 text-xs text-white/90">
             {sel.threshold === 0
-              ? "Başlanğıc səviyyə — hamı üçün açıqdır."
-              : `İllik ${azn(sel.threshold)} xərcdən sonra açılır.`}
+              ? t("tier.startLevel")
+              : t("tier.unlockAt", { amount: azn(sel.threshold) })}
           </p>
         )}
       </div>
 
       {/* Üstünlüklər */}
       <p className="mb-2 mt-5 text-xs font-semibold text-ink-500">
-        {sel.name} üstünlükləri
+        {t("tier.benefitsTitle", { tier: sel.name })}
       </p>
       <ul className="space-y-2.5">
-        {TIER_BENEFITS[selected].map((b) => (
+        {TIER_BENEFITS_I18N[lang][selected].map((b) => (
           <li key={b} className="flex items-center gap-2.5 text-sm text-ink-700">
             <span className="grid size-5 shrink-0 place-items-center rounded-full bg-blue-100 text-blue-600">
               <svg
@@ -129,7 +135,7 @@ export function TierSheet({
       </ul>
 
       <p className="mt-5 text-center text-[11px] leading-relaxed text-ink-400">
-        Səviyyə cari ildəki ümumi xərcə görə avtomatik yenilənir.
+        {t("tier.autoNote")}
       </p>
     </Sheet>
   );

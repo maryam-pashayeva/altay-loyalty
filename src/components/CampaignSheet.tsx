@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { shortDate } from "@/lib/format";
 import { accentAt } from "@/lib/accents";
+import { useT } from "@/lib/i18n";
 import type { Campaign } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +17,7 @@ export function CampaignSheet({
   index?: number;
   onClose: () => void;
 }) {
+  const { t, lang } = useT();
   const [done, setDone] = useState<null | "booked" | "copied" | "shared">(null);
 
   function handleClose() {
@@ -25,7 +27,7 @@ export function CampaignSheet({
 
   async function handleShare(code: string) {
     const url = `https://altay-loyalty.vercel.app/?ref=${code}`;
-    const text = `Altaywash-a qoşul, ilk yumanda hər ikimiz 10 ₼ qazanaq! Kodum: ${code}`;
+    const text = t("campaign.shareText", { code });
     try {
       if (typeof navigator !== "undefined" && navigator.share) {
         await navigator.share({ title: "Altaywash", text, url });
@@ -81,10 +83,17 @@ export function CampaignSheet({
                 })}
               </div>
               <p className="mt-3 text-center text-xs text-ink-600">
-                {campaign.stamps.done}/{campaign.stamps.total} tamamlandı —{" "}
+                {t("campaign.stampsDone", {
+                  done: campaign.stamps.done,
+                  total: campaign.stamps.total,
+                })}{" "}
                 <span className="font-semibold text-ink-900">
-                  {Math.max(0, campaign.stamps.total - campaign.stamps.done)}{" "}
-                  yuma sonra hədiyyə
+                  {t("campaign.stampsLeft", {
+                    n: Math.max(
+                      0,
+                      campaign.stamps.total - campaign.stamps.done,
+                    ),
+                  })}
                 </span>
               </p>
             </div>
@@ -93,7 +102,9 @@ export function CampaignSheet({
           {/* Dəvət kodu */}
           {campaign.share && (
             <div className="mt-4 rounded-2xl border border-dashed border-ink-300 bg-ink-50 p-4 text-center">
-              <p className="text-[11px] text-ink-500">Sizin dəvət kodunuz</p>
+              <p className="text-[11px] text-ink-500">
+                {t("campaign.inviteCode")}
+              </p>
               <p className="mt-1 font-mono text-base font-semibold tracking-widest text-ink-900">
                 {campaign.share.code}
               </p>
@@ -102,7 +113,9 @@ export function CampaignSheet({
 
           {!campaign.stamps && !campaign.share && (
             <p className="mt-3 text-xs text-ink-500">
-              {shortDate(campaign.validUntil)} tarixinədək keçərlidir
+              {t("campaign.validUntil", {
+                date: shortDate(campaign.validUntil, lang),
+              })}
             </p>
           )}
 
@@ -110,18 +123,18 @@ export function CampaignSheet({
             {done ? (
               <div className="rounded-2xl bg-mint-100 px-4 py-3 text-center text-sm font-medium text-mint-600">
                 {done === "copied"
-                  ? "Dəvət linki kopyalandı — dostunla paylaş!"
+                  ? t("campaign.done.copied")
                   : done === "shared"
-                    ? "Paylaşıldı — təşəkkürlər!"
-                    : "Uğurla qeydə alındı — tezliklə sizinlə əlaqə saxlanılacaq."}
+                    ? t("campaign.done.shared")
+                    : t("campaign.done.booked")}
               </div>
             ) : campaign.share ? (
               <Button onClick={() => handleShare(campaign.share!.code)}>
-                {campaign.ctaLabel ?? "Dostunu dəvət et"}
+                {campaign.ctaLabel ?? t("campaign.invite")}
               </Button>
             ) : (
               <Button onClick={() => setDone("booked")}>
-                {campaign.ctaLabel ?? "İştirak et"}
+                {campaign.ctaLabel ?? t("campaign.participate")}
               </Button>
             )}
           </div>

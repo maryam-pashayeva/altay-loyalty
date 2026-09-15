@@ -1,10 +1,12 @@
 "use client";
 
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
 import { FlameIcon, TrophyIcon } from "@/components/Icons";
 
 export function StreakCard() {
   const { customer } = useSession();
+  const { t } = useT();
   if (!customer) return null;
 
   const { current, goal } = customer.washStreak;
@@ -18,12 +20,12 @@ export function StreakCard() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-ink-900">
-            {current} yuma seriyası
+            {t("streak.series", { n: current })}
           </p>
           <p className="text-xs text-ink-500">
             {remaining > 0
-              ? `${remaining} yumaya pulsuz yuma`
-              : "Pulsuz yuma hazırdır!"}
+              ? t("streak.toFree", { n: remaining })
+              : t("streak.ready")}
           </p>
         </div>
       </div>

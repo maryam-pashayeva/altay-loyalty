@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
+import { useT } from "@/lib/i18n";
 import { FlashIcon, FlashOffIcon } from "@/components/Icons";
 
 /**
@@ -10,6 +11,7 @@ import { FlashIcon, FlashOffIcon } from "@/components/Icons";
  * fənər (torch) düyməsi göstərilir.
  */
 export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
+  const { t } = useT();
   const videoRef = useRef<HTMLVideoElement>(null);
   const trackRef = useRef<MediaStreamTrack | null>(null);
   const [status, setStatus] = useState<"starting" | "scanning" | "denied">(
@@ -102,10 +104,9 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
     return (
       <div className="grid aspect-square w-full place-items-center rounded-3xl bg-ink-100 p-6 text-center">
         <p className="text-sm font-semibold text-ink-900">
-          Kameraya icazə verilmədi
+          {t("scanner.denied.title")}
           <span className="mt-1 block text-xs font-normal leading-relaxed text-ink-500">
-            Skan üçün brauzer parametrlərindən kameraya icazə verin. Alternativ
-            olaraq aşağıdan kodu əllə daxil edə bilərsiniz.
+            {t("scanner.denied.text")}
           </span>
         </p>
       </div>
@@ -133,7 +134,7 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
 
       {status === "starting" && (
         <div className="absolute inset-0 grid place-items-center bg-ink-950/60 text-sm text-white/80">
-          Kamera açılır…
+          {t("scanner.starting")}
         </div>
       )}
 
@@ -141,7 +142,7 @@ export function QrScanner({ onResult }: { onResult: (code: string) => void }) {
         <button
           type="button"
           onClick={toggleTorch}
-          aria-label="Fənər"
+          aria-label={t("scanner.torch")}
           className={`absolute bottom-4 left-1/2 grid size-12 -translate-x-1/2 place-items-center rounded-full backdrop-blur transition ${
             torch.on ? "bg-white text-ink-900" : "bg-white/20 text-white"
           }`}

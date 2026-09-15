@@ -17,8 +17,10 @@ npm install
 npm run dev
 ```
 
-http://localhost:3000 → `/login` səhifəsinə yönləndirir.
-**Demo rejimdə OTP kodu: `1234`** (istənilən 9 rəqəmli nömrə ilə).
+http://localhost:3000 → giriş etməmiş istifadəçini `/welcome` (qarşılama)
+səhifəsinə yönləndirir.
+**Parolsuz giriş** — istənilən 9 rəqəmli nömrə ilə (SMS/OTP yoxdur). Nömrə
+sistemdə varsa yalnız telefon kifayətdir; yenidirsə ad-soyad soruşulur.
 
 ## ERP inteqrasiyası
 
@@ -34,8 +36,9 @@ Real ERP qoşmaq üçün:
 
    | Metod | Endpoint | Cavab |
    |---|---|---|
-   | `POST` | `/auth/otp` | `{ sent: true }` |
-   | `POST` | `/auth/verify` | `Session` (`token` + `customer`) |
+   | `POST` | `/auth/check` | `{ exists: boolean }` |
+   | `POST` | `/auth/login` | `Session` (`token` + `customer`) |
+   | `POST` | `/auth/register` | `Session` (`token` + `customer`) |
    | `GET` | `/me` | `Customer` |
    | `GET` | `/me/transactions` | `Transaction[]` |
    | `GET` | `/campaigns` | `Campaign[]` |
@@ -53,7 +56,7 @@ Kod dəyişikliyi yalnız bu iki fayla toxunur — UI qatı ERP-dən asılı dey
 ```
 src/
   app/
-    login/            OTP ilə giriş (2 addım)
+    login/            Parolsuz giriş (nömrə, yeni müştəriyə ad-soyad)
     (app)/            Autentifikasiya tələb edən bölmə (AuthGuard + BottomNav)
       page.tsx        Ana səhifə — balans, səviyyə, kampaniyalar, son əməliyyatlar
       qr/             Kassada oxudulan QR loyallıq kartı
@@ -65,9 +68,10 @@ src/
   components/         UI komponentləri (BottomNav, BalanceCard, QrCard, ...)
   lib/
     api/              ERP qatı — client.ts, index.ts (fasad), mock-data.ts
-    session.tsx       Sessiya konteksti (token localStorage-da)
+    session.tsx       Sessiya konteksti (token yalnız yaddaşda — F5-də sıfırlanır)
+    i18n.tsx          Dil konteksti və tərcümələr (AZ/RU/EN)
     types.ts          Domen tipləri
-    tier.ts           Səviyyə (Silver/Gold/Platinum) hesablaması
+    tier.ts           Səviyyə (Bronze/Silver/Gold/Platinum) hesablaması
     format.ts         Məbləğ, tarix və telefon formatı
 ```
 
@@ -75,7 +79,8 @@ src/
 
 | Səviyyə | İllik xərc | Bonus |
 |---|---|---|
-| Silver | 0 ₼-dən | 3% |
+| Bronze | 0 ₼-dən | 2% |
+| Silver | 150 ₼-dən | 3% |
 | Gold | 300 ₼-dən | 5% |
 | Platinum | 800 ₼-dən | 8% |
 

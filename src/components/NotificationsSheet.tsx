@@ -1,43 +1,13 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
+import {
+  NOTIFICATIONS,
+  type NotificationTone,
+} from "@/lib/notifications";
 import { Sheet } from "@/components/ui/Sheet";
 
-type Note = {
-  id: string;
-  title: string;
-  text: string;
-  time: string;
-  tone: "mint" | "blue" | "amber";
-  unread?: boolean;
-};
-
-const NOTES: Note[] = [
-  {
-    id: "n1",
-    title: "Xal qazandınız",
-    text: "Kompleks yuma üçün +1.25 ₼ bonus hesabınıza yazıldı.",
-    time: "2 saat əvvəl",
-    tone: "mint",
-    unread: true,
-  },
-  {
-    id: "n2",
-    title: "Yeni kampaniya",
-    text: "Həftəiçi 20% endirim başladı — indi yoxlayın.",
-    time: "Dünən",
-    tone: "blue",
-    unread: true,
-  },
-  {
-    id: "n3",
-    title: "Paketiniz azalır",
-    text: "Paketinizdə 3 yuma qaldı. Yeniləmək üçün toxunun.",
-    time: "3 gün əvvəl",
-    tone: "amber",
-  },
-];
-
-const dot: Record<Note["tone"], string> = {
+const dot: Record<NotificationTone, string> = {
   mint: "bg-mint-500",
   blue: "bg-blue-500",
   amber: "bg-amber-500",
@@ -50,10 +20,12 @@ export function NotificationsSheet({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useT();
+
   return (
-    <Sheet open={open} onClose={onClose} title="Bildirişlər">
+    <Sheet open={open} onClose={onClose} title={t("notifications.title")}>
       <ul className="space-y-1">
-        {NOTES.map((n) => (
+        {NOTIFICATIONS.map((n) => (
           <li
             key={n.id}
             className="flex gap-3 rounded-2xl p-3 transition active:bg-ink-100"
@@ -63,13 +35,15 @@ export function NotificationsSheet({
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-ink-900">{n.title}</p>
+                <p className="text-sm font-semibold text-ink-900">
+                  {t(n.titleKey)}
+                </p>
                 <span className="shrink-0 text-[11px] text-ink-400">
-                  {n.time}
+                  {t(n.timeKey)}
                 </span>
               </div>
               <p className="mt-0.5 text-xs leading-relaxed text-ink-600">
-                {n.text}
+                {t(n.textKey)}
               </p>
             </div>
           </li>

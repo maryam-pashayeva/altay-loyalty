@@ -96,19 +96,26 @@ export const api = {
       const registry = readRegistry();
       registry[digits] = fullName;
       writeRegistry(registry);
+      // Tamamilə təmiz hesab — demo müştərinin maşınları/kartı/tarixi miras
+      // qalmasın deyə mockCustomer YAYILMIR, sahələr açıq şəkildə qurulur.
+      const now = Date.now();
       const session: Session = {
         token: "mock-token",
         customer: {
-          ...mockCustomer,
-          phone,
+          id: `cus_${now}`,
           fullName,
-          // Yeni müştəri sıfır balansla başlayır
+          phone,
+          cardNumber: `AW-${String(now).slice(-4)}-${String(
+            Math.floor(Math.random() * 9000) + 1000,
+          )}`,
+          tier: "bronze",
           bonusBalance: 0,
           walletBalance: 0,
           washesLeft: 0,
           washStreak: { current: 0, goal: 5 },
           yearlySpend: 0,
-          tier: "bronze",
+          vehicles: [],
+          createdAt: new Date(now).toISOString(),
         },
       };
       setToken(session.token);

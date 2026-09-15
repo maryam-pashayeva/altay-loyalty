@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
 import type { Vehicle } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
 
-const BODY_TYPES: { value: Vehicle["bodyType"]; label: string }[] = [
-  { value: "sedan", label: "Sedan" },
-  { value: "suv", label: "SUV" },
-  { value: "minivan", label: "Minivan" },
-  { value: "pickup", label: "Pikap" },
+const BODY_TYPES: { value: Vehicle["bodyType"]; labelKey: string }[] = [
+  { value: "sedan", labelKey: "body.sedan" },
+  { value: "suv", labelKey: "body.suv" },
+  { value: "minivan", labelKey: "body.minivan" },
+  { value: "pickup", labelKey: "body.pickup" },
 ];
 
 export function AddVehicleSheet({
@@ -22,6 +23,7 @@ export function AddVehicleSheet({
   onClose: () => void;
 }) {
   const { customer, updateCustomer } = useSession();
+  const { t } = useT();
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
   const [bodyType, setBodyType] = useState<Vehicle["bodyType"]>("sedan");
@@ -48,11 +50,11 @@ export function AddVehicleSheet({
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Yeni avtomobil">
+    <Sheet open={open} onClose={onClose} title={t("addVehicle.title")}>
       <form onSubmit={submit} className="space-y-3">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-ink-500">
-            Dövlət nömrəsi
+            {t("addVehicle.plateLabel")}
           </label>
           <input
             autoFocus
@@ -64,7 +66,7 @@ export function AddVehicleSheet({
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-medium text-ink-500">
-            Marka və model
+            {t("addVehicle.modelLabel")}
           </label>
           <input
             value={model}
@@ -75,7 +77,7 @@ export function AddVehicleSheet({
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-medium text-ink-500">
-            Kuza tipi
+            {t("addVehicle.bodyLabel")}
           </label>
           <div className="flex flex-wrap gap-2">
             {BODY_TYPES.map((b) => (
@@ -89,7 +91,7 @@ export function AddVehicleSheet({
                     : "bg-ink-100 text-ink-500"
                 }`}
               >
-                {b.label}
+                {t(b.labelKey)}
               </button>
             ))}
           </div>
@@ -99,7 +101,7 @@ export function AddVehicleSheet({
           className="mt-2"
           disabled={busy || plate.trim().length < 3 || model.trim().length < 2}
         >
-          {busy ? "Əlavə edilir…" : "Avtomobili əlavə et"}
+          {busy ? t("addVehicle.adding") : t("addVehicle.submit")}
         </Button>
       </form>
     </Sheet>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { azn } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
 
 export type ScanResultData = {
@@ -38,6 +39,7 @@ export function ScanResultModal({
   data: ScanResultData | null;
   onClose: () => void;
 }) {
+  const { t } = useT();
   const open = !!data;
   const balance = useCountUp(
     data?.fromBalance ?? 0,
@@ -52,7 +54,7 @@ export function ScanResultModal({
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-6">
       <button
-        aria-label="Bağla"
+        aria-label={t("common.close")}
         onClick={onClose}
         className="fade-in absolute inset-0 h-full w-full cursor-default bg-ink-950/50"
       />
@@ -61,7 +63,7 @@ export function ScanResultModal({
           {earned ? "🎉" : "🚀"}
         </div>
         <h2 className="mt-4 text-lg font-bold tracking-tight text-ink-900">
-          {earned ? "Bonus qazanıldı!" : "Ödəniş uğurlu!"}
+          {earned ? t("scanResult.earned") : t("scanResult.paid")}
         </h2>
         <p
           className={`mt-1 text-3xl font-bold ${
@@ -76,12 +78,14 @@ export function ScanResultModal({
         </p>
 
         <div className="mt-5 rounded-2xl bg-ink-50 py-3">
-          <p className="text-[11px] text-ink-500">Yeni bonus balansı</p>
+          <p className="text-[11px] text-ink-500">
+            {t("scanResult.newBalance")}
+          </p>
           <p className="text-xl font-semibold text-ink-900">{azn(balance)}</p>
         </div>
 
         <Button className="mt-5" onClick={onClose}>
-          {earned ? "Əla!" : "Bitir"}
+          {earned ? t("scanResult.earnedCta") : t("scanResult.paidCta")}
         </Button>
       </div>
     </div>

@@ -37,6 +37,21 @@ export const mockCustomer: Customer = {
   ],
 };
 
+/* Demo tarixləri "indi"yə nisbətən qurulur ki, ana səhifədəki "cari ay"
+   bölməsi vaxt keçdikcə boş qalmasın. İlk iki əməliyyat həmişə cari aya düşür. */
+const NOW = new Date();
+
+/** Cari ayın içində bir tarix (gələcəyə keçməsin deyə sıxılıb). */
+function thisMonth(dayOffset: number, h: number, min: number) {
+  const day = Math.max(1, NOW.getDate() - dayOffset);
+  return new Date(NOW.getFullYear(), NOW.getMonth(), day, h, min).toISOString();
+}
+
+/** k ay əvvələ aid tarix (il sərhədini avtomatik keçir). */
+function monthsAgo(k: number, day: number, h: number, min: number) {
+  return new Date(NOW.getFullYear(), NOW.getMonth() - k, day, h, min).toISOString();
+}
+
 export const mockTransactions: Transaction[] = [
   {
     id: "trx_9012",
@@ -46,7 +61,7 @@ export const mockTransactions: Transaction[] = [
     amount: -25,
     bonusDelta: 1.25,
     vehiclePlate: "10-AA-334",
-    createdAt: "2026-09-06T14:20:00Z",
+    createdAt: thisMonth(0, 14, 20),
   },
   {
     id: "trx_9008",
@@ -55,7 +70,7 @@ export const mockTransactions: Transaction[] = [
     branchName: "Altaywash",
     amount: 0,
     bonusDelta: 50,
-    createdAt: "2026-09-02T10:05:00Z",
+    createdAt: thisMonth(4, 10, 5),
   },
   {
     id: "trx_8991",
@@ -65,7 +80,7 @@ export const mockTransactions: Transaction[] = [
     amount: 0,
     bonusDelta: -15,
     vehiclePlate: "77-BB-901",
-    createdAt: "2026-08-28T17:40:00Z",
+    createdAt: monthsAgo(1, 28, 17, 40),
   },
   {
     id: "trx_8964",
@@ -75,7 +90,7 @@ export const mockTransactions: Transaction[] = [
     amount: -12,
     bonusDelta: 0.6,
     vehiclePlate: "10-AA-334",
-    createdAt: "2026-08-21T09:15:00Z",
+    createdAt: monthsAgo(1, 21, 9, 15),
   },
   {
     id: "trx_8930",
@@ -85,7 +100,7 @@ export const mockTransactions: Transaction[] = [
     amount: -38,
     bonusDelta: 1.9,
     vehiclePlate: "77-BB-901",
-    createdAt: "2026-08-14T12:50:00Z",
+    createdAt: monthsAgo(2, 14, 12, 50),
   },
 ];
 

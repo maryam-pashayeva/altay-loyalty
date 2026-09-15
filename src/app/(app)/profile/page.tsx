@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
-import { shortDate } from "@/lib/format";
+import { useT, LANGS } from "@/lib/i18n";
+import { formatPhone, shortDate } from "@/lib/format";
 import { tierOf } from "@/lib/tier";
 import { PageHeader } from "@/components/PageHeader";
 import { AddVehicleSheet } from "@/components/AddVehicleSheet";
@@ -15,13 +16,6 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@/components/Icons";
-
-type Lang = "az" | "ru" | "en";
-const LANGS: { value: Lang; label: string }[] = [
-  { value: "az", label: "AZ" },
-  { value: "ru", label: "RU" },
-  { value: "en", label: "EN" },
-];
 
 function readBool(key: string, fallback: boolean) {
   try {
@@ -60,30 +54,19 @@ function Toggle({
 
 export default function ProfilePage() {
   const { customer, updateCustomer, signOut } = useSession();
+  const { t, lang, setLang } = useT();
   const [addOpen, setAddOpen] = useState(false);
-  const [lang, setLang] = useState<Lang>("az");
   const [notifCampaigns, setNotifCampaigns] = useState(true);
   const [notifReminders, setNotifReminders] = useState(true);
   const [removing, setRemoving] = useState<string | null>(null);
 
   useEffect(() => {
-    // Parametrləri localStorage-dan bərpa edirik (yalnız brauzerdə mövcuddur).
+    // Bildiriş parametrlərini localStorage-dan bərpa edirik (yalnız brauzerdə).
     /* eslint-disable react-hooks/set-state-in-effect */
-    try {
-      const l = localStorage.getItem("altaywash.lang") as Lang | null;
-      if (l) setLang(l);
-    } catch {}
     setNotifCampaigns(readBool("altaywash.notif.campaigns", true));
     setNotifReminders(readBool("altaywash.notif.reminders", true));
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
-
-  function pickLang(l: Lang) {
-    setLang(l);
-    try {
-      localStorage.setItem("altaywash.lang", l);
-    } catch {}
-  }
 
   function setNotif(key: string, setter: (v: boolean) => void, v: boolean) {
     setter(v);
@@ -111,7 +94,7 @@ export default function ProfilePage() {
 
   return (
     <main>
-      <PageHeader title="Profil" />
+      <PageHeader title={t("profile.title")} />
 
       <div className="px-5">
         <Card className="flex items-center gap-4">
@@ -124,9 +107,12 @@ export default function ProfilePage() {
           </div>
           <div className="min-w-0">
             <p className="truncate font-semibold">{customer.fullName}</p>
-            <p className="text-xs text-ink-500">{customer.phone}</p>
+            <p className="text-xs text-ink-500">{formatPhone(customer.phone)}</p>
             <p className="mt-1 text-[11px] font-medium text-sun-600">
-              {tier.name} · {tier.cashbackPercent}% bonus
+              {t("profile.tierLine", {
+                tier: tier.name,
+                pct: tier.cashbackPercent,
+              })}
             </p>
           </div>
         </Card>
@@ -134,7 +120,7 @@ export default function ProfilePage() {
         {/* Qaraj */}
         <section className="mt-6">
           <SectionTitle
-            title="Qaraj"
+            title={t("profile.garage")}
             action={
               <button
                 type="button"
@@ -142,7 +128,7 @@ export default function ProfilePage() {
                 className="flex items-center gap-1 rounded-full bg-blue-500/12 px-3 py-1.5 text-xs font-medium text-blue-600 transition active:scale-95"
               >
                 <PlusIcon className="size-4" />
-                Yeni maşın
+                {t("profile.newCar")}
               </button>
             }
           />
@@ -161,7 +147,7 @@ export default function ProfilePage() {
                     type="button"
                     onClick={() => removeVehicle(v.id)}
                     disabled={removing === v.id}
-                    aria-label="Sil"
+                    aria-label={t("profile.delete")}
                     className="grid size-9 shrink-0 place-items-center rounded-xl text-ink-400 transition active:scale-95 disabled:opacity-40"
                   >
                     <TrashIcon className="size-5" />
@@ -174,16 +160,16 @@ export default function ProfilePage() {
 
         {/* Dil */}
         <section className="mt-6">
-          <SectionTitle title="Dil" />
+          <SectionTitle title={t("profile.language")} />
           <Card className="flex items-center gap-3">
             <GlobeIcon className="size-5 shrink-0 text-ink-500" />
-            <span className="flex-1 text-sm">Tətbiq dili</span>
+            <span className="flex-1 text-sm">{t("profile.appLanguage")}</span>
             <div className="flex gap-1 rounded-full bg-ink-100 p-1">
               {LANGS.map((l) => (
                 <button
                   key={l.value}
                   type="button"
-                  onClick={() => pickLang(l.value)}
+                  onClick={() => setLang(l.value)}
                   className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                     lang === l.value
                       ? "bg-white text-ink-900 shadow-sm"
@@ -199,13 +185,15 @@ export default function ProfilePage() {
 
         {/* Bildiriş parametrləri */}
         <section className="mt-6">
-          <SectionTitle title="Bildiriş parametrləri" />
+          <SectionTitle title={t("profile.notifSettings")} />
           <Card className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">Kampaniya bildirişləri</p>
+                <p className="text-sm font-medium">
+                  {t("profile.notifCampaigns")}
+                </p>
                 <p className="text-[11px] text-ink-500">
-                  Yeni endirim və təkliflər barədə
+                  {t("profile.notifCampaignsDesc")}
                 </p>
               </div>
               <Toggle
@@ -221,9 +209,11 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center gap-3 border-t border-ink-200 pt-4">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">Yuma xatırlatması</p>
+                <p className="text-sm font-medium">
+                  {t("profile.notifReminders")}
+                </p>
                 <p className="text-[11px] text-ink-500">
-                  Uzun fasilədə yumanı xatırladırıq
+                  {t("profile.notifRemindersDesc")}
                 </p>
               </div>
               <Toggle
@@ -239,12 +229,14 @@ export default function ProfilePage() {
             </div>
           </Card>
           <p className="mt-2 px-1 text-[11px] leading-relaxed text-ink-400">
-            Push bildirişlər ERP inteqrasiyasından sonra aktivləşəcək.
+            {t("profile.pushNote")}
           </p>
         </section>
 
         <p className="mt-6 text-center text-[11px] text-ink-400">
-          Üzv olma tarixi: {shortDate(customer.createdAt)}
+          {t("profile.memberSince", {
+            date: shortDate(customer.createdAt, lang),
+          })}
         </p>
 
         <button
@@ -252,7 +244,7 @@ export default function ProfilePage() {
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-ink-100 py-3.5 text-sm text-red-500"
         >
           <LogoutIcon className="size-5" />
-          Hesabdan çıx
+          {t("profile.signOut")}
         </button>
       </div>
 

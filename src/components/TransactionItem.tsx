@@ -1,5 +1,8 @@
+"use client";
+
 import type { ComponentType } from "react";
 import { azn, dateTime } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 import type { Transaction } from "@/lib/types";
 import { DropIcon, GiftIcon, PlusIcon } from "@/components/Icons";
 
@@ -16,6 +19,7 @@ const meta: Record<Transaction["kind"], Meta> = {
 };
 
 export function TransactionItem({ trx }: { trx: Transaction }) {
+  const { t, lang } = useT();
   const { Icon, tone } = meta[trx.kind];
   const primary = trx.amount !== 0 ? trx.amount : trx.bonusDelta;
 
@@ -34,7 +38,7 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
         <p className="mt-0.5 truncate text-xs text-ink-500">
           {trx.branchName}
           {trx.vehiclePlate ? ` · ${trx.vehiclePlate}` : ""} ·{" "}
-          {dateTime(trx.createdAt)}
+          {dateTime(trx.createdAt, lang)}
         </p>
       </div>
 
@@ -48,7 +52,7 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
         </p>
         {trx.amount !== 0 && trx.bonusDelta !== 0 && (
           <p className="text-[11px] font-medium text-sun-600">
-            {azn(trx.bonusDelta, { sign: true })} bonus
+            {azn(trx.bonusDelta, { sign: true })} {t("transaction.bonusSuffix")}
           </p>
         )}
       </div>

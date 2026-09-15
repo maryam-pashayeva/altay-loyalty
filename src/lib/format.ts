@@ -1,11 +1,23 @@
+import type { Lang } from "@/lib/types";
+
 /**
  * Intl-in `az-AZ` lokalı Node və brauzerlərdə ay adlarını "M09" kimi verir,
- * ona görə tarixlər əl ilə formatlanır.
+ * ona görə tarixlər əl ilə (və dil üzrə) formatlanır.
  */
-const MONTHS_SHORT = [
-  "yan", "fev", "mar", "apr", "may", "iyn",
-  "iyl", "avq", "sen", "okt", "noy", "dek",
-];
+const MONTHS_SHORT: Record<Lang, string[]> = {
+  az: [
+    "yan", "fev", "mar", "apr", "may", "iyn",
+    "iyl", "avq", "sen", "okt", "noy", "dek",
+  ],
+  ru: [
+    "янв", "фев", "мар", "апр", "май", "июн",
+    "июл", "авг", "сен", "окт", "ноя", "дек",
+  ],
+  en: [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ],
+};
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -30,15 +42,15 @@ export function azn(value: number, opts: { sign?: boolean } = {}) {
 }
 
 /** 06 sen 2026 */
-export function shortDate(iso: string) {
+export function shortDate(iso: string, lang: Lang = "az") {
   const d = new Date(iso);
-  return `${pad(d.getDate())} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+  return `${pad(d.getDate())} ${MONTHS_SHORT[lang][d.getMonth()]} ${d.getFullYear()}`;
 }
 
 /** 06 sen, 18:20 */
-export function dateTime(iso: string) {
+export function dateTime(iso: string, lang: Lang = "az") {
   const d = new Date(iso);
-  return `${pad(d.getDate())} ${MONTHS_SHORT[d.getMonth()]}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${pad(d.getDate())} ${MONTHS_SHORT[lang][d.getMonth()]}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 /** +994 50 123 45 67 formatına salır */
@@ -54,7 +66,14 @@ export function formatPhone(raw: string) {
 }
 
 export function phoneDigits(raw: string) {
-  return raw.replace(/\D/g, "").replace(/^994/, "").slice(0, 9);
+  const digits = raw.replace(/\D/g, "");
+  // Ölkə kodunu (994) yalnız tam beynəlxalq formatda (≥12 rəqəm) at;
+  // 9 rəqəmli milli nömrəyə toxunma — məs. 099-4XX-XX-XX → "994XXXXXX".
+  const national =
+    digits.length >= 12 && digits.startsWith("994")
+      ? digits.slice(3)
+      : digits;
+  return national.slice(0, 9);
 }
 
 /** İş saatları mətnindən ("09:00 – 21:00") hazırda açıq olub-olmadığını hesablayır. */
@@ -68,14 +87,24 @@ export function isOpenNow(workingHours: string): boolean | null {
   return end > start ? cur >= start && cur < end : cur >= start || cur < end;
 }
 
-const MONTHS_FULL = [
-  "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
-  "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr",
-];
+const MONTHS_FULL: Record<Lang, string[]> = {
+  az: [
+    "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
+    "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr",
+  ],
+  ru: [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь",
+  ],
+  en: [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ],
+};
 
 /** Cari ayın adı (məs. "Sentyabr") */
-export function currentMonthName() {
-  return MONTHS_FULL[new Date().getMonth()];
+export function currentMonthName(lang: Lang = "az") {
+  return MONTHS_FULL[lang][new Date().getMonth()];
 }
 
 /** Verilən tarix cari təqvim ayına aiddirmi */

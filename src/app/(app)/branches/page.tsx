@@ -4,12 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { distanceKm } from "@/lib/geo";
 import { isOpenNow } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 import type { Branch } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { PinIcon } from "@/components/Icons";
 
 export default function BranchesPage() {
+  const { t } = useT();
   const [branches, setBranches] = useState<Branch[] | null>(null);
   const [me, setMe] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -32,7 +34,7 @@ export default function BranchesPage() {
 
   return (
     <main>
-      <PageHeader title="Filiallar" subtitle="Sizə ən yaxın Altaywash" />
+      <PageHeader title={t("branches.title")} subtitle={t("branches.subtitle")} />
       <div className="space-y-3 px-5">
         {sorted
           ? sorted.map((b) => (
@@ -64,7 +66,7 @@ export default function BranchesPage() {
                                 open ? "bg-mint-500" : "bg-red-500"
                               }`}
                             />
-                            {open ? "Açıqdır" : "Bağlıdır"}
+                            {open ? t("branches.open") : t("branches.closed")}
                           </span>
                         );
                       })()}
@@ -77,7 +79,7 @@ export default function BranchesPage() {
                     href={`tel:${b.phone.replace(/\s/g, "")}`}
                     className="flex-1 rounded-xl bg-ink-100 py-2.5 text-center text-xs"
                   >
-                    Zəng et
+                    {t("branches.call")}
                   </a>
                   <a
                     href={`https://waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}
@@ -85,7 +87,7 @@ export default function BranchesPage() {
                     rel="noreferrer"
                     className="flex-1 rounded-xl bg-blue-600 py-2.5 text-center text-xs font-semibold text-white"
                   >
-                    Marşrut
+                    {t("branches.route")}
                   </a>
                 </div>
               </article>

@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { distanceKm } from "@/lib/geo";
+import { useT } from "@/lib/i18n";
 import { ArrowUpRightIcon, PinIcon } from "@/components/Icons";
 
 /** Ana səhifədəki "Filiallar" qısayolu — icazə verilərsə ən yaxın filialı və
  *  məsafəni göstərir; əks halda sadəcə "Filiallar" qalır. */
 export function BranchesQuickCard() {
+  const { t } = useT();
   const [nearest, setNearest] = useState<{ name: string; km: number } | null>(
     null,
   );
@@ -52,11 +54,16 @@ export function BranchesQuickCard() {
         <PinIcon className="size-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-sm font-medium">Filiallar</span>
+        <span className="block text-sm font-medium">
+          {t("branchesQuick.title")}
+        </span>
         <span className="block truncate text-xs text-ink-500">
           {nearest
-            ? `Ən yaxın: ${nearest.name} · ${nearest.km.toFixed(1)} km`
-            : "Bütün filiallara və marşruta bax"}
+            ? t("branchesQuick.nearest", {
+                name: nearest.name,
+                km: nearest.km.toFixed(1),
+              })
+            : t("branchesQuick.subtitle")}
         </span>
       </span>
       <span className="grid size-8 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-600">

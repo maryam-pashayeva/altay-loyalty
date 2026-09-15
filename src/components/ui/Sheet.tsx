@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import type { ReactNode } from "react";
+import { useT } from "@/lib/i18n";
 
 /** Aşağıdan açılan modal vərəq (bottom sheet). */
 export function Sheet({
@@ -15,6 +16,7 @@ export function Sheet({
   title?: string;
   children: ReactNode;
 }) {
+  const { t } = useT();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -31,7 +33,7 @@ export function Sheet({
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
       <button
-        aria-label="Bağla"
+        aria-label={t("common.close")}
         onClick={onClose}
         className="fade-in absolute inset-0 h-full w-full cursor-default bg-ink-950/40"
       />

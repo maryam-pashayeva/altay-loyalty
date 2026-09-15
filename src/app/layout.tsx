@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/session";
+import { LanguageProvider } from "@/lib/i18n";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 
@@ -27,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="az" className={inter.variable}>
       <body className="font-sans antialiased">
-        <SessionProvider>
-          <div className="app-shell">{children}</div>
-        </SessionProvider>
+        <LanguageProvider>
+          <SessionProvider>
+            <div className="app-shell">{children}</div>
+          </SessionProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

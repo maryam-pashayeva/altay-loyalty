@@ -3,20 +3,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
+import { useT } from "@/lib/i18n";
 import type { Transaction, TransactionKind } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { TransactionItem } from "@/components/TransactionItem";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-const filters: { key: "all" | TransactionKind; label: string }[] = [
-  { key: "all", label: "Hamısı" },
-  { key: "wash", label: "Yumalar" },
-  { key: "bonus_spent", label: "Bonuslar" },
+const filters: { key: "all" | TransactionKind; labelKey: string }[] = [
+  { key: "all", labelKey: "history.filter.all" },
+  { key: "wash", labelKey: "history.filter.wash" },
+  { key: "bonus_spent", labelKey: "history.filter.bonus" },
 ];
 
 export default function HistoryPage() {
   const { customer } = useSession();
+  const { t } = useT();
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [active, setActive] = useState<"all" | TransactionKind>("all");
   const [vehicle, setVehicle] = useState<string>("all");
@@ -44,7 +46,7 @@ export default function HistoryPage() {
 
   return (
     <main>
-      <PageHeader title="Tarixçə" subtitle="Bütün əməliyyatlarınız" />
+      <PageHeader title={t("history.title")} subtitle={t("history.subtitle")} />
 
       <div className="-mx-1 flex gap-2 overflow-x-auto px-5 pb-3 no-scrollbar">
         {filters.map((f) => (
@@ -57,7 +59,7 @@ export default function HistoryPage() {
                 : "bg-ink-100 text-ink-500"
             }`}
           >
-            {f.label}
+            {t(f.labelKey)}
           </button>
         ))}
       </div>
@@ -72,7 +74,7 @@ export default function HistoryPage() {
                 : "bg-ink-100 text-ink-500"
             }`}
           >
-            Bütün maşınlar
+            {t("history.allCars")}
           </button>
           {vehicles.map((v) => (
             <button
@@ -102,7 +104,7 @@ export default function HistoryPage() {
             </Card>
           ) : (
             <p className="py-16 text-center text-sm text-ink-400">
-              Bu bölmədə hələ əməliyyat yoxdur.
+              {t("history.empty")}
             </p>
           )
         ) : (

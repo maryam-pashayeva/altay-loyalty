@@ -1,5 +1,8 @@
+"use client";
+
 import { shortDate } from "@/lib/format";
 import { accentAt } from "@/lib/accents";
+import { useT } from "@/lib/i18n";
 import type { Campaign } from "@/lib/types";
 import { ChevronIcon, GiftIcon } from "@/components/Icons";
 
@@ -12,6 +15,7 @@ export function CampaignCard({
   index?: number;
   onClick?: () => void;
 }) {
+  const { t, lang } = useT();
   return (
     <button
       type="button"
@@ -49,7 +53,9 @@ export function CampaignCard({
           </div>
         ) : (
           <span className="mt-2 inline-block rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-medium text-ink-500">
-            {shortDate(campaign.validUntil)}-dək
+            {t("campaign.validUntilShort", {
+              date: shortDate(campaign.validUntil, lang),
+            })}
           </span>
         )}
       </div>

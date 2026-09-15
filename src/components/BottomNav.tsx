@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/lib/i18n";
 import {
   GiftIcon,
   HistoryIcon,
@@ -11,21 +12,23 @@ import {
 } from "@/components/Icons";
 
 const items = [
-  { href: "/", label: "Ana səhifə", Icon: HomeIcon },
-  { href: "/campaigns", label: "Kampaniya", Icon: GiftIcon },
-  { href: "/qr", label: "Skan et", Icon: QrIcon, primary: true },
-  { href: "/history", label: "Tarixçə", Icon: HistoryIcon },
-  { href: "/profile", label: "Profil", Icon: UserIcon },
+  { href: "/", labelKey: "nav.home", Icon: HomeIcon },
+  { href: "/campaigns", labelKey: "nav.campaigns", Icon: GiftIcon },
+  { href: "/qr", labelKey: "nav.scan", Icon: QrIcon, primary: true },
+  { href: "/history", labelKey: "nav.history", Icon: HistoryIcon },
+  { href: "/profile", labelKey: "nav.profile", Icon: UserIcon },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useT();
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white shadow-[0_-3px_18px_rgba(15,23,42,0.08)]">
       <div className="mx-auto flex w-full max-w-[30rem] items-stretch justify-between px-2 pb-[env(safe-area-inset-bottom)] pt-2">
-        {items.map(({ href, label, Icon, primary }) => {
+        {items.map(({ href, labelKey, Icon, primary }) => {
           const active = pathname === href;
+          const label = t(labelKey);
 
           if (primary) {
             return (

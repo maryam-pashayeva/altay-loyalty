@@ -2,28 +2,33 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { ButtonLink } from "@/components/ui/Button";
 import { AltayLogo } from "@/components/AltayLogo";
 
 const slides = [
   {
+    id: "slide1",
     image: "/onboarding/slide-1-wash.png",
-    title: "Xoş gəldin, Altay!",
-    text: "Hər yumada xal qazan, xalları növbəti yumada endirimə çevir.",
+    titleKey: "welcome.slide1.title",
+    textKey: "welcome.slide1.text",
   },
   {
+    id: "slide2",
     image: "/onboarding/slide-2-scan.png",
-    title: "QR-ı skan et",
-    text: "Terminaldakı QR kodu telefonunla oxu — xalın avtomatik hesabına yazılsın.",
+    titleKey: "welcome.slide2.title",
+    textKey: "welcome.slide2.text",
   },
   {
+    id: "slide3",
     image: "/onboarding/slide-3-reward.png",
-    title: "Xallarını hədiyyəyə çevir",
-    text: "Kifayət qədər xal topladıqda pulsuz yuma və ya endirim qazanırsan.",
+    titleKey: "welcome.slide3.title",
+    textKey: "welcome.slide3.text",
   },
 ];
 
 export default function WelcomePage() {
+  const { t } = useT();
   const [i, setI] = useState(0);
   const startX = useRef<number | null>(null);
 
@@ -53,21 +58,21 @@ export default function WelcomePage() {
             className="flex transition-transform duration-300 ease-out"
             style={{ transform: `translateX(-${i * 100}%)` }}
           >
-            {slides.map(({ image, title, text }) => (
-              <section key={title} className="w-full shrink-0 px-1 text-center">
+            {slides.map(({ id, image, titleKey, textKey }) => (
+              <section key={id} className="w-full shrink-0 px-1 text-center">
                 {/* Şəkillərin fonu ağdır; səhifə fonu da ağ olduğu üçün
                     heç bir görünən kənar/qutu yaranmır. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={image}
-                  alt={title}
+                  alt={t(titleKey)}
                   className="mx-auto aspect-square w-full max-w-[19rem] object-contain"
                 />
                 <h1 className="mt-8 text-2xl font-bold tracking-tight text-ink-900">
-                  {title}
+                  {t(titleKey)}
                 </h1>
                 <p className="mx-auto mt-2 max-w-[19rem] text-sm leading-relaxed text-ink-500">
-                  {text}
+                  {t(textKey)}
                 </p>
               </section>
             ))}
@@ -78,9 +83,9 @@ export default function WelcomePage() {
         <div className="mt-7 flex items-center justify-center gap-2">
           {slides.map((s, idx) => (
             <button
-              key={s.title}
+              key={s.id}
               type="button"
-              aria-label={`Slayd ${idx + 1}`}
+              aria-label={t("welcome.slideAria", { n: idx + 1 })}
               onClick={() => setI(idx)}
               className={`h-2 rounded-full transition-all ${
                 i === idx ? "w-6 bg-blue-600" : "w-2 bg-ink-300"
@@ -91,11 +96,11 @@ export default function WelcomePage() {
       </div>
 
       <div className="space-y-3">
-        <ButtonLink href="/login">Daxil ol</ButtonLink>
+        <ButtonLink href="/login">{t("welcome.signIn")}</ButtonLink>
         <p className="text-center text-sm text-ink-500">
-          Hesabınız yoxdur?{" "}
+          {t("welcome.noAccount")}{" "}
           <Link href="/login" className="font-semibold text-blue-600">
-            Qeydiyyatdan keçin
+            {t("welcome.register")}
           </Link>
         </p>
       </div>
