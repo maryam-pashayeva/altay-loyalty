@@ -35,9 +35,6 @@ export const mockCustomer: Customer = {
     { id: "veh_1", plate: "10-AA-334", model: "Toyota Camry", bodyType: "sedan" },
     { id: "veh_2", plate: "77-BB-901", model: "Hyundai Tucson", bodyType: "suv" },
   ],
-  cards: [
-    { id: "card_1", brand: "visa", last4: "4021", expMonth: 8, expYear: 27 },
-  ],
 };
 
 /* Demo tarixləri "indi"yə nisbətən qurulur ki, ana səhifədəki "cari ay"

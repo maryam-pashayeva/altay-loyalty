@@ -1,39 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
-import { useSession } from "@/lib/session";
+import QRCode from "qrcode";
 import { useT } from "@/lib/i18n";
-import { azn } from "@/lib/format";
-import type { SavedCard } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
-import { PlusIcon } from "@/components/Icons";
+import { CardIcon, CopyIcon } from "@/components/Icons";
 
-const PRESETS = [10, 20, 50, 100];
+/**
+ * Balans artırma vərəqi — tətbiq daxilində ödəniş QƏBUL OLUNMUR (vergi/uçot
+ * səbəbi). Yalnız köçürmə ediləcək kart nömrəsi və onun QR kodu göstərilir;
+ * istifadəçi öz bank tətbiqi ilə QR-ı skan edir və ya karta köçürmə edir.
+ * Kart nömrəsi bir dəfə daxil edilir və yaddaşda saxlanılır (yenidən soruşulmur).
+ */
+const CARD_KEY = "altaywash.topup.card";
+const NAME_KEY = "altaywash.topup.name";
 
-const brandLabel: Record<SavedCard["brand"], string> = {
-  visa: "VISA",
-  mastercard: "MC",
-};
-
-/** Kart göstəricisi — brend rozetkası + son 4 rəqəm (tam nömrə saxlanmır). */
-function CardLabel({ card }: { card: SavedCard }) {
-  const { t } = useT();
-  return (
-    <span className="flex items-center gap-2">
-      <span className="grid h-5 w-8 shrink-0 place-items-center rounded bg-ink-900 text-[9px] font-bold tracking-wide text-white">
-        {brandLabel[card.brand]}
-      </span>
-      <span className="font-semibold text-ink-900">•••• {card.last4}</span>
-      <span className="text-[11px] text-ink-400">
-        {t("cards.expires", {
-          mm: String(card.expMonth).padStart(2, "0"),
-          yy: String(card.expYear).padStart(2, "0"),
-        })}
-      </span>
-    </span>
-  );
+/** Rəqəmləri 4-lük qruplara ayırır: 4169 7388 1234 5678 */
+function groupCard(digits: string) {
+  return digits.replace(/(.{4})/g, "$1 ").trim();
 }
 
 export function TopUpSheet({
@@ -43,185 +28,171 @@ export function TopUpSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const { customer, updateCustomer } = useSession();
   const { t } = useT();
-  const [amount, setAmount] = useState<number | null>(null);
-  const [custom, setCustom] = useState("");
-  const [cardId, setCardId] = useState<string>("new");
-  const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
+  const [card, setCard] = useState("");
+  const [name, setName] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [draftCard, setDraftCard] = useState("");
+  const [draftName, setDraftName] = useState("");
+  const [qr, setQr] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  const cards = customer?.cards ?? [];
-
-  // Açılanda vəziyyəti sıfırla və mövcud kartı seç
+  // Açılanda saxlanmış kartı oxu (yalnız brauzerdə)
   useEffect(() => {
     if (!open) return;
+    let savedCard = "";
+    let savedName = "";
+    try {
+      savedCard = localStorage.getItem(CARD_KEY) ?? "";
+      savedName = localStorage.getItem(NAME_KEY) ?? "";
+    } catch {}
     /* eslint-disable react-hooks/set-state-in-effect */
-    setDone(false);
-    setBusy(false);
-    setAmount(null);
-    setCustom("");
-    setCardId(cards[0]?.id ?? "new");
+    setCard(savedCard);
+    setName(savedName);
+    setDraftCard(savedCard);
+    setDraftName(savedName);
+    setEditing(savedCard.length < 12);
+    setCopied(false);
     /* eslint-enable react-hooks/set-state-in-effect */
-    // yalnız açılış anında — cards asılılığı qəsdən xaric edilib
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  function pickPreset(v: number) {
-    setAmount(v);
-    setCustom("");
-  }
-
-  function onCustom(raw: string) {
-    const cleaned = raw.replace(/[^\d]/g, "").slice(0, 4);
-    setCustom(cleaned);
-    setAmount(cleaned ? Number(cleaned) : null);
-  }
-
-  async function pay() {
-    if (!customer || !amount || amount <= 0) return;
-    setBusy(true);
-    try {
-      let useCardId = cardId;
-      // Yeni kart seçilibsə əvvəlcə tokenləşdiririk (mock) və ya banka yönlənir.
-      if (useCardId === "new") {
-        const { card, redirectUrl } = await api.addCard();
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-          return;
-        }
-        if (card) {
-          updateCustomer({ cards: [...customer.cards, card] });
-          useCardId = card.id;
-        }
-      }
-      const res = await api.topUp(amount, useCardId);
-      if (res.redirectUrl) {
-        window.location.href = res.redirectUrl;
-        return;
-      }
-      updateCustomer({ walletBalance: customer.walletBalance + amount });
-      setDone(true);
-    } finally {
-      setBusy(false);
+  // Kart dəyişdikcə QR-ı yenidən qur
+  useEffect(() => {
+    if (!card || card.length < 12) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setQr("");
+      return;
     }
+    let alive = true;
+    QRCode.toDataURL(card, { width: 320, margin: 1 })
+      .then((url) => {
+        if (alive) setQr(url);
+      })
+      .catch(() => {
+        if (alive) setQr("");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [card]);
+
+  function saveCard() {
+    const digits = draftCard.replace(/\D/g, "").slice(0, 19);
+    if (digits.length < 12) return;
+    const nm = draftName.trim();
+    setCard(digits);
+    setName(nm);
+    setEditing(false);
+    try {
+      localStorage.setItem(CARD_KEY, digits);
+      if (nm) localStorage.setItem(NAME_KEY, nm);
+      else localStorage.removeItem(NAME_KEY);
+    } catch {}
   }
 
-  if (!customer) return null;
+  async function copyCard() {
+    try {
+      await navigator.clipboard.writeText(card);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  }
 
   return (
     <Sheet open={open} onClose={onClose} title={t("topup.title")}>
-      {done ? (
-        <div className="py-4 text-center">
-          <div className="mx-auto grid size-16 place-items-center rounded-full bg-mint-100 text-3xl">
-            🎉
-          </div>
-          <p className="mt-4 text-sm font-semibold text-mint-600">
-            {t("topup.success", { amount: azn(amount ?? 0) })}
+      <p className="text-sm leading-relaxed text-ink-600">
+        {t("topup.instructions")}
+      </p>
+
+      {editing ? (
+        <div className="mt-4 space-y-3">
+          <p className="text-[11px] leading-relaxed text-ink-500">
+            {t("topup.setCardPrompt")}
           </p>
-          <p className="mt-1 text-xs text-ink-500">
-            {t("wallet.title")}: {azn(customer.walletBalance)}
-          </p>
-          <Button className="mt-5" onClick={onClose}>
-            {t("scanResult.paidCta")}
+          <input
+            inputMode="numeric"
+            autoFocus
+            value={groupCard(draftCard.replace(/\D/g, "").slice(0, 19))}
+            onChange={(e) => setDraftCard(e.target.value.replace(/\D/g, ""))}
+            placeholder="0000 0000 0000 0000"
+            className="h-12 w-full rounded-2xl bg-ink-100 px-4 text-base tracking-wide outline-none ring-1 ring-ink-200 focus:ring-blue-500"
+          />
+          <input
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            placeholder={t("topup.namePlaceholder")}
+            className="h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm outline-none ring-1 ring-ink-200 focus:ring-blue-500"
+          />
+          <Button
+            onClick={saveCard}
+            disabled={draftCard.replace(/\D/g, "").length < 12}
+          >
+            {t("topup.save")}
           </Button>
         </div>
       ) : (
         <>
-          <div className="mb-4 rounded-2xl bg-ink-50 p-4 text-center">
-            <p className="text-[11px] text-ink-500">{t("wallet.title")}</p>
-            <p className="text-2xl font-bold text-ink-900">
-              {azn(customer.walletBalance)}
-            </p>
+          {/* QR kod */}
+          <div className="mt-4 flex justify-center">
+            {qr ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={qr}
+                alt="QR"
+                className="size-48 rounded-2xl border border-ink-200 bg-white p-2"
+              />
+            ) : (
+              <div className="size-48 rounded-2xl bg-ink-100" />
+            )}
           </div>
 
-          {/* Məbləğ */}
-          <p className="mb-1.5 text-xs font-medium text-ink-500">
-            {t("topup.amount")}
-          </p>
-          <div className="grid grid-cols-4 gap-2">
-            {PRESETS.map((v) => (
+          {/* Kart nömrəsi + kopyala */}
+          <div className="mt-4 rounded-2xl border border-ink-200 p-4">
+            <div className="flex items-center gap-2">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600">
+                <CardIcon className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] text-ink-500">
+                  {t("topup.cardNumber")}
+                </p>
+                <p className="font-mono text-base font-semibold tracking-wider text-ink-900">
+                  {groupCard(card)}
+                </p>
+                {name && (
+                  <p className="text-[11px] text-ink-500">
+                    {t("topup.holderName")}: {name}
+                  </p>
+                )}
+              </div>
               <button
-                key={v}
                 type="button"
-                onClick={() => pickPreset(v)}
-                className={`rounded-xl py-2.5 text-sm font-semibold transition ${
-                  amount === v && !custom
-                    ? "bg-blue-600 text-white"
-                    : "bg-ink-100 text-ink-700"
-                }`}
+                onClick={copyCard}
+                className="flex shrink-0 items-center gap-1 rounded-full bg-blue-500/12 px-3 py-1.5 text-xs font-semibold text-blue-600 transition active:scale-95"
               >
-                {v} ₼
+                <CopyIcon className="size-4" />
+                {copied ? t("topup.copied") : t("topup.copy")}
               </button>
-            ))}
-          </div>
-          <input
-            inputMode="numeric"
-            value={custom}
-            onChange={(e) => onCustom(e.target.value)}
-            placeholder={t("topup.customAmount")}
-            className="mt-2 h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm outline-none ring-1 ring-ink-200 focus:ring-blue-500"
-          />
-
-          {/* Ödəniş kartı */}
-          <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
-            {t("topup.payWith")}
-          </p>
-          <div className="space-y-2">
-            {cards.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCardId(c.id)}
-                className={`flex w-full items-center justify-between gap-2 rounded-2xl border p-3 text-left text-sm transition ${
-                  cardId === c.id
-                    ? "border-blue-500 bg-blue-50/60 ring-1 ring-blue-500/30"
-                    : "border-ink-200 bg-white"
-                }`}
-              >
-                <CardLabel card={c} />
-                <span
-                  className={`grid size-5 shrink-0 place-items-center rounded-full border ${
-                    cardId === c.id
-                      ? "border-blue-600 bg-blue-600"
-                      : "border-ink-300"
-                  }`}
-                >
-                  {cardId === c.id && (
-                    <span className="size-2 rounded-full bg-white" />
-                  )}
-                </span>
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setCardId("new")}
-              className={`flex w-full items-center gap-2 rounded-2xl border p-3 text-left text-sm font-medium transition ${
-                cardId === "new"
-                  ? "border-blue-500 bg-blue-50/60 text-blue-700 ring-1 ring-blue-500/30"
-                  : "border-dashed border-ink-300 text-ink-600"
-              }`}
-            >
-              <PlusIcon className="size-4 shrink-0" />
-              {t("cards.new")}
-            </button>
+            </div>
           </div>
 
-          <p className="mt-3 text-[11px] leading-relaxed text-ink-400">
-            {t("topup.secureNote")}
-          </p>
-
-          <Button
-            className="mt-4"
-            disabled={busy || !amount || amount <= 0}
-            onClick={pay}
+          <button
+            type="button"
+            onClick={() => {
+              setDraftCard(card);
+              setDraftName(name);
+              setEditing(true);
+            }}
+            className="mt-3 block w-full text-center text-xs font-semibold text-blue-600"
           >
-            {busy
-              ? t("topup.processing")
-              : t("topup.pay", { amount: amount ? azn(amount) : azn(0) })}
-          </Button>
+            {t("topup.edit")}
+          </button>
         </>
       )}
+
+      <p className="mt-4 text-[11px] leading-relaxed text-ink-400">
+        {t("topup.noInAppPay")}
+      </p>
     </Sheet>
   );
 }

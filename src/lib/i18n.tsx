@@ -429,62 +429,55 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Payment will be completed via redirect to the bank page once ERP integration is connected.",
   },
 
-  // Balans artırma və kartlar
+  // Balans artırma (köçürmə/QR — tətbiq daxilində ödəniş YOXDUR)
   "wallet.title": {
     az: "Hesab balansı",
     ru: "Баланс счёта",
     en: "Account balance",
   },
-  "topup.balanceAdd": { az: "Balansı artır", ru: "Пополнить", en: "Top up" },
+  "topup.balanceAdd": {
+    az: "Kartla / QR ilə artır",
+    ru: "Пополнить картой / QR",
+    en: "Top up by card / QR",
+  },
   "topup.title": {
     az: "Balansı artır",
     ru: "Пополнить баланс",
     en: "Top up balance",
   },
-  "topup.amount": { az: "Məbləğ", ru: "Сумма", en: "Amount" },
-  "topup.customAmount": {
-    az: "Başqa məbləğ",
-    ru: "Другая сумма",
-    en: "Other amount",
+  "topup.instructions": {
+    az: "QR kodu bank tətbiqinizlə skan edin və ya göstərilən karta köçürmə edin. Ödəniş təsdiqləndikdən sonra balansınız yenilənir.",
+    ru: "Отсканируйте QR-код в банковском приложении или переведите на указанную карту. Баланс обновится после подтверждения оплаты.",
+    en: "Scan the QR in your banking app or transfer to the card below. Your balance updates once the payment is confirmed.",
   },
-  "topup.payWith": {
-    az: "Ödəniş kartı",
-    ru: "Карта оплаты",
-    en: "Payment card",
+  "topup.cardNumber": {
+    az: "Köçürmə üçün kart",
+    ru: "Карта для перевода",
+    en: "Card for transfer",
   },
-  "topup.pay": { az: "{amount} ödə", ru: "Оплатить {amount}", en: "Pay {amount}" },
-  "topup.processing": { az: "Ödəniş edilir…", ru: "Оплата…", en: "Processing…" },
-  "topup.success": {
-    az: "Balans {amount} artırıldı!",
-    ru: "Баланс пополнен на {amount}!",
-    en: "Balance topped up by {amount}!",
+  "topup.holderName": {
+    az: "Kart sahibi",
+    ru: "Держатель карты",
+    en: "Cardholder",
   },
-  "topup.secureNote": {
-    az: "Kart məlumatı bankın təhlükəsiz səhifəsində daxil olunur — tətbiq onu saxlamır.",
-    ru: "Данные карты вводятся на защищённой странице банка — приложение их не хранит.",
-    en: "Card details are entered on the bank's secure page — the app never stores them.",
+  "topup.copy": { az: "Kopyala", ru: "Копировать", en: "Copy" },
+  "topup.copied": { az: "Kopyalandı", ru: "Скопировано", en: "Copied" },
+  "topup.edit": { az: "Dəyiş", ru: "Изменить", en: "Edit" },
+  "topup.save": { az: "Yadda saxla", ru: "Сохранить", en: "Save" },
+  "topup.setCardPrompt": {
+    az: "Köçürmələrin gedəcəyi kart nömrəsini bir dəfə daxil edin — sonra yadda saxlanacaq.",
+    ru: "Введите номер карты для переводов один раз — он будет сохранён.",
+    en: "Enter the card number for transfers once — it will be saved.",
   },
-  "cards.title": {
-    az: "Ödəniş kartları",
-    ru: "Карты оплаты",
-    en: "Payment cards",
+  "topup.namePlaceholder": {
+    az: "Ad Soyad (istəyə görə)",
+    ru: "Имя Фамилия (необязательно)",
+    en: "Full name (optional)",
   },
-  "cards.add": { az: "Kart əlavə et", ru: "Добавить карту", en: "Add card" },
-  "cards.adding": { az: "Əlavə olunur…", ru: "Добавление…", en: "Adding…" },
-  "cards.empty": {
-    az: "Saxlanmış kart yoxdur",
-    ru: "Нет сохранённых карт",
-    en: "No saved cards",
-  },
-  "cards.new": {
-    az: "Yeni kartla ödə",
-    ru: "Оплатить новой картой",
-    en: "Pay with a new card",
-  },
-  "cards.expires": {
-    az: "Bitmə {mm}/{yy}",
-    ru: "До {mm}/{yy}",
-    en: "Exp {mm}/{yy}",
+  "topup.noInAppPay": {
+    az: "Tətbiq daxilində birbaşa ödəniş qəbul olunmur — köçürmə bank tətbiqi ilə edilir.",
+    ru: "Прямая оплата в приложении не принимается — перевод выполняется в банковском приложении.",
+    en: "No in-app payment is accepted — the transfer is made in your banking app.",
   },
 
   // Tarixçə
