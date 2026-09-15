@@ -4,16 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useT } from "@/lib/i18n";
 import {
-  GiftIcon,
   HistoryIcon,
   HomeIcon,
+  PinIcon,
   QrIcon,
   UserIcon,
 } from "@/components/Icons";
 
 const items = [
   { href: "/", labelKey: "nav.home", Icon: HomeIcon },
-  { href: "/campaigns", labelKey: "nav.campaigns", Icon: GiftIcon },
+  { href: "/branches", labelKey: "nav.branches", Icon: PinIcon },
   { href: "/qr", labelKey: "nav.scan", Icon: QrIcon, primary: true },
   { href: "/history", labelKey: "nav.history", Icon: HistoryIcon },
   { href: "/profile", labelKey: "nav.profile", Icon: UserIcon },

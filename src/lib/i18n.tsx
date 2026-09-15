@@ -28,7 +28,7 @@ const STRINGS: Record<string, Record<Lang, string>> = {
 
   // Naviqasiya
   "nav.home": { az: "Ana səhifə", ru: "Главная", en: "Home" },
-  "nav.campaigns": { az: "Kampaniya", ru: "Акции", en: "Offers" },
+  "nav.branches": { az: "Filiallar", ru: "Филиалы", en: "Branches" },
   "nav.scan": { az: "Skan et", ru: "Сканировать", en: "Scan" },
   "nav.history": { az: "Tarixçə", ru: "История", en: "History" },
   "nav.profile": { az: "Profil", ru: "Профиль", en: "Profile" },
