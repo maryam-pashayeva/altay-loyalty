@@ -429,6 +429,64 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Payment will be completed via redirect to the bank page once ERP integration is connected.",
   },
 
+  // Balans artırma və kartlar
+  "wallet.title": {
+    az: "Hesab balansı",
+    ru: "Баланс счёта",
+    en: "Account balance",
+  },
+  "topup.balanceAdd": { az: "Balansı artır", ru: "Пополнить", en: "Top up" },
+  "topup.title": {
+    az: "Balansı artır",
+    ru: "Пополнить баланс",
+    en: "Top up balance",
+  },
+  "topup.amount": { az: "Məbləğ", ru: "Сумма", en: "Amount" },
+  "topup.customAmount": {
+    az: "Başqa məbləğ",
+    ru: "Другая сумма",
+    en: "Other amount",
+  },
+  "topup.payWith": {
+    az: "Ödəniş kartı",
+    ru: "Карта оплаты",
+    en: "Payment card",
+  },
+  "topup.pay": { az: "{amount} ödə", ru: "Оплатить {amount}", en: "Pay {amount}" },
+  "topup.processing": { az: "Ödəniş edilir…", ru: "Оплата…", en: "Processing…" },
+  "topup.success": {
+    az: "Balans {amount} artırıldı!",
+    ru: "Баланс пополнен на {amount}!",
+    en: "Balance topped up by {amount}!",
+  },
+  "topup.secureNote": {
+    az: "Kart məlumatı bankın təhlükəsiz səhifəsində daxil olunur — tətbiq onu saxlamır.",
+    ru: "Данные карты вводятся на защищённой странице банка — приложение их не хранит.",
+    en: "Card details are entered on the bank's secure page — the app never stores them.",
+  },
+  "cards.title": {
+    az: "Ödəniş kartları",
+    ru: "Карты оплаты",
+    en: "Payment cards",
+  },
+  "cards.add": { az: "Kart əlavə et", ru: "Добавить карту", en: "Add card" },
+  "cards.adding": { az: "Əlavə olunur…", ru: "Добавление…", en: "Adding…" },
+  "cards.empty": {
+    az: "Saxlanmış kart yoxdur",
+    ru: "Нет сохранённых карт",
+    en: "No saved cards",
+  },
+  "cards.new": {
+    az: "Yeni kartla ödə",
+    ru: "Оплатить новой картой",
+    en: "Pay with a new card",
+  },
+  "cards.expires": {
+    az: "Bitmə {mm}/{yy}",
+    ru: "До {mm}/{yy}",
+    en: "Exp {mm}/{yy}",
+  },
+
   // Tarixçə
   "history.title": { az: "Tarixçə", ru: "История", en: "History" },
   "history.subtitle": {

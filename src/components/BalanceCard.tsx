@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n";
 import type { Customer } from "@/lib/types";
 import { DropIcon, PlusIcon } from "@/components/Icons";
 import { TierSheet } from "@/components/TierSheet";
+import { TopUpSheet } from "@/components/TopUpSheet";
 
 /** Səviyyə rozetkasının rəngi — səviyyəyə uyğun */
 const tierBadge: Record<string, string> = {
@@ -20,6 +21,7 @@ const tierBadge: Record<string, string> = {
 export function BalanceCard({ customer }: { customer: Customer }) {
   const { t } = useT();
   const [tierOpen, setTierOpen] = useState(false);
+  const [topUpOpen, setTopUpOpen] = useState(false);
   const [barW, setBarW] = useState(0);
   const tier = tierOf(customer.tier);
   const { next, remaining, percent } = tierProgress(
@@ -91,8 +93,26 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
         )}
 
-        {/* Paket */}
+        {/* Cüzdan balansı — kartla artırılır */}
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/20 pt-4">
+          <div className="min-w-0">
+            <p className="text-[11px] text-white/80">{t("wallet.title")}</p>
+            <p className="mt-0.5 text-base font-semibold">
+              {azn(customer.walletBalance)}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTopUpOpen(true)}
+            className="flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 transition active:scale-95"
+          >
+            <PlusIcon className="size-4" />
+            {t("topup.balanceAdd")}
+          </button>
+        </div>
+
+        {/* Paket */}
+        <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/20 pt-4">
           <div className="min-w-0">
             <p className="text-[11px] text-white/80">{t("balance.myPackage")}</p>
             <p className="mt-0.5 flex items-center gap-1.5 text-base font-semibold">
@@ -104,7 +124,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           </div>
           <Link
             href="/packages"
-            className="pulse-glow flex shrink-0 items-center gap-1 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-blue-600 transition active:scale-95"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-white/20 px-4 py-2.5 text-xs font-semibold text-white backdrop-blur transition active:scale-95"
           >
             <PlusIcon className="size-4" />
             {t("balance.buyPackage")}
@@ -118,6 +138,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
         current={customer.tier}
         yearlySpend={customer.yearlySpend}
       />
+      <TopUpSheet open={topUpOpen} onClose={() => setTopUpOpen(false)} />
     </>
   );
 }

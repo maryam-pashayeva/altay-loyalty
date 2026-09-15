@@ -178,3 +178,10 @@ export const LogoutIcon = (p: P) => (
     <path d="M17 8.5 20.5 12 17 15.5M20 12h-9" />
   </S>
 );
+
+export const CardIcon = (p: P) => (
+  <S {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+    <path d="M3 9.5h18M6.5 15.5h4" />
+  </S>
+);

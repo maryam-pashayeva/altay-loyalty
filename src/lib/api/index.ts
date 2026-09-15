@@ -2,6 +2,7 @@ import type {
   Branch,
   Campaign,
   Customer,
+  SavedCard,
   ScanResult,
   Session,
   Transaction,
@@ -115,6 +116,7 @@ export const api = {
           washStreak: { current: 0, goal: 5 },
           yearlySpend: 0,
           vehicles: [],
+          cards: [],
           createdAt: new Date(now).toISOString(),
         },
       };
@@ -251,6 +253,59 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ ref, vehiclePlate }),
     });
+  },
+
+  /**
+   * Cüzdan balansını kartla artırır.
+   *  - Saxlanmış kart (cardId) ilə: provayder tokeni çərçivəsində ödəniş → `ok`.
+   *  - Yeni kartla (cardId yoxdur): real ERP-də bankın təhlükəsiz 3-D Secure
+   *    səhifəsinə `redirectUrl` qaytarılır (kart məlumatı YALNIZ orada daxil
+   *    olunur; tətbiq PAN/CVV toplamır).
+   */
+  async topUp(
+    amount: number,
+    cardId?: string,
+  ): Promise<{ ok?: true; redirectUrl?: string }> {
+    if (USE_MOCK) {
+      await delay(700);
+      return { ok: true };
+    }
+    return request("/wallet/topup", {
+      method: "POST",
+      body: JSON.stringify({ amount, cardId }),
+    });
+  },
+
+  /**
+   * Yeni kart əlavə edir. Real ERP-də bu, provayderin tokenləşdirmə (hosted)
+   * səhifəsinə `redirectUrl` qaytarır; kart orada daxil olunur və geri yalnız
+   * token + son 4 rəqəm gəlir. Mock: tokenləşdirilmiş kartı simulyasiya edir.
+   */
+  async addCard(): Promise<{ card?: SavedCard; redirectUrl?: string }> {
+    if (USE_MOCK) {
+      await delay(700);
+      const brand: SavedCard["brand"] =
+        Math.random() > 0.5 ? "visa" : "mastercard";
+      return {
+        card: {
+          id: `card_${Date.now()}`,
+          brand,
+          last4: String(1000 + Math.floor(Math.random() * 9000)),
+          expMonth: 1 + Math.floor(Math.random() * 12),
+          expYear: 27 + Math.floor(Math.random() * 4),
+        },
+      };
+    }
+    return request("/wallet/cards", { method: "POST" });
+  },
+
+  /** Saxlanmış kartı silir (token provayder tərəfində ləğv olunur). */
+  async removeCard(id: string): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(300);
+      return { ok: true };
+    }
+    return request(`/wallet/cards/${id}`, { method: "DELETE" });
   },
 };
 

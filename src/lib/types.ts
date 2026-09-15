@@ -32,6 +32,8 @@ export interface Customer {
   /** Cari il ərzində xərclənən məbləğ — səviyyə hesablaması üçün */
   yearlySpend: number;
   vehicles: Vehicle[];
+  /** Yadda saxlanmış ödəniş kartları (tokenləşdirilmiş) */
+  cards: SavedCard[];
   createdAt: string;
 }
 
@@ -41,6 +43,19 @@ export interface Vehicle {
   model: string;
   /** Kuza tipi qiymətə təsir edir */
   bodyType: "sedan" | "suv" | "minivan" | "pickup";
+}
+
+/**
+ * Yadda saxlanmış ödəniş kartı — YALNIZ provayder tərəfindən tokenləşdirilmiş
+ * göstərici məlumat. Tam kart nömrəsi (PAN) və CVV heç vaxt tətbiqdə saxlanmır.
+ */
+export interface SavedCard {
+  id: string;
+  brand: "visa" | "mastercard";
+  /** Kartın son 4 rəqəmi (göstərmək üçün) */
+  last4: string;
+  expMonth: number;
+  expYear: number;
 }
 
 export type TransactionKind = "wash" | "topup" | "bonus_earned" | "bonus_spent";
