@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { azn, bonus } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
+import { GiftIcon, SparkIcon } from "@/components/Icons";
 
 export type ScanResultData = {
   /** pay = terminala ödəniş, wash = xidmət sonu bonusu (ödəniş yoxdur) */
@@ -63,8 +64,12 @@ export function ScanResultModal({
         className="fade-in absolute inset-0 h-full w-full cursor-default bg-ink-950/50"
       />
       <div className="pop-in relative w-full max-w-[22rem] rounded-3xl bg-white p-6 text-center shadow-[0_20px_60px_-20px_rgba(15,23,42,0.4)]">
-        <div className="mx-auto grid size-16 place-items-center rounded-full bg-mint-100 text-3xl">
-          {data.kind === "wash" ? "🎁" : "🎉"}
+        <div className="mx-auto grid size-16 place-items-center rounded-full bg-mint-100 text-mint-600">
+          {data.kind === "wash" ? (
+            <GiftIcon className="size-8" />
+          ) : (
+            <SparkIcon className="size-8" />
+          )}
         </div>
         <h2 className="mt-4 text-lg font-bold tracking-tight text-ink-900">
           {data.kind === "wash"
@@ -80,13 +85,13 @@ export function ScanResultModal({
             ? t("wash.servicePrice", { amount: azn(data.amount) })
             : t("pay.terminalCredited", { amount: azn(data.amount) })}
         </p>
-        <p className="mt-1 text-2xl font-bold text-mint-600">
+        <p className="figure mt-1 text-2xl font-bold text-mint-600">
           {t("pay.bonusEarned", { bonus: bonus(data.bonusEarned) })}
         </p>
 
         <div className="mt-5 rounded-2xl bg-ink-50 py-3">
-          <p className="text-[11px] text-ink-500">{t("pay.newBonus")}</p>
-          <p className="text-xl font-semibold text-ink-900">
+          <p className="eyebrow text-ink-400">{t("pay.newBonus")}</p>
+          <p className="figure text-2xl font-bold text-ink-950">
             {bonus(balance)}{" "}
             <span className="text-sm font-medium text-ink-500">
               {t("common.bonusUnit")}

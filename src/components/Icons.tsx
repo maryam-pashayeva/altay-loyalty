@@ -185,3 +185,37 @@ export const CardIcon = (p: P) => (
     <path d="M3 9.5h18M6.5 15.5h4" />
   </S>
 );
+
+/* --- Emoji əvəzinə istifadə olunan nişanlar ---
+   Emoji platformadan-platformaya dəyişir və müvəqqəti həll təsiri bağışlayır;
+   bu nişanlar qalan interfeyslə eyni xətt qalınlığındadır. */
+
+export const CrownIcon = (p: P) => (
+  <S {...p}>
+    <path d="M3 8.5l3.6 2.6L12 5l5.4 6.1L21 8.5 19.4 18H4.6L3 8.5Z" />
+    <path d="M4.6 18h14.8" />
+  </S>
+);
+
+export const CakeIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4 16.5V13a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3.5" />
+    <path d="M3 16.5c1.5 0 1.5 1.4 3 1.4s1.5-1.4 3-1.4 1.5 1.4 3 1.4 1.5-1.4 3-1.4 1.5 1.4 3 1.4 1.5-1.4 3-1.4" />
+    <path d="M12 11V8" />
+    <path d="M12 5.2c.5.6.8 1 .8 1.4a.8.8 0 0 1-1.6 0c0-.4.3-.8.8-1.4Z" />
+  </S>
+);
+
+export const SparkIcon = (p: P) => (
+  <S {...p}>
+    <path d="M12 3.5 13.7 9l5.5 1.7-5.5 1.7L12 18l-1.7-5.6L4.8 10.7 10.3 9 12 3.5Z" />
+    <path d="M18.5 4.2v2.6M17.2 5.5h2.6" />
+  </S>
+);
+
+export const TicketIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h13A1.5 1.5 0 0 1 20 8.5v1.9a1.8 1.8 0 0 0 0 3.2v1.9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5v-1.9a1.8 1.8 0 0 0 0-3.2V8.5Z" />
+    <path d="M14 7.6v8.8" strokeDasharray="2 2" />
+  </S>
+);

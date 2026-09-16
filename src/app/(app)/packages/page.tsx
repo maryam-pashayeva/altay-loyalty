@@ -81,10 +81,10 @@ export default function PackagesPage() {
         {customer && (
           <Card className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] text-ink-500">
+              <p className="eyebrow text-ink-400">
                 {t("packages.walletTitle")}
               </p>
-              <p className="mt-0.5 text-xl font-bold text-ink-900">
+              <p className="figure mt-1 text-2xl font-bold text-ink-950">
                 {azn(customer.walletBalance)}
               </p>
             </div>
@@ -122,7 +122,9 @@ export default function PackagesPage() {
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-xl font-semibold">{azn(pkg.price)}</p>
+                    <p className="figure text-2xl font-bold text-ink-950">
+                      {azn(pkg.price)}
+                    </p>
                     <p className="text-[11px] text-mint-600">
                       {t("packages.savings", { amount: azn(pkg.savings) })}
                     </p>

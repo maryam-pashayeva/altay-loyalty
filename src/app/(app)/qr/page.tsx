@@ -18,7 +18,7 @@ import {
 } from "@/components/ScanResultModal";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
-import { CardIcon, DropIcon, PlusIcon } from "@/components/Icons";
+import { CardIcon, DropIcon, GiftIcon, PlusIcon } from "@/components/Icons";
 
 /** Sürətli seçim üçün hazır məbləğlər (₼) */
 const AMOUNTS = [0.5, 1, 1.5, 5];
@@ -318,16 +318,14 @@ function QrPageInner() {
             </div>
 
             {/* Məbləğ */}
-            <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
-              {t("pay.amount")}
-            </p>
+            <p className="eyebrow mb-2 mt-5 text-ink-400">{t("pay.amount")}</p>
             <div className="grid grid-cols-4 gap-2">
               {AMOUNTS.map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => pickPreset(v)}
-                  className={`rounded-xl py-2.5 text-sm font-semibold transition ${
+                  className={`figure rounded-xl py-2.5 text-[15px] font-semibold transition ${
                     custom === "" && amount === v
                       ? "bg-blue-600 text-white"
                       : "bg-ink-100 text-ink-700"
@@ -355,7 +353,7 @@ function QrPageInner() {
                 onChange={(e) => changeCustom(e.target.value)}
                 placeholder={t("pay.customAmount")}
                 aria-label={t("pay.customAmount")}
-                className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink-900 outline-none placeholder:font-normal placeholder:text-ink-400"
+                className="figure min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-ink-900 outline-none placeholder:font-sans placeholder:font-normal placeholder:text-ink-400"
               />
               <span className="shrink-0 text-sm font-semibold text-ink-500">
                 ₼
@@ -373,9 +371,7 @@ function QrPageInner() {
             </p>
 
             {/* Kart */}
-            <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
-              {t("pay.card")}
-            </p>
+            <p className="eyebrow mb-2 mt-5 text-ink-400">{t("pay.card")}</p>
             {cards.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-ink-300 p-4 text-center">
                 <p className="text-xs text-ink-500">{t("pay.noCards")}</p>
@@ -438,8 +434,8 @@ function QrPageInner() {
                 {t("topup.note")}
               </p>
             ) : (
-              <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
-                🎁{" "}
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
+                <GiftIcon className="size-4 shrink-0" />
                 {amountValid
                   ? t("pay.bonusPreview", {
                       pct: cashback,
