@@ -122,6 +122,8 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Collect enough points to get a free wash or a discount.",
   },
   "welcome.slideAria": { az: "Slayd {n}", ru: "Слайд {n}", en: "Slide {n}" },
+  "welcome.next": { az: "Növbəti", ru: "Далее", en: "Next" },
+  "welcome.skip": { az: "Keç", ru: "Пропустить", en: "Skip" },
   "welcome.signIn": { az: "Daxil ol", ru: "Войти", en: "Sign in" },
   "welcome.noAccount": {
     az: "Hesabınız yoxdur?",

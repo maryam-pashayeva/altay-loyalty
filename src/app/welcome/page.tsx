@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useT } from "@/lib/i18n";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { AltayLogo } from "@/components/AltayLogo";
 
 const slides = [
@@ -31,6 +31,11 @@ export default function WelcomePage() {
   const { t } = useT();
   const [i, setI] = useState(0);
   const startX = useRef<number | null>(null);
+  const isLast = i === slides.length - 1;
+
+  function next() {
+    setI((v) => Math.min(v + 1, slides.length - 1));
+  }
 
   function onTouchStart(e: React.TouchEvent) {
     startX.current = e.touches[0].clientX;
@@ -46,7 +51,17 @@ export default function WelcomePage() {
 
   return (
     <main className="flex min-h-dvh flex-col bg-white px-6 pb-10 pt-10">
-      <AltayLogo className="h-7 text-ink-900" />
+      <div className="flex h-7 items-center justify-between">
+        <AltayLogo className="h-7 text-ink-900" />
+        {!isLast && (
+          <Link
+            href="/login"
+            className="text-sm font-semibold text-ink-400 transition active:scale-95"
+          >
+            {t("welcome.skip")}
+          </Link>
+        )}
+      </div>
 
       <div className="flex flex-1 flex-col justify-center">
         <div
@@ -96,13 +111,19 @@ export default function WelcomePage() {
       </div>
 
       <div className="space-y-3">
-        <ButtonLink href="/login">{t("welcome.signIn")}</ButtonLink>
-        <p className="text-center text-sm text-ink-500">
-          {t("welcome.noAccount")}{" "}
-          <Link href="/login" className="font-semibold text-blue-600">
-            {t("welcome.register")}
-          </Link>
-        </p>
+        {isLast ? (
+          <div className="rise space-y-3">
+            <ButtonLink href="/login">{t("welcome.signIn")}</ButtonLink>
+            <p className="text-center text-sm text-ink-500">
+              {t("welcome.noAccount")}{" "}
+              <Link href="/login" className="font-semibold text-blue-600">
+                {t("welcome.register")}
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <Button onClick={next}>{t("welcome.next")}</Button>
+        )}
       </div>
     </main>
   );
