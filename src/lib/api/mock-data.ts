@@ -109,15 +109,6 @@ export const mockTransactions: Transaction[] = [
 
 export const mockCampaigns: Campaign[] = [
   {
-    id: "cmp_1",
-    title: "Həftəiçi 20% endirim",
-    description:
-      "Bazar ertəsi–cümə saat 09:00–13:00 arası bütün kompleks yumalara 20% endirim tətbiq olunur.",
-    badge: "20%",
-    validUntil: "2026-10-31T23:59:59Z",
-    ctaLabel: "İndi vaxt təyin et",
-  },
-  {
     id: "cmp_3",
     title: "Dostunu dəvət et — 10 AZN",
     description:

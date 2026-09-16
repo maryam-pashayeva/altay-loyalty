@@ -154,9 +154,20 @@ export default function HomePage() {
           />
           {campaigns ? (
             <div className="relative -mx-5">
-              <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 pr-8 no-scrollbar">
+              <div
+                className={`flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 no-scrollbar ${
+                  campaigns.length > 1 ? "pr-8" : ""
+                }`}
+              >
                 {campaigns.map((c, i) => (
-                  <div key={c.id} className="w-[85%] shrink-0 snap-start">
+                  <div
+                    key={c.id}
+                    /* Tək kampaniya varsa tam eni tutsun — yanda "davamı var"
+                       təəssüratı yaradan boşluq qalmasın. */
+                    className={`shrink-0 snap-start ${
+                      campaigns.length > 1 ? "w-[85%]" : "w-full"
+                    }`}
+                  >
                     <CampaignCard
                       campaign={c}
                       index={i}
@@ -165,7 +176,9 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-5 bg-linear-to-l from-ink-100 to-transparent" />
+              {campaigns.length > 1 && (
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-5 bg-linear-to-l from-ink-100 to-transparent" />
+              )}
             </div>
           ) : (
             <Skeleton className="h-28 w-full" />
