@@ -25,6 +25,8 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   // Ümumi
   "common.cancel": { az: "Ləğv et", ru: "Отмена", en: "Cancel" },
   "common.close": { az: "Bağla", ru: "Закрыть", en: "Close" },
+  /** Bonus vahidi — bonus xaldır, manat deyil; heç vaxt ₼ ilə göstərilmir */
+  "common.bonusUnit": { az: "bonus", ru: "бонус", en: "bonus" },
 
   // Naviqasiya
   "nav.home": { az: "Ana səhifə", ru: "Главная", en: "Home" },
@@ -431,10 +433,62 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Payment will be completed via redirect to the bank page once ERP integration is connected.",
   },
 
+  // Xidmət sonu QR-ı — ödəniş yox, yalnız qazanılmış bonus
+  "wash.title": {
+    az: "Xidmət tamamlandı",
+    ru: "Услуга завершена",
+    en: "Service completed",
+  },
+  "wash.amount": {
+    az: "Xidmətin məbləği",
+    ru: "Стоимость услуги",
+    en: "Service amount",
+  },
+  "wash.rate": {
+    az: "Qazandığınız bonus ({pct}%)",
+    ru: "Ваш бонус ({pct}%)",
+    en: "Bonus earned ({pct}%)",
+  },
+  "wash.noCharge": {
+    az: "Bu QR ödəniş almır — xidmət artıq ödənilib. Yalnız bonusunuz hesaba yazılır.",
+    ru: "Этот QR не списывает деньги — услуга уже оплачена. Начисляется только бонус.",
+    en: "This QR takes no payment — the service is already paid. Only your bonus is credited.",
+  },
+  "wash.claim": {
+    az: "Bonusu hesabıma yaz",
+    ru: "Начислить бонус",
+    en: "Credit my bonus",
+  },
+  "wash.successTitle": {
+    az: "Bonus hesabınıza yazıldı!",
+    ru: "Бонус начислен!",
+    en: "Bonus credited!",
+  },
+  "wash.servicePrice": {
+    az: "Xidmətin məbləği {amount}",
+    ru: "Стоимость услуги {amount}",
+    en: "Service amount {amount}",
+  },
+  "wash.error": {
+    az: "Bonus yazılmadı — QR artıq istifadə olunub ola bilər",
+    ru: "Бонус не начислен — возможно, QR уже использован",
+    en: "Bonus not credited — the QR may already be used",
+  },
+
   // Terminalda ödəniş (skan → məbləğ → kart → ödə)
   "pay.title": { az: "Ödəniş", ru: "Оплата", en: "Payment" },
   "pay.terminal": { az: "Terminal", ru: "Терминал", en: "Terminal" },
   "pay.amount": { az: "Məbləğ", ru: "Сумма", en: "Amount" },
+  "pay.customAmount": {
+    az: "Başqa məbləğ",
+    ru: "Другая сумма",
+    en: "Other amount",
+  },
+  "pay.amountRange": {
+    az: "Min {min} — maks {max}",
+    ru: "Мин {min} — макс {max}",
+    en: "Min {min} — max {max}",
+  },
   "pay.card": { az: "Kart", ru: "Карта", en: "Card" },
   "pay.bonusHint": {
     az: "Hər 1 ₼-ə 1 bonus qazanırsınız",

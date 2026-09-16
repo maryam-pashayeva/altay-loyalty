@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { azn } from "@/lib/format";
+import { azn, bonus } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import { useT } from "@/lib/i18n";
 import type { Customer } from "@/lib/types";
@@ -42,7 +42,10 @@ export function BalanceCard({ customer }: { customer: Customer }) {
           <div className="min-w-0">
             <p className="text-[13px] text-white/90">{t("balance.title")}</p>
             <p className="mt-1 whitespace-nowrap text-[2.75rem] font-bold leading-none tracking-tight">
-              {azn(customer.bonusBalance)}
+              {bonus(customer.bonusBalance)}
+              <span className="ml-1.5 align-middle text-base font-semibold text-white/80">
+                {t("common.bonusUnit")}
+              </span>
             </p>
           </div>
           <button

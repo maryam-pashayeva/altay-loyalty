@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { azn } from "@/lib/format";
+import { azn, bonus } from "@/lib/format";
 import { tierOf } from "@/lib/tier";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
@@ -82,7 +82,7 @@ export default function PackagesPage() {
                   <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
                     <GiftIcon className="size-4 shrink-0" />
                     {t("packages.bonusHint", {
-                      amount: azn((pkg.price * cashback) / 100),
+                      amount: bonus((pkg.price * cashback) / 100),
                     })}
                   </div>
                 )}

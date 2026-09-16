@@ -41,6 +41,30 @@ export function azn(value: number, opts: { sign?: boolean } = {}) {
   return `${prefix}${formatted} ₼`;
 }
 
+/**
+ * Bonus dəyəri — QƏSDƏN ₼ işarəsi OLMADAN. Bonus xal sistemidir; manat
+ * məbləğləri ilə eyni ekranda göründüyü üçün valyuta işarəsi baş qarışdırır.
+ */
+export function bonus(value: number, opts: { sign?: boolean } = {}) {
+  const abs = Math.abs(value);
+  const formatted = abs.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(abs) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+  const prefix = opts.sign
+    ? value > 0
+      ? "+"
+      : value < 0
+        ? "−"
+        : ""
+    : value < 0
+      ? "−"
+      : "";
+
+  return `${prefix}${formatted}`;
+}
+
 /** 06 sen 2026 */
 export function shortDate(iso: string, lang: Lang = "az") {
   const d = new Date(iso);

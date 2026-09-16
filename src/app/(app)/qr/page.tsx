@@ -5,7 +5,9 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
-import { azn } from "@/lib/format";
+import { azn, bonus as bonusFmt } from "@/lib/format";
+import { tierOf } from "@/lib/tier";
+import type { WashScan } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { QrScanner } from "@/components/QrScanner";
 import { AddCardSheet } from "@/components/AddCardSheet";
@@ -15,10 +17,20 @@ import {
 } from "@/components/ScanResultModal";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
-import { CardIcon, PlusIcon } from "@/components/Icons";
+import { CardIcon, DropIcon, PlusIcon } from "@/components/Icons";
 
-/** Terminalda seçilə bilən məbləğlər (₼) */
+/** Sürətli seçim üçün hazır məbləğlər (₼) */
 const AMOUNTS = [0.5, 1, 1.5, 5];
+
+/** Bir ödənişdə icazə verilən aralıq (₼) */
+const MIN_AMOUNT = 0.5;
+const MAX_AMOUNT = 500;
+
+/** "12,50" → 12.5; boş/yanlış dəyər üçün null */
+function parseAmount(raw: string): number | null {
+  const n = Number(raw.replace(",", "."));
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null;
+}
 
 const brandLabel: Record<string, string> = {
   visa: "VISA",
@@ -36,6 +48,7 @@ type Phase =
   | { kind: "scan" }
   | { kind: "loading" }
   | ({ kind: "terminal" } & Terminal)
+  | ({ kind: "wash" } & WashScan)
   | { kind: "processing" }
   | { kind: "error"; message: string };
 
@@ -45,6 +58,8 @@ export default function QrPage() {
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
   const [result, setResult] = useState<ScanResultData | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
+  // Sərbəst məbləğ xanası — yalnız mətn kimi saxlanır, `amount` ondan törəyir
+  const [custom, setCustom] = useState("");
   const [cardId, setCardId] = useState<string | null>(null);
   const [addCardOpen, setAddCardOpen] = useState(false);
 
@@ -53,10 +68,16 @@ export default function QrPage() {
       if (!customer) return;
       setPhase({ kind: "loading" });
       try {
-        const term = await api.scanTerminal(code);
+        const scan = await api.resolveScan(code);
+        if (scan.kind === "wash") {
+          // Xidmət sonu QR-ı — ödəniş yoxdur, yalnız bonus təsdiqlənir
+          setPhase({ ...scan });
+          return;
+        }
         setAmount(null);
+        setCustom("");
         setCardId(customer.cards[0]?.id ?? null);
-        setPhase({ kind: "terminal", ...term });
+        setPhase({ ...scan });
       } catch (e) {
         setPhase({
           kind: "error",
@@ -73,10 +94,29 @@ export default function QrPage() {
   const effectiveCardId = cards.some((c) => c.id === cardId)
     ? cardId
     : (cards[0]?.id ?? null);
-  const paused = result !== null || phase.kind === "terminal";
+  const paused =
+    result !== null || phase.kind === "terminal" || phase.kind === "wash";
+  /** Səviyyəyə uyğun keşbek faizi — xidmət sonu bonusu bundan hesablanır */
+  const cashback = tierOf(customer.tier).cashbackPercent;
+  const amountValid =
+    amount !== null && amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
+  const amountOutOfRange = amount !== null && !amountValid;
+
+  /** Hazır məbləğ seçimi — sərbəst xananı təmizləyir */
+  function pickPreset(v: number) {
+    setAmount(v);
+    setCustom("");
+  }
+
+  /** Sərbəst xana — rəqəm və bir onluq ayırıcıdan başqa simvol qəbul etmir */
+  function changeCustom(raw: string) {
+    const cleaned = raw.replace(/[^\d.,]/g, "").replace(/([.,].*)[.,]/g, "$1");
+    setCustom(cleaned);
+    setAmount(parseAmount(cleaned));
+  }
 
   async function pay(term: Terminal) {
-    if (!customer || !amount || !effectiveCardId) return;
+    if (!customer || !amount || !amountValid || !effectiveCardId) return;
     setPhase({ kind: "processing" });
     try {
       await api.payTerminal(term.terminalId, amount, effectiveCardId);
@@ -85,9 +125,10 @@ export default function QrPage() {
       const to = from + bonusEarned;
       updateCustomer({ bonusBalance: to });
       setResult({
-        paidAmount: amount,
+        kind: "pay",
+        amount,
         bonusEarned,
-        terminalName: term.terminalName,
+        subject: term.terminalName,
         branchName: term.branchName,
         fromBonus: from,
         toBonus: to,
@@ -97,6 +138,47 @@ export default function QrPage() {
       setPhase({
         kind: "error",
         message: e instanceof Error ? e.message : t("pay.error"),
+      });
+    }
+  }
+
+  /**
+   * Xidmət sonu QR-ının təsdiqi — heç nə ödənilmir, yalnız bonus yazılır.
+   * Xidmətin qiyməti illik xərcə də əlavə olunur (səviyyə ondan asılıdır).
+   */
+  async function claimWash(scan: WashScan) {
+    if (!customer) return;
+    const earned = Math.round(scan.amount * cashback) / 100;
+    setPhase({ kind: "processing" });
+    try {
+      await api.confirmWash(scan.washId);
+      const from = customer.bonusBalance;
+      const to = from + earned;
+      const streak = customer.washStreak;
+      const reachedGoal = streak.current + 1 >= streak.goal;
+      updateCustomer({
+        bonusBalance: to,
+        yearlySpend: customer.yearlySpend + scan.amount,
+        washStreak: {
+          ...streak,
+          current: reachedGoal ? 0 : streak.current + 1,
+        },
+        ...(reachedGoal ? { washesLeft: customer.washesLeft + 1 } : {}),
+      });
+      setResult({
+        kind: "wash",
+        amount: scan.amount,
+        bonusEarned: earned,
+        subject: scan.serviceName,
+        branchName: scan.branchName,
+        fromBonus: from,
+        toBonus: to,
+      });
+      setPhase({ kind: "scan" });
+    } catch (e) {
+      setPhase({
+        kind: "error",
+        message: e instanceof Error ? e.message : t("wash.error"),
       });
     }
   }
@@ -161,9 +243,9 @@ export default function QrPage() {
                 <button
                   key={v}
                   type="button"
-                  onClick={() => setAmount(v)}
+                  onClick={() => pickPreset(v)}
                   className={`rounded-xl py-2.5 text-sm font-semibold transition ${
-                    amount === v
+                    custom === "" && amount === v
                       ? "bg-blue-600 text-white"
                       : "bg-ink-100 text-ink-700"
                   }`}
@@ -172,6 +254,40 @@ export default function QrPage() {
                 </button>
               ))}
             </div>
+
+            {/* Sərbəst məbləğ */}
+            <div
+              className={`mt-2 flex items-center gap-2 rounded-2xl border bg-white px-3 py-2.5 transition ${
+                amountOutOfRange
+                  ? "border-red-400 ring-1 ring-red-400/30"
+                  : custom !== "" && amountValid
+                    ? "border-blue-500 ring-1 ring-blue-500/30"
+                    : "border-ink-200"
+              }`}
+            >
+              <input
+                type="text"
+                inputMode="decimal"
+                value={custom}
+                onChange={(e) => changeCustom(e.target.value)}
+                placeholder={t("pay.customAmount")}
+                aria-label={t("pay.customAmount")}
+                className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink-900 outline-none placeholder:font-normal placeholder:text-ink-400"
+              />
+              <span className="shrink-0 text-sm font-semibold text-ink-500">
+                ₼
+              </span>
+            </div>
+            <p
+              className={`mt-1 px-1 text-[11px] ${
+                amountOutOfRange ? "font-medium text-red-500" : "text-ink-400"
+              }`}
+            >
+              {t("pay.amountRange", {
+                min: azn(MIN_AMOUNT),
+                max: azn(MAX_AMOUNT),
+              })}
+            </p>
 
             {/* Kart */}
             <p className="mb-1.5 mt-4 text-xs font-medium text-ink-500">
@@ -240,10 +356,68 @@ export default function QrPage() {
 
             <Button
               className="mt-4"
-              disabled={!amount || !effectiveCardId}
+              disabled={!amountValid || !effectiveCardId}
               onClick={() => pay(phase)}
             >
-              {t("pay.confirm", { amount: amount ? azn(amount) : azn(0) })}
+              {t("pay.confirm", { amount: azn(amountValid ? amount : 0) })}
+            </Button>
+            <Button
+              variant="ghost"
+              className="mt-2"
+              onClick={() => setPhase({ kind: "scan" })}
+            >
+              {t("common.cancel")}
+            </Button>
+          </>
+        )}
+      </Sheet>
+
+      {/* Xidmət sonu vərəqi — ödəniş yoxdur, yalnız bonus təsdiqlənir */}
+      <Sheet
+        open={phase.kind === "wash"}
+        onClose={() => setPhase({ kind: "scan" })}
+        title={t("wash.title")}
+      >
+        {phase.kind === "wash" && (
+          <>
+            <div className="flex items-center gap-2 rounded-2xl bg-ink-50 p-3 text-sm">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-mint-100 text-mint-600">
+                <DropIcon className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-ink-900">
+                  {phase.serviceName}
+                </p>
+                <p className="text-[11px] text-ink-500">{phase.branchName}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 space-y-2 rounded-2xl border border-ink-200 p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-500">{t("wash.amount")}</span>
+                <span className="font-semibold text-ink-900">
+                  {azn(phase.amount)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-500">
+                  {t("wash.rate", { pct: cashback })}
+                </span>
+                <span className="text-lg font-bold text-mint-600">
+                  {bonusFmt((phase.amount * cashback) / 100, { sign: true })}{" "}
+                  <span className="text-xs font-semibold">
+                    {t("common.bonusUnit")}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-3 rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-700">
+              {t("wash.noCharge")}
+            </p>
+
+            <Button className="mt-4" onClick={() => claimWash(phase)}>
+              {t("wash.claim")}
             </Button>
             <Button
               variant="ghost"

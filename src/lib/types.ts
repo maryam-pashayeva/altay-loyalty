@@ -116,11 +116,30 @@ export interface Session {
 }
 
 /**
- * Terminaldakı statik QR oxunduqda alınan nəticə — QR yalnız terminalı
- * eyniləşdirir (filial/terminal DB-dən). Məbləğ və kart tətbiqdə seçilir.
+ * Terminaldakı statik QR — yalnız terminalı eyniləşdirir (filial/terminal
+ * DB-dən). Məbləğ və kart tətbiqdə seçilir, sonra `payTerminal` çağırılır.
  */
-export interface ScanResult {
+export interface TerminalScan {
+  kind: "terminal";
   terminalId: string;
   terminalName: string;
   branchName: string;
 }
+
+/**
+ * Xidmət sonu QR — operator yumanı bitirəndə çek/ekran üzərində göstərilən
+ * birdəfəlik QR. Ödəniş APARILMIR; müştəri yalnız qazandığı bonusu hesabına
+ * yazır (`confirmWash`). Məbləğ artıq kassada ödənilmiş xidmətin qiymətidir.
+ */
+export interface WashScan {
+  kind: "wash";
+  /** Birdəfəlik əməliyyat kodu — eyni QR iki dəfə bonus vermir */
+  washId: string;
+  serviceName: string;
+  branchName: string;
+  /** Ödənilmiş xidmətin məbləği (AZN) — bonus bundan hesablanır */
+  amount: number;
+  vehiclePlate?: string;
+}
+
+export type ScanResult = TerminalScan | WashScan;

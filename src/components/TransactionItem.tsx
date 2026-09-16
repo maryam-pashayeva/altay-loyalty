@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { azn, dateTime } from "@/lib/format";
+import { azn, bonus, dateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import type { Transaction } from "@/lib/types";
 import { DropIcon, GiftIcon, PlusIcon } from "@/components/Icons";
@@ -21,7 +21,9 @@ const meta: Record<Transaction["kind"], Meta> = {
 export function TransactionItem({ trx }: { trx: Transaction }) {
   const { t, lang } = useT();
   const { Icon, tone } = meta[trx.kind];
-  const primary = trx.amount !== 0 ? trx.amount : trx.bonusDelta;
+  // Məbləğ varsa manat, yoxdursa (saf bonus əməliyyatı) bonus xalı göstərilir
+  const isMoney = trx.amount !== 0;
+  const primary = isMoney ? trx.amount : trx.bonusDelta;
 
   return (
     <li className="flex items-center gap-3 py-3">
@@ -48,11 +50,14 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
             primary > 0 ? "text-mint-600" : "text-ink-900"
           }`}
         >
-          {azn(primary, { sign: true })}
+          {isMoney
+            ? azn(primary, { sign: true })
+            : `${bonus(primary, { sign: true })} ${t("transaction.bonusSuffix")}`}
         </p>
         {trx.amount !== 0 && trx.bonusDelta !== 0 && (
           <p className="text-[11px] font-medium text-sun-600">
-            {azn(trx.bonusDelta, { sign: true })} {t("transaction.bonusSuffix")}
+            {bonus(trx.bonusDelta, { sign: true })}{" "}
+            {t("transaction.bonusSuffix")}
           </p>
         )}
       </div>

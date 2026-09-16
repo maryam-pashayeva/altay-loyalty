@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { azn } from "@/lib/format";
+import { azn, bonus } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/Button";
 
 export type ScanResultData = {
-  paidAmount: number;
+  /** pay = terminala ödəniş, wash = xidmət sonu bonusu (ödəniş yoxdur) */
+  kind: "pay" | "wash";
+  /** pay: terminala köçürülən məbləğ · wash: xidmətin qiyməti */
+  amount: number;
   bonusEarned: number;
-  terminalName: string;
+  /** pay: terminalın adı · wash: xidmətin adı */
+  subject: string;
   branchName: string;
   fromBonus: number;
   toBonus: number;
@@ -54,25 +58,34 @@ export function ScanResultModal({
       />
       <div className="pop-in relative w-full max-w-[22rem] rounded-3xl bg-white p-6 text-center shadow-[0_20px_60px_-20px_rgba(15,23,42,0.4)]">
         <div className="mx-auto grid size-16 place-items-center rounded-full bg-mint-100 text-3xl">
-          🎉
+          {data.kind === "wash" ? "🎁" : "🎉"}
         </div>
         <h2 className="mt-4 text-lg font-bold tracking-tight text-ink-900">
-          {t("pay.successTitle")}
+          {data.kind === "wash"
+            ? t("wash.successTitle")
+            : t("pay.successTitle")}
         </h2>
         <p className="mt-1 text-xs text-ink-500">
-          {data.terminalName} · {data.branchName}
+          {data.subject} · {data.branchName}
         </p>
 
         <p className="mt-4 text-sm font-medium text-ink-900">
-          {t("pay.terminalCredited", { amount: azn(data.paidAmount) })}
+          {data.kind === "wash"
+            ? t("wash.servicePrice", { amount: azn(data.amount) })
+            : t("pay.terminalCredited", { amount: azn(data.amount) })}
         </p>
         <p className="mt-1 text-2xl font-bold text-mint-600">
-          {t("pay.bonusEarned", { bonus: azn(data.bonusEarned) })}
+          {t("pay.bonusEarned", { bonus: bonus(data.bonusEarned) })}
         </p>
 
         <div className="mt-5 rounded-2xl bg-ink-50 py-3">
           <p className="text-[11px] text-ink-500">{t("pay.newBonus")}</p>
-          <p className="text-xl font-semibold text-ink-900">{azn(balance)}</p>
+          <p className="text-xl font-semibold text-ink-900">
+            {bonus(balance)}{" "}
+            <span className="text-sm font-medium text-ink-500">
+              {t("common.bonusUnit")}
+            </span>
+          </p>
         </div>
 
         <Button className="mt-5" onClick={onClose}>

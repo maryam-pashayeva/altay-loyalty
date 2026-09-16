@@ -8,6 +8,7 @@ import type {
   Transaction,
   Vehicle,
   WashPackage,
+  WashScan,
 } from "@/lib/types";
 import { request, setToken } from "./client";
 import {
@@ -46,6 +47,30 @@ function writeRegistry(map: Record<string, string>) {
 
 /** Demo üçün öncədən qeydiyyatlı nömrə (köhnə müştəri) */
 const SEEDED_PHONE = mockCustomer.phone.replace(/\D/g, "");
+
+/**
+ * Test/demo üçün xidmət sonu QR formatı:
+ *   ALTAY:WASH:<məbləğ>[:<xidmət adı>[:<filial>]]
+ * Məsələn:  ALTAY:WASH:25         → 25 ₼-lik "Kompleks yuma"
+ *           ALTAY:WASH:38:Mum     → 38 ₼-lik "Mum"
+ * Format uyğun gəlmirsə null qaytarır (deməli terminal QR-ıdır).
+ */
+function parseWashCode(raw: string): WashScan | null {
+  const m = /^ALTAY:WASH:([\d.,]+)(?::([^:]*))?(?::([^:]*))?$/i.exec(raw);
+  if (!m) return null;
+
+  const amount = Number(m[1].replace(",", "."));
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  return {
+    kind: "wash",
+    // Hər skanda yeni id — mock-da təkrar yoxlanışı serverdə olduğu üçün
+    washId: `wash_${Date.now()}`,
+    serviceName: m[2]?.trim() || "Kompleks yuma",
+    branchName: m[3]?.trim() || "Altaywash Xətai",
+    amount: Math.round(amount * 100) / 100,
+  };
+}
 
 export const api = {
   /** Nömrənin sistemdə mövcud olub-olmadığını yoxlayır.
@@ -184,23 +209,44 @@ export const api = {
   },
 
   /**
-   * Terminaldakı statik QR oxunduqda çağırılır. QR yalnız terminalı
-   * eyniləşdirir — hansı filial/terminal olduğunu ERP DB-dən qaytarır.
-   * Məbləğ və kart tətbiqdə seçilir; sonra `payTerminal` çağırılır.
+   * Oxunan QR-ın NƏ olduğunu təyin edir. İki tip var:
+   *  • terminal QR-ı  → tətbiqdə məbləğ seçilir və kartla ödənilir
+   *  • xidmət sonu QR-ı → ödəniş yoxdur, yalnız qazanılan bonus yazılır
+   * Tipi həmişə ERP qaytarır — tətbiq QR-ın məzmununa güvənmir.
    */
-  async scanTerminal(code: string): Promise<ScanResult> {
+  async resolveScan(code: string): Promise<ScanResult> {
     if (USE_MOCK) {
       await delay(700);
-      if (!code || code.trim().length < 4) {
+      const raw = code.trim();
+      if (raw.length < 4) {
         throw new Error("QR kod tanınmadı. Yenidən cəhd edin.");
       }
+
+      // Mock rejimdə tip QR mətnindən oxunur ki, test QR-ları ilə hər iki
+      // axını yoxlamaq mümkün olsun. Real ERP-də bu qərarı server verir.
+      const wash = parseWashCode(raw);
+      if (wash) return wash;
+
       return {
+        kind: "terminal",
         terminalId: "term_12",
         terminalName: "Terminal 3",
         branchName: "Altaywash Xətai",
       };
     }
-    return request(`/terminals/resolve?code=${encodeURIComponent(code)}`);
+    return request(`/scan/resolve?code=${encodeURIComponent(code)}`);
+  },
+
+  /**
+   * Xidmət sonu QR-ının təsdiqi — bonusu müştərinin hesabına yazır.
+   * Ödəniş aparmır; `washId` birdəfəlikdir, təkrar çağırışda ERP rədd edir.
+   */
+  async confirmWash(washId: string): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(600);
+      return { ok: true };
+    }
+    return request(`/washes/${washId}/confirm`, { method: "POST" });
   },
 
   /**
