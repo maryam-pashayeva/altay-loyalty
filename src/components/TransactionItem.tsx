@@ -14,6 +14,7 @@ type Meta = {
 const meta: Record<Transaction["kind"], Meta> = {
   wash: { Icon: DropIcon, tone: "bg-blue-50 text-blue-600" },
   topup: { Icon: PlusIcon, tone: "bg-mint-100 text-mint-600" },
+  package: { Icon: DropIcon, tone: "bg-blue-50 text-blue-600" },
   bonus_earned: { Icon: GiftIcon, tone: "bg-sun-400/15 text-sun-600" },
   bonus_spent: { Icon: GiftIcon, tone: "bg-sun-400/15 text-sun-600" },
 };
@@ -35,7 +36,7 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-ink-900">
-          {trx.title}
+          {trx.titleKey ? t(trx.titleKey) : trx.title}
         </p>
         <p className="mt-0.5 truncate text-xs text-ink-500">
           {trx.branchName}

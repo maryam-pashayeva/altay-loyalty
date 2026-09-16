@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { getToken, setToken } from "@/lib/api/client";
-import type { Customer, Vehicle } from "@/lib/types";
+import type { Customer, Transaction, Vehicle } from "@/lib/types";
 
 interface SessionValue {
   customer: Customer | null;
@@ -21,6 +21,10 @@ interface SessionValue {
   setActiveVehicleId: (id: string) => void;
   /** Balans və s. sahələri lokal (optimistik) yeniləyir */
   updateCustomer: (partial: Partial<Customer>) => void;
+  /** Əməliyyat tarixçəsi — bütün səhifələr bu vahid siyahını oxuyur */
+  transactions: Transaction[] | null;
+  /** Yeni əməliyyatı tarixçənin başına yazır (ödəniş, bonus, balans, paket) */
+  addTransaction: (trx: Omit<Transaction, "id" | "createdAt">) => void;
   signIn: (customer: Customer) => void;
   signOut: () => void;
   refresh: () => Promise<void>;
@@ -32,6 +36,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeVehicleId, setActiveVehicleId] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const router = useRouter();
 
   const applyCustomer = useCallback((next: Customer | null) => {
@@ -42,14 +47,21 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const refresh = useCallback(async () => {
     if (!getToken()) {
       applyCustomer(null);
+      setTransactions(null);
       setLoading(false);
       return;
     }
     try {
-      applyCustomer(await api.getProfile());
+      const [profile, history] = await Promise.all([
+        api.getProfile(),
+        api.getTransactions(),
+      ]);
+      applyCustomer(profile);
+      setTransactions(history);
     } catch {
       setToken(null);
       applyCustomer(null);
+      setTransactions(null);
     } finally {
       setLoading(false);
     }
@@ -64,6 +76,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     (next: Customer) => {
       applyCustomer(next);
       setLoading(false);
+      // Giriş ardınca tarixçə çəkilir; uğursuz olsa boş siyahı qalır.
+      void api
+        .getTransactions()
+        .then(setTransactions)
+        .catch(() => setTransactions([]));
     },
     [applyCustomer],
   );
@@ -71,6 +88,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => {
     setToken(null);
     applyCustomer(null);
+    setTransactions(null);
     // AuthGuard sessiyasız istifadəçini onsuz da /welcome-ə yönləndirir; eyni
     // hədəfə keçirik ki, iki yönləndirmə yarışmasın (əvvəl /login "ölü" idi).
     router.replace("/welcome");
@@ -79,6 +97,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const updateCustomer = useCallback((partial: Partial<Customer>) => {
     setCustomer((c) => (c ? { ...c, ...partial } : c));
   }, []);
+
+  const addTransaction = useCallback(
+    (trx: Omit<Transaction, "id" | "createdAt">) => {
+      const entry: Transaction = {
+        ...trx,
+        id: `trx_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+      };
+      setTransactions((list) => [entry, ...(list ?? [])]);
+    },
+    [],
+  );
 
   const activeVehicle = useMemo(
     () =>
@@ -95,6 +125,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       activeVehicle,
       setActiveVehicleId,
       updateCustomer,
+      transactions,
+      addTransaction,
       signIn,
       signOut,
       refresh,
@@ -104,6 +136,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       loading,
       activeVehicle,
       updateCustomer,
+      transactions,
+      addTransaction,
       signIn,
       signOut,
       refresh,

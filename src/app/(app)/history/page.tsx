@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { useMemo, useState } from "react";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
-import type { Transaction, TransactionKind } from "@/lib/types";
+import type { TransactionKind } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { TransactionItem } from "@/components/TransactionItem";
 import { Card } from "@/components/ui/Card";
@@ -14,18 +13,14 @@ const filters: { key: "all" | TransactionKind; labelKey: string }[] = [
   { key: "all", labelKey: "history.filter.all" },
   { key: "wash", labelKey: "history.filter.wash" },
   { key: "bonus_spent", labelKey: "history.filter.bonus" },
+  { key: "topup", labelKey: "history.filter.balance" },
 ];
 
 export default function HistoryPage() {
-  const { customer } = useSession();
+  const { customer, transactions } = useSession();
   const { t } = useT();
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [active, setActive] = useState<"all" | TransactionKind>("all");
   const [vehicle, setVehicle] = useState<string>("all");
-
-  useEffect(() => {
-    void api.getTransactions().then(setTransactions);
-  }, []);
 
   const vehicles = customer?.vehicles ?? [];
   const showVehicleFilter = vehicles.length >= 2;
@@ -38,7 +33,9 @@ export default function HistoryPage() {
           ? true
           : active === "bonus_spent"
             ? t.kind.startsWith("bonus")
-            : t.kind === active;
+            : active === "topup"
+              ? t.kind === "topup" || t.kind === "package"
+              : t.kind === active;
       const byVehicle = vehicle === "all" ? true : t.vehiclePlate === vehicle;
       return byKind && byVehicle;
     });

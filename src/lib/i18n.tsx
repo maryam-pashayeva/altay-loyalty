@@ -643,6 +643,11 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   "history.filter.all": { az: "Hamısı", ru: "Все", en: "All" },
   "history.filter.wash": { az: "Yumalar", ru: "Мойки", en: "Washes" },
   "history.filter.bonus": { az: "Bonuslar", ru: "Бонусы", en: "Bonuses" },
+  "history.filter.balance": {
+    az: "Balans",
+    ru: "Баланс",
+    en: "Balance",
+  },
   "history.allCars": {
     az: "Bütün maşınlar",
     ru: "Все автомобили",
@@ -655,6 +660,17 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   },
 
   // Əməliyyat sətri
+  // Tətbiqin özü yazdığı əməliyyat başlıqları
+  "trx.terminalPay": {
+    az: "Terminalda ödəniş",
+    ru: "Оплата на терминале",
+    en: "Paid at terminal",
+  },
+  "trx.topUp": {
+    az: "Balans artırıldı",
+    ru: "Баланс пополнен",
+    en: "Balance topped up",
+  },
   "transaction.bonusSuffix": { az: "bonus", ru: "бонус", en: "bonus" },
 
   // Filiallar

@@ -15,7 +15,7 @@ import { GiftIcon, PlusIcon } from "@/components/Icons";
 import { Card } from "@/components/ui/Card";
 
 export default function PackagesPage() {
-  const { customer, updateCustomer } = useSession();
+  const { customer, updateCustomer, addTransaction } = useSession();
   const { t } = useT();
   const [packages, setPackages] = useState<WashPackage[] | null>(null);
   const [pending, setPending] = useState<string | null>(null);
@@ -60,6 +60,13 @@ export default function PackagesPage() {
         walletBalance:
           Math.round((customer.walletBalance - pkg.price) * 100) / 100,
         washesLeft: customer.washesLeft + pkg.washCount,
+      });
+      addTransaction({
+        kind: "package",
+        title: pkg.name,
+        branchName: "Altaywash",
+        amount: -pkg.price,
+        bonusDelta: 0,
       });
       setDone(pkg.id);
     } finally {

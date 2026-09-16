@@ -7,7 +7,7 @@ import { currentMonthName, isThisMonth } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
 import { UNREAD_NOTIFICATIONS } from "@/lib/notifications";
-import type { Campaign, Transaction } from "@/lib/types";
+import type { Campaign } from "@/lib/types";
 import { BalanceCard } from "@/components/BalanceCard";
 import { BranchesQuickCard } from "@/components/BranchesQuickCard";
 import { CampaignCard } from "@/components/CampaignCard";
@@ -26,10 +26,9 @@ import {
 } from "@/components/Icons";
 
 export default function HomePage() {
-  const { customer, activeVehicle } = useSession();
+  const { customer, activeVehicle, transactions } = useSession();
   const { t, lang } = useT();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [vehicleOpen, setVehicleOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifUnread, setNotifUnread] = useState(true);
@@ -40,7 +39,6 @@ export default function HomePage() {
 
   useEffect(() => {
     void api.getCampaigns().then(setCampaigns);
-    void api.getTransactions().then(setTransactions);
     try {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotifUnread(localStorage.getItem("altaywash.notifRead") !== "1");

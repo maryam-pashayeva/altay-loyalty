@@ -65,12 +65,23 @@ export interface SavedCard {
   expYear: number;
 }
 
-export type TransactionKind = "wash" | "topup" | "bonus_earned" | "bonus_spent";
+export type TransactionKind =
+  | "wash"
+  | "topup"
+  | "package"
+  | "bonus_earned"
+  | "bonus_spent";
 
 export interface Transaction {
   id: string;
   kind: TransactionKind;
+  /** ERP-dən gələn hazır başlıq */
   title: string;
+  /**
+   * Tətbiqin özü yazdığı əməliyyatlar üçün i18n açarı — dil dəyişəndə başlıq
+   * da tərcümə olunsun deyə `title` yerinə bu üstün tutulur.
+   */
+  titleKey?: string;
   branchName: string;
   /** Müsbət = balansa əlavə, mənfi = balansdan çıxım */
   amount: number;

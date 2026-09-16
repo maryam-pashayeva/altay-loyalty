@@ -56,7 +56,7 @@ type Phase =
   | { kind: "error"; message: string };
 
 function QrPageInner() {
-  const { customer, updateCustomer } = useSession();
+  const { customer, updateCustomer, addTransaction } = useSession();
   const { t } = useT();
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
   const [result, setResult] = useState<ScanResultData | null>(null);
@@ -150,6 +150,14 @@ function QrPageInner() {
         yearlyWashes: washes,
         tier: tierFor(washes),
       });
+      addTransaction({
+        kind: "wash",
+        title: "",
+        titleKey: "trx.terminalPay",
+        branchName: term.branchName,
+        amount: -amount,
+        bonusDelta: bonusEarned,
+      });
       setResult({
         kind: "pay",
         amount,
@@ -176,6 +184,14 @@ function QrPageInner() {
       await api.topUpWallet(amount, effectiveCardId);
       updateCustomer({
         walletBalance: Math.round((customer.walletBalance + amount) * 100) / 100,
+      });
+      addTransaction({
+        kind: "topup",
+        title: "",
+        titleKey: "trx.topUp",
+        branchName: "Altaywash",
+        amount,
+        bonusDelta: 0,
       });
       setPhase({ kind: "scan" });
       router.replace("/packages");
@@ -211,6 +227,14 @@ function QrPageInner() {
           current: reachedGoal ? 0 : streak.current + 1,
         },
         ...(reachedGoal ? { washesLeft: customer.washesLeft + 1 } : {}),
+      });
+      addTransaction({
+        kind: "bonus_earned",
+        title: scan.serviceName,
+        branchName: scan.branchName,
+        amount: 0,
+        bonusDelta: earned,
+        ...(scan.vehiclePlate ? { vehiclePlate: scan.vehiclePlate } : {}),
       });
       setResult({
         kind: "wash",
