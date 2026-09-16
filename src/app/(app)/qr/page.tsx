@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
 import { azn, bonus as bonusFmt } from "@/lib/format";
-import { tierOf } from "@/lib/tier";
+import { tierFor, tierOf } from "@/lib/tier";
 import type { WashScan } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { QrScanner } from "@/components/QrScanner";
@@ -143,10 +143,12 @@ function QrPageInner() {
       const bonusEarned = Math.round(amount * cashback) / 100;
       const from = customer.bonusBalance;
       const to = from + bonusEarned;
-      // Ödənilən məbləğ illik xərcə yazılır — səviyyə irəliləyişi bundan asılıdır
+      // Yuma sayı artır — səviyyə irəliləyişi bundan asılıdır
+      const washes = customer.yearlyWashes + 1;
       updateCustomer({
         bonusBalance: to,
-        yearlySpend: customer.yearlySpend + amount,
+        yearlyWashes: washes,
+        tier: tierFor(washes),
       });
       setResult({
         kind: "pay",
@@ -187,7 +189,7 @@ function QrPageInner() {
 
   /**
    * Xidmət sonu QR-ının təsdiqi — heç nə ödənilmir, yalnız bonus yazılır.
-   * Xidmətin qiyməti illik xərcə də əlavə olunur (səviyyə ondan asılıdır).
+   * Yuma sayı da artır (səviyyə ondan asılıdır).
    */
   async function claimWash(scan: WashScan) {
     if (!customer) return;
@@ -199,9 +201,11 @@ function QrPageInner() {
       const to = from + earned;
       const streak = customer.washStreak;
       const reachedGoal = streak.current + 1 >= streak.goal;
+      const washes = customer.yearlyWashes + 1;
       updateCustomer({
         bonusBalance: to,
-        yearlySpend: customer.yearlySpend + scan.amount,
+        yearlyWashes: washes,
+        tier: tierFor(washes),
         washStreak: {
           ...streak,
           current: reachedGoal ? 0 : streak.current + 1,

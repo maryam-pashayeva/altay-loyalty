@@ -10,8 +10,12 @@ export interface Tier {
   name: string;
   /** Hər yumada qazanılan bonus faizi, məs. 5 => 5% */
   cashbackPercent: number;
-  /** Bu səviyyəyə çatmaq üçün lazım olan illik xərc (AZN) */
-  threshold: number;
+  /**
+   * Bu səviyyəyə çatmaq üçün cari ildə lazım olan yuma sayı.
+   * Səviyyə QƏSDƏN məbləğlə yox, yuma sayı ilə ölçülür — xidmət qiyməti
+   * dəyişəndə eşiklər pozulmasın və müştəri üçün aydın olsun.
+   */
+  washesRequired: number;
 }
 
 export interface Customer {
@@ -31,8 +35,8 @@ export interface Customer {
   washesLeft: number;
   /** Ardıcıl yuma seriyası — hədəfə çatanda pulsuz yuma */
   washStreak: { current: number; goal: number };
-  /** Cari il ərzində xərclənən məbləğ — səviyyə hesablaması üçün */
-  yearlySpend: number;
+  /** Cari ildə tamamlanmış yuma sayı — səviyyə hesablaması bundan asılıdır */
+  yearlyWashes: number;
   vehicles: Vehicle[];
   /** Ödəniş kartları — terminalda ödəniş üçün (tokenləşdirilmiş) */
   cards: SavedCard[];

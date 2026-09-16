@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { azn, bonus } from "@/lib/format";
+import { bonus } from "@/lib/format";
 import { tierOf, tierProgress } from "@/lib/tier";
 import { useT } from "@/lib/i18n";
 import type { Customer } from "@/lib/types";
@@ -24,7 +24,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
   const tier = tierOf(customer.tier);
   const { next, remaining, percent } = tierProgress(
     customer.tier,
-    customer.yearlySpend,
+    customer.yearlyWashes,
   );
   const targetW = Math.max(6, percent);
 
@@ -79,7 +79,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
                 {t("balance.toTier", { tier: next.name })}
               </span>
               <span className="text-[13px] font-bold text-white">
-                {t("balance.remaining", { amount: azn(remaining) })}
+                {t("balance.washesToGo", { n: remaining })}
               </span>
             </div>
             <div className="relative h-3 overflow-hidden rounded-full bg-blue-950/40">
@@ -119,7 +119,7 @@ export function BalanceCard({ customer }: { customer: Customer }) {
         open={tierOpen}
         onClose={() => setTierOpen(false)}
         current={customer.tier}
-        yearlySpend={customer.yearlySpend}
+        yearlyWashes={customer.yearlyWashes}
       />
     </>
   );

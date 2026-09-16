@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { azn } from "@/lib/format";
 import { allTiers, tierOf, tierProgress } from "@/lib/tier";
 import { useT, TIER_BENEFITS_I18N } from "@/lib/i18n";
 import type { TierCode } from "@/lib/types";
@@ -18,12 +17,12 @@ export function TierSheet({
   open,
   onClose,
   current,
-  yearlySpend,
+  yearlyWashes,
 }: {
   open: boolean;
   onClose: () => void;
   current: TierCode;
-  yearlySpend: number;
+  yearlyWashes: number;
 }) {
   const { t, lang } = useT();
   const [selected, setSelected] = useState<TierCode>(current);
@@ -36,7 +35,7 @@ export function TierSheet({
 
   const sel = tierOf(selected);
   const isCurrent = selected === current;
-  const { next, remaining, percent } = tierProgress(current, yearlySpend);
+  const { next, remaining, percent } = tierProgress(current, yearlyWashes);
 
   return (
     <Sheet open={open} onClose={onClose} title={t("tier.title")}>
@@ -89,7 +88,7 @@ export function TierSheet({
                 {t("tier.toTier", { tier: next.name })}
               </span>
               <span className="font-bold">
-                {t("balance.remaining", { amount: azn(remaining) })}
+                {t("balance.washesToGo", { n: remaining })}
               </span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-black/20">
@@ -101,9 +100,9 @@ export function TierSheet({
           </div>
         ) : (
           <p className="mt-3 text-xs text-white/90">
-            {sel.threshold === 0
+            {sel.washesRequired === 0
               ? t("tier.startLevel")
-              : t("tier.unlockAt", { amount: azn(sel.threshold) })}
+              : t("tier.unlockAt", { n: sel.washesRequired })}
           </p>
         )}
       </div>

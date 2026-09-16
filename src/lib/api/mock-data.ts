@@ -7,15 +7,16 @@ import type {
   WashPackage,
 } from "@/lib/types";
 
+/** Eşiklər cari ildə edilmiş yuma sayıdır (məbləğ deyil). */
 export const TIERS: Record<string, Tier> = {
-  bronze: { code: "bronze", name: "Bronze", cashbackPercent: 2, threshold: 0 },
-  silver: { code: "silver", name: "Silver", cashbackPercent: 3, threshold: 150 },
-  gold: { code: "gold", name: "Gold", cashbackPercent: 5, threshold: 300 },
+  bronze: { code: "bronze", name: "Bronze", cashbackPercent: 2, washesRequired: 0 },
+  silver: { code: "silver", name: "Silver", cashbackPercent: 3, washesRequired: 10 },
+  gold: { code: "gold", name: "Gold", cashbackPercent: 5, washesRequired: 25 },
   platinum: {
     code: "platinum",
     name: "Platinum",
     cashbackPercent: 8,
-    threshold: 800,
+    washesRequired: 60,
   },
 };
 
@@ -29,7 +30,7 @@ export const mockCustomer: Customer = {
   walletBalance: 85,
   washesLeft: 3,
   washStreak: { current: 3, goal: 5 },
-  yearlySpend: 465,
+  yearlyWashes: 28,
   createdAt: "2024-03-12T09:00:00Z",
   vehicles: [
     { id: "veh_1", plate: "10-AA-334", model: "Toyota Camry", bodyType: "sedan" },

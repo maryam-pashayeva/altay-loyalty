@@ -144,7 +144,7 @@ export const api = {
           walletBalance: 0,
           washesLeft: 0,
           washStreak: { current: 0, goal: 5 },
-          yearlySpend: 0,
+          yearlyWashes: 0,
           vehicles: [],
           cards: [],
           createdAt: new Date(now).toISOString(),

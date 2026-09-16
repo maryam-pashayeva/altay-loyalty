@@ -188,10 +188,10 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     ru: "До уровня {tier}",
     en: "To {tier} level",
   },
-  "balance.remaining": {
-    az: "{amount} qalıb",
-    ru: "осталось {amount}",
-    en: "{amount} to go",
+  "balance.washesToGo": {
+    az: "{n} yuma qalıb",
+    ru: "осталось {n} моек",
+    en: "{n} washes to go",
   },
   "balance.myPackage": { az: "Paketim", ru: "Мой пакет", en: "My package" },
   "balance.washesLeft": {
@@ -815,9 +815,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Starting level — open to everyone.",
   },
   "tier.unlockAt": {
-    az: "İllik {amount} xərcdən sonra açılır.",
-    ru: "Открывается после годовых трат {amount}.",
-    en: "Unlocks after {amount} in annual spending.",
+    az: "İldə {n} yumadan sonra açılır.",
+    ru: "Открывается после {n} моек за год.",
+    en: "Unlocks after {n} washes in a year.",
   },
   "tier.benefitsTitle": {
     az: "{tier} üstünlükləri",
@@ -825,9 +825,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "{tier} benefits",
   },
   "tier.autoNote": {
-    az: "Səviyyə cari ildəki ümumi xərcə görə avtomatik yenilənir.",
-    ru: "Уровень обновляется автоматически по сумме трат за текущий год.",
-    en: "Your tier updates automatically based on this year's total spending.",
+    az: "Səviyyə cari ildə etdiyiniz yuma sayına görə avtomatik yenilənir.",
+    ru: "Уровень обновляется автоматически по количеству моек за текущий год.",
+    en: "Your tier updates automatically based on this year's wash count.",
   },
 
   // Bildirişlər
