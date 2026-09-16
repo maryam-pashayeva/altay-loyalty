@@ -115,7 +115,11 @@ export const api = {
   },
 
   /** Yeni müştəri — ad-soyad və telefon nömrəsi ilə qeydiyyat */
-  async signUp(phone: string, fullName: string): Promise<Session> {
+  async signUp(
+    phone: string,
+    fullName: string,
+    birthDate?: string,
+  ): Promise<Session> {
     if (USE_MOCK) {
       await delay(500);
       const digits = phone.replace(/\D/g, "");
@@ -131,6 +135,7 @@ export const api = {
           id: `cus_${now}`,
           fullName,
           phone,
+          ...(birthDate ? { birthDate } : {}),
           cardNumber: `AW-${String(now).slice(-4)}-${String(
             Math.floor(Math.random() * 9000) + 1000,
           )}`,
@@ -150,7 +155,7 @@ export const api = {
     }
     const session = await request<Session>("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ phone, fullName }),
+      body: JSON.stringify({ phone, fullName, birthDate }),
     });
     setToken(session.token);
     return session;
@@ -293,6 +298,38 @@ export const api = {
       return { ok: true };
     }
     return request(`/me/cards/${id}`, { method: "DELETE" });
+  },
+
+  /** Profil sahələrini yeniləyir (məs. doğum günü) */
+  async updateProfile(
+    partial: Pick<Customer, "birthDate">,
+  ): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(400);
+      return { ok: true };
+    }
+    return request("/me", {
+      method: "PATCH",
+      body: JSON.stringify(partial),
+    });
+  },
+
+  /**
+   * Daxili balansın kartla artırılması — paket almaq üçün istifadə olunur.
+   * Kart yalnız tokeni (`cardId`) ilə göstərilir.
+   */
+  async topUpWallet(
+    amount: number,
+    cardId: string,
+  ): Promise<{ ok: true }> {
+    if (USE_MOCK) {
+      await delay(700);
+      return { ok: true };
+    }
+    return request("/me/wallet/topup", {
+      method: "POST",
+      body: JSON.stringify({ amount, cardId }),
+    });
   },
 
   /** Qaraja yeni avtomobil əlavə edir */

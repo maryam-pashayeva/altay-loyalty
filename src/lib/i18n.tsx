@@ -58,6 +58,16 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Your phone number",
   },
   "login.nameLabel": { az: "Ad, soyad", ru: "Имя, фамилия", en: "Full name" },
+  "login.birthLabel": {
+    az: "Doğum günü (istəyə bağlı)",
+    ru: "День рождения (необязательно)",
+    en: "Birthday (optional)",
+  },
+  "login.birthHint": {
+    az: "Doğum günündə hədiyyə göndərə bilməyimiz üçün",
+    ru: "Чтобы мы могли отправить подарок в ваш день рождения",
+    en: "So we can send you a birthday gift",
+  },
   "login.namePlaceholder": {
     az: "Rəşad Məmmədov",
     ru: "Иван Иванов",
@@ -406,6 +416,26 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     ru: "Популярный",
     en: "Most popular",
   },
+  "packages.walletTitle": {
+    az: "Daxili balansınız",
+    ru: "Ваш внутренний баланс",
+    en: "Your wallet balance",
+  },
+  "packages.topUp": {
+    az: "Balansı artır",
+    ru: "Пополнить",
+    en: "Top up",
+  },
+  "packages.topUpAmount": {
+    az: "{amount} artır",
+    ru: "Пополнить на {amount}",
+    en: "Top up {amount}",
+  },
+  "packages.shortBalance": {
+    az: "Balansınız kifayət etmir. Paketin qiyməti {price} — daha {missing} artırmalısınız.",
+    ru: "Недостаточно средств. Пакет стоит {price} — нужно пополнить ещё на {missing}.",
+    en: "Not enough balance. The package costs {price} — top up {missing} more.",
+  },
   "packages.savings": {
     az: "{amount} qənaət",
     ru: "экономия {amount}",
@@ -475,6 +505,33 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "Bonus not credited — the QR may already be used",
   },
 
+  // Balansın artırılması (paket almaq üçün)
+  "topup.title": {
+    az: "Balansı artır",
+    ru: "Пополнить баланс",
+    en: "Top up balance",
+  },
+  "topup.walletLabel": {
+    az: "Daxili balans",
+    ru: "Внутренний баланс",
+    en: "Wallet balance",
+  },
+  "topup.currentBalance": {
+    az: "Hazırda: {amount}",
+    ru: "Сейчас: {amount}",
+    en: "Current: {amount}",
+  },
+  "topup.note": {
+    az: "Balans paket almaq üçündür. Artırmadan bonus qazanılmır — bonus yalnız yumadan sonra verilir.",
+    ru: "Баланс нужен для покупки пакетов. Пополнение не даёт бонусов — бонус начисляется только за мойку.",
+    en: "The balance is for buying packages. Topping up earns no bonus — bonus is credited only for a wash.",
+  },
+  "topup.confirm": {
+    az: "{amount} artır",
+    ru: "Пополнить на {amount}",
+    en: "Top up {amount}",
+  },
+
   // Terminalda ödəniş (skan → məbləğ → kart → ödə)
   "pay.title": { az: "Ödəniş", ru: "Оплата", en: "Payment" },
   "pay.terminal": { az: "Terminal", ru: "Терминал", en: "Terminal" },
@@ -491,9 +548,14 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   },
   "pay.card": { az: "Kart", ru: "Карта", en: "Card" },
   "pay.bonusHint": {
-    az: "Hər 1 ₼-ə 1 bonus qazanırsınız",
-    ru: "За каждый 1 ₼ вы получаете 1 бонус",
-    en: "You earn 1 bonus for every 1 ₼",
+    az: "Hər ödənişdən {pct}% bonus qazanırsınız",
+    ru: "С каждой оплаты вы получаете {pct}% бонуса",
+    en: "You earn {pct}% bonus on every payment",
+  },
+  "pay.bonusPreview": {
+    az: "Bu ödənişdən {bonus} bonus qazanacaqsınız ({pct}%)",
+    ru: "С этой оплаты вы получите {bonus} бонуса ({pct}%)",
+    en: "You will earn {bonus} bonus from this payment ({pct}%)",
   },
   "pay.noCards": {
     az: "Kart yoxdur — ödəniş üçün kart əlavə edin",
@@ -612,6 +674,23 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   "profile.garage": { az: "Qaraj", ru: "Гараж", en: "Garage" },
   "profile.newCar": { az: "Yeni maşın", ru: "Новый авто", en: "New car" },
   "profile.delete": { az: "Sil", ru: "Удалить", en: "Delete" },
+  "profile.birthday": {
+    az: "Doğum günü",
+    ru: "День рождения",
+    en: "Birthday",
+  },
+  "profile.birthdayPrompt": {
+    az: "Doğum günündə hədiyyə qazanmaq üçün tarixi əlavə edin. Tarix bir dəfə yazılır.",
+    ru: "Добавьте дату, чтобы получить подарок в день рождения. Дата указывается один раз.",
+    en: "Add your date to receive a birthday gift. The date is set once.",
+  },
+  "profile.birthdaySaved": {
+    az: "Doğum günü hədiyyəniz bu tarixdə göndəriləcək",
+    ru: "Подарок будет отправлен в эту дату",
+    en: "Your birthday gift will arrive on this date",
+  },
+  "profile.save": { az: "Yadda saxla", ru: "Сохранить", en: "Save" },
+  "profile.saving": { az: "Yazılır…", ru: "Сохранение…", en: "Saving…" },
   "profile.language": { az: "Dil", ru: "Язык", en: "Language" },
   "profile.appLanguage": {
     az: "Tətbiq dili",
@@ -670,6 +749,11 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     az: "Dövlət nömrəsi",
     ru: "Гос. номер",
     en: "License plate",
+  },
+  "addVehicle.plateHint": {
+    az: "Format: 10-AA-334 — defislər avtomatik qoyulur",
+    ru: "Формат: 10-AA-334 — дефисы ставятся автоматически",
+    en: "Format: 10-AA-334 — hyphens are added automatically",
   },
   "addVehicle.modelLabel": {
     az: "Marka və model",

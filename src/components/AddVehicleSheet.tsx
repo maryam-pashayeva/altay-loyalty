@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
+import { formatPlate, isValidPlate, titleCase } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
@@ -31,12 +32,12 @@ export function AddVehicleSheet({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!customer || plate.trim().length < 3 || model.trim().length < 2) return;
+    if (!customer || !isValidPlate(plate) || model.trim().length < 2) return;
     setBusy(true);
     try {
       const v = await api.addVehicle({
-        plate: plate.trim().toUpperCase(),
-        model: model.trim(),
+        plate,
+        model: titleCase(model),
         bodyType,
       });
       updateCustomer({ vehicles: [...customer.vehicles, v] });
@@ -59,10 +60,22 @@ export function AddVehicleSheet({
           <input
             autoFocus
             value={plate}
-            onChange={(e) => setPlate(e.target.value)}
+            onChange={(e) => setPlate(formatPlate(e.target.value))}
             placeholder="10-AA-334"
-            className="h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm uppercase outline-none ring-1 ring-ink-200 focus:ring-blue-500"
+            inputMode="text"
+            autoCapitalize="characters"
+            autoComplete="off"
+            spellCheck={false}
+            aria-invalid={plate.length > 0 && !isValidPlate(plate)}
+            className={`h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm font-semibold tracking-wider outline-none ring-1 focus:ring-blue-500 ${
+              plate.length > 0 && !isValidPlate(plate)
+                ? "ring-red-300"
+                : "ring-ink-200"
+            }`}
           />
+          <p className="mt-1 px-1 text-[11px] text-ink-400">
+            {t("addVehicle.plateHint")}
+          </p>
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-medium text-ink-500">
@@ -71,6 +84,7 @@ export function AddVehicleSheet({
           <input
             value={model}
             onChange={(e) => setModel(e.target.value)}
+            onBlur={() => setModel((m) => titleCase(m))}
             placeholder="Toyota Camry"
             className="h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm outline-none ring-1 ring-ink-200 focus:ring-blue-500"
           />
@@ -99,7 +113,7 @@ export function AddVehicleSheet({
         <Button
           type="submit"
           className="mt-2"
-          disabled={busy || plate.trim().length < 3 || model.trim().length < 2}
+          disabled={busy || !isValidPlate(plate) || model.trim().length < 2}
         >
           {busy ? t("addVehicle.adding") : t("addVehicle.submit")}
         </Button>

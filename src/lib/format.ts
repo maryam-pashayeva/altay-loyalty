@@ -77,6 +77,44 @@ export function dateTime(iso: string, lang: Lang = "az") {
   return `${pad(d.getDate())} ${MONTHS_SHORT[lang][d.getMonth()]}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/**
+ * Azərbaycan dövlət nişanı: 2 rəqəm — 2 hərf — 3 rəqəm (məs. 10-AA-334).
+ * İstifadəçi yazdıqca defislər avtomatik qoyulur; artıq və yanlış simvollar
+ * (hərf yerinə rəqəm və s.) qəbul edilmir.
+ */
+export function formatPlate(raw: string) {
+  const clean = raw.toUpperCase().replace(/[^0-9A-Z]/g, "");
+
+  const region = clean.slice(0, 2).replace(/\D/g, "");
+  const rest = clean.slice(region.length);
+  const letters = rest.slice(0, 2).replace(/[^A-Z]/g, "");
+  const digits = rest.slice(letters.length).replace(/\D/g, "").slice(0, 3);
+
+  return [region, letters, digits].filter(Boolean).join("-");
+}
+
+/** Nişan tam doldurulubmu (10-AA-334) */
+export function isValidPlate(plate: string) {
+  return /^\d{2}-[A-Z]{2}-\d{3}$/.test(plate);
+}
+
+/** "toyota  camry" → "Toyota Camry" */
+export function titleCase(raw: string) {
+  return raw
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/** "1995-04-12" → "12 apr 1995"; boş/yanlış dəyər üçün null */
+export function birthdayLabel(iso: string | undefined, lang: Lang = "az") {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : shortDate(iso, lang);
+}
+
 /** +994 50 123 45 67 formatına salır */
 export function formatPhone(raw: string) {
   const digits = phoneDigits(raw);

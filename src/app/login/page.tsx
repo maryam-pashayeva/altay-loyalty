@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [phase, setPhase] = useState<Phase>("phone");
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
+  // Doğum günü istəyə bağlıdır — doğum günü hədiyyəsi üçün istifadə olunur
+  const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const { signIn } = useSession();
@@ -49,7 +51,11 @@ export default function LoginPage() {
     setError(null);
     setBusy(true);
     try {
-      const session = await api.signUp(`+994${digits}`, fullName.trim());
+      const session = await api.signUp(
+        `+994${digits}`,
+        fullName.trim(),
+        birthDate || undefined,
+      );
       signIn(session.customer);
       router.replace("/");
     } catch (e) {
@@ -114,6 +120,28 @@ export default function LoginPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 className="h-14 w-full rounded-2xl bg-ink-100 px-4 text-lg outline-none ring-1 ring-ink-200 focus:ring-blue-500"
               />
+            </div>
+          )}
+
+          {phase === "register" && (
+            <div className="rise">
+              <label
+                htmlFor="birth"
+                className="mb-1.5 block text-xs font-medium text-ink-500"
+              >
+                {t("login.birthLabel")}
+              </label>
+              <input
+                id="birth"
+                type="date"
+                max={new Date().toISOString().slice(0, 10)}
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="h-14 w-full rounded-2xl bg-ink-100 px-4 text-lg outline-none ring-1 ring-ink-200 focus:ring-blue-500"
+              />
+              <p className="mt-1 px-1 text-[11px] text-ink-400">
+                {t("login.birthHint")}
+              </p>
             </div>
           )}
 

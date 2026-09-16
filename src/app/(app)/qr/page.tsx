@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
@@ -49,10 +50,12 @@ type Phase =
   | { kind: "loading" }
   | ({ kind: "terminal" } & Terminal)
   | ({ kind: "wash" } & WashScan)
+  /** Daxili balansın artırılması — QR skan edilmir, birbaşa kartdan */
+  | { kind: "topup" }
   | { kind: "processing" }
   | { kind: "error"; message: string };
 
-export default function QrPage() {
+function QrPageInner() {
   const { customer, updateCustomer } = useSession();
   const { t } = useT();
   const [phase, setPhase] = useState<Phase>({ kind: "scan" });
@@ -62,6 +65,19 @@ export default function QrPage() {
   const [custom, setCustom] = useState("");
   const [cardId, setCardId] = useState<string | null>(null);
   const [addCardOpen, setAddCardOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const topupParam = searchParams.get("topup");
+
+  // /qr?topup=25 — paketlər səhifəsindən balans artırmaq üçün gəlinib
+  useEffect(() => {
+    if (topupParam === null) return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setPhase({ kind: "topup" });
+    setCustom(topupParam);
+    setAmount(parseAmount(topupParam));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [topupParam]);
 
   const handleScan = useCallback(
     async (code: string) => {
@@ -95,7 +111,10 @@ export default function QrPage() {
     ? cardId
     : (cards[0]?.id ?? null);
   const paused =
-    result !== null || phase.kind === "terminal" || phase.kind === "wash";
+    result !== null ||
+    phase.kind === "terminal" ||
+    phase.kind === "wash" ||
+    phase.kind === "topup";
   /** Səviyyəyə uyğun keşbek faizi — xidmət sonu bonusu bundan hesablanır */
   const cashback = tierOf(customer.tier).cashbackPercent;
   const amountValid =
@@ -120,10 +139,15 @@ export default function QrPage() {
     setPhase({ kind: "processing" });
     try {
       await api.payTerminal(term.terminalId, amount, effectiveCardId);
-      const bonusEarned = amount; // hər 1 ₼-ə 1 bonus
+      // Bonus səviyyənin keşbek faizi ilə hesablanır (Bronze 2% … Platinum 8%)
+      const bonusEarned = Math.round(amount * cashback) / 100;
       const from = customer.bonusBalance;
       const to = from + bonusEarned;
-      updateCustomer({ bonusBalance: to });
+      // Ödənilən məbləğ illik xərcə yazılır — səviyyə irəliləyişi bundan asılıdır
+      updateCustomer({
+        bonusBalance: to,
+        yearlySpend: customer.yearlySpend + amount,
+      });
       setResult({
         kind: "pay",
         amount,
@@ -134,6 +158,25 @@ export default function QrPage() {
         toBonus: to,
       });
       setPhase({ kind: "scan" });
+    } catch (e) {
+      setPhase({
+        kind: "error",
+        message: e instanceof Error ? e.message : t("pay.error"),
+      });
+    }
+  }
+
+  /** Daxili balansın kartla artırılması — bonus qazandırmır */
+  async function topUp() {
+    if (!customer || !amount || !amountValid || !effectiveCardId) return;
+    setPhase({ kind: "processing" });
+    try {
+      await api.topUpWallet(amount, effectiveCardId);
+      updateCustomer({
+        walletBalance: Math.round((customer.walletBalance + amount) * 100) / 100,
+      });
+      setPhase({ kind: "scan" });
+      router.replace("/packages");
     } catch (e) {
       setPhase({
         kind: "error",
@@ -214,23 +257,35 @@ export default function QrPage() {
         )}
       </div>
 
-      {/* Ödəniş vərəqi */}
+      {/* Ödəniş vərəqi — terminala ödəniş və balans artırma eyni formadan keçir */}
       <Sheet
-        open={phase.kind === "terminal"}
+        open={phase.kind === "terminal" || phase.kind === "topup"}
         onClose={() => setPhase({ kind: "scan" })}
-        title={t("pay.title")}
+        title={phase.kind === "topup" ? t("topup.title") : t("pay.title")}
       >
-        {phase.kind === "terminal" && (
+        {(phase.kind === "terminal" || phase.kind === "topup") && (
           <>
             <div className="flex items-center gap-2 rounded-2xl bg-ink-50 p-3 text-sm">
               <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-500/12 text-blue-600">
-                <CardIcon className="size-5" />
+                {phase.kind === "topup" ? (
+                  <PlusIcon className="size-5" />
+                ) : (
+                  <CardIcon className="size-5" />
+                )}
               </span>
               <div className="min-w-0">
                 <p className="font-semibold text-ink-900">
-                  {phase.terminalName}
+                  {phase.kind === "topup"
+                    ? t("topup.walletLabel")
+                    : phase.terminalName}
                 </p>
-                <p className="text-[11px] text-ink-500">{phase.branchName}</p>
+                <p className="text-[11px] text-ink-500">
+                  {phase.kind === "topup"
+                    ? t("topup.currentBalance", {
+                        amount: azn(customer.walletBalance),
+                      })
+                    : phase.branchName}
+                </p>
               </div>
             </div>
 
@@ -350,16 +405,30 @@ export default function QrPage() {
               </div>
             )}
 
-            <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
-              🎁 {t("pay.bonusHint")}
-            </div>
+            {phase.kind === "topup" ? (
+              <p className="mt-3 rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-medium leading-relaxed text-blue-700">
+                {t("topup.note")}
+              </p>
+            ) : (
+              <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-mint-100 px-3 py-2 text-xs font-medium text-mint-600">
+                🎁{" "}
+                {amountValid
+                  ? t("pay.bonusPreview", {
+                      pct: cashback,
+                      bonus: bonusFmt(Math.round(amount * cashback) / 100),
+                    })
+                  : t("pay.bonusHint", { pct: cashback })}
+              </div>
+            )}
 
             <Button
               className="mt-4"
               disabled={!amountValid || !effectiveCardId}
-              onClick={() => pay(phase)}
+              onClick={() => (phase.kind === "topup" ? topUp() : pay(phase))}
             >
-              {t("pay.confirm", { amount: azn(amountValid ? amount : 0) })}
+              {phase.kind === "topup"
+                ? t("topup.confirm", { amount: azn(amountValid ? amount : 0) })
+                : t("pay.confirm", { amount: azn(amountValid ? amount : 0) })}
             </Button>
             <Button
               variant="ghost"
@@ -439,5 +508,16 @@ export default function QrPage() {
         </Link>
       </p>
     </main>
+  );
+}
+
+/**
+ * `useSearchParams` Suspense sərhədi tələb edir — səhifə statik qurulur.
+ */
+export default function QrPage() {
+  return (
+    <Suspense fallback={null}>
+      <QrPageInner />
+    </Suspense>
   );
 }

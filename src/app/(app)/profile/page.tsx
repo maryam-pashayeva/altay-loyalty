@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { useT, LANGS } from "@/lib/i18n";
-import { formatPhone, shortDate } from "@/lib/format";
+import { birthdayLabel, formatPhone, shortDate } from "@/lib/format";
 import { tierOf } from "@/lib/tier";
 import { PageHeader } from "@/components/PageHeader";
 import { AddVehicleSheet } from "@/components/AddVehicleSheet";
@@ -69,6 +69,8 @@ export default function ProfilePage() {
   const [notifReminders, setNotifReminders] = useState(true);
   const [removing, setRemoving] = useState<string | null>(null);
   const [removingCard, setRemovingCard] = useState<string | null>(null);
+  const [birthDraft, setBirthDraft] = useState("");
+  const [savingBirth, setSavingBirth] = useState(false);
 
   useEffect(() => {
     // Bildiriş parametrlərini localStorage-dan bərpa edirik (yalnız brauzerdə).
@@ -83,6 +85,19 @@ export default function ProfilePage() {
     try {
       localStorage.setItem(key, v ? "1" : "0");
     } catch {}
+  }
+
+  /** Doğum gününü yadda saxlayır — hədiyyə kampaniyası bu tarixə baxır */
+  async function saveBirthday() {
+    if (!customer || !birthDraft) return;
+    setSavingBirth(true);
+    try {
+      await api.updateProfile({ birthDate: birthDraft });
+      updateCustomer({ birthDate: birthDraft });
+      setBirthDraft("");
+    } finally {
+      setSavingBirth(false);
+    }
   }
 
   async function removeVehicle(id: string) {
@@ -137,6 +152,52 @@ export default function ProfilePage() {
             </p>
           </div>
         </Card>
+
+        {/* Doğum günü — hədiyyə üçün */}
+        <section className="mt-6">
+          <SectionTitle title={t("profile.birthday")} />
+          <Card>
+            {customer.birthDate ? (
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sun-400/15 text-lg">
+                  🎂
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">
+                    {birthdayLabel(customer.birthDate, lang)}
+                  </p>
+                  <p className="text-[11px] text-ink-500">
+                    {t("profile.birthdaySaved")}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-xs leading-relaxed text-ink-500">
+                  {t("profile.birthdayPrompt")}
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    type="date"
+                    max={new Date().toISOString().slice(0, 10)}
+                    value={birthDraft}
+                    onChange={(e) => setBirthDraft(e.target.value)}
+                    aria-label={t("profile.birthday")}
+                    className="h-11 min-w-0 flex-1 rounded-2xl bg-ink-100 px-3 text-sm outline-none ring-1 ring-ink-200 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={saveBirthday}
+                    disabled={!birthDraft || savingBirth}
+                    className="h-11 shrink-0 rounded-2xl bg-blue-600 px-4 text-xs font-semibold text-white transition active:scale-95 disabled:opacity-40"
+                  >
+                    {savingBirth ? t("profile.saving") : t("profile.save")}
+                  </button>
+                </div>
+              </>
+            )}
+          </Card>
+        </section>
 
         {/* Qaraj */}
         <section className="mt-6">

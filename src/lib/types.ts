@@ -21,6 +21,8 @@ export interface Customer {
   /** Kartın/müştərinin unikal kodu — QR-da bu kod oxunur */
   cardNumber: string;
   tier: TierCode;
+  /** Doğum günü (ISO tarix, məs. "1995-04-12") — doğum günü hədiyyəsi üçün */
+  birthDate?: string;
   /** Bonus balansı (AZN) */
   bonusBalance: number;
   /** Depozit/paket balansı (AZN) — daxili uçot üçün */

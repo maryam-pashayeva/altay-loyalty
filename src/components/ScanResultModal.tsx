@@ -31,7 +31,13 @@ function useCountUp(from: number, to: number, active: boolean, ms = 700) {
       if (p < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    // Fon sekmesi kimi rAF-ın dayandığı hallarda rəqəm başlanğıcda ilişib
+    // qalmasın — müddət bitəndə son dəyər hər halda yazılır.
+    const settle = setTimeout(() => setValue(to), ms + 80);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(settle);
+    };
   }, [from, to, active, ms]);
   return value;
 }
