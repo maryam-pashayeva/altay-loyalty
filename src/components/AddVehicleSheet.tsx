@@ -54,7 +54,7 @@ export function AddVehicleSheet({
     <Sheet open={open} onClose={onClose} title={t("addVehicle.title")}>
       <form onSubmit={submit} className="space-y-3">
         <div>
-          <label className="eyebrow mb-2 block text-ink-400">
+          <label className="mb-1.5 block text-xs font-medium text-ink-500">
             {t("addVehicle.plateLabel")}
           </label>
           <input
@@ -67,7 +67,7 @@ export function AddVehicleSheet({
             autoComplete="off"
             spellCheck={false}
             aria-invalid={plate.length > 0 && !isValidPlate(plate)}
-            className={`plate h-12 w-full rounded-2xl bg-ink-100 px-4 text-base outline-none ring-1 focus:ring-blue-500 ${
+            className={`h-12 w-full rounded-2xl bg-ink-100 px-4 text-sm font-semibold tracking-wider outline-none ring-1 focus:ring-blue-500 ${
               plate.length > 0 && !isValidPlate(plate)
                 ? "ring-red-300"
                 : "ring-ink-200"
@@ -78,7 +78,7 @@ export function AddVehicleSheet({
           </p>
         </div>
         <div>
-          <label className="eyebrow mb-2 block text-ink-400">
+          <label className="mb-1.5 block text-xs font-medium text-ink-500">
             {t("addVehicle.modelLabel")}
           </label>
           <input
@@ -90,7 +90,7 @@ export function AddVehicleSheet({
           />
         </div>
         <div>
-          <label className="eyebrow mb-2 block text-ink-400">
+          <label className="mb-1.5 block text-xs font-medium text-ink-500">
             {t("addVehicle.bodyLabel")}
           </label>
           <div className="flex flex-wrap gap-2">

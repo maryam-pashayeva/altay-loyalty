@@ -11,7 +11,6 @@ import { AddVehicleSheet } from "@/components/AddVehicleSheet";
 import { AddCardSheet } from "@/components/AddCardSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
 import {
-  CakeIcon,
   CardIcon,
   CarIcon,
   GlobeIcon,
@@ -160,8 +159,8 @@ export default function ProfilePage() {
           <Card>
             {customer.birthDate ? (
               <div className="flex items-center gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sun-400/15 text-sun-600">
-                  <CakeIcon className="size-5" />
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sun-400/15 text-lg">
+                  🎂
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">
@@ -222,10 +221,8 @@ export default function ProfilePage() {
                   <CarIcon className="size-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="plate inline-block rounded border border-ink-200 bg-white px-1.5 py-0.5 text-[13px] leading-none text-ink-950">
-                    {v.plate}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-ink-500">{v.model}</p>
+                  <p className="text-sm font-medium">{v.plate}</p>
+                  <p className="truncate text-[11px] text-ink-500">{v.model}</p>
                 </div>
                 {customer.vehicles.length > 1 && (
                   <button

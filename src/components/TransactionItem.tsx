@@ -38,16 +38,16 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
         <p className="truncate text-sm font-semibold text-ink-900">
           {trx.titleKey ? t(trx.titleKey) : trx.title}
         </p>
-        {/* Tarix əvvəldə: sətir kəsiləndə filial/nişan gedir, tarix qalır */}
         <p className="mt-0.5 truncate text-xs text-ink-500">
-          {dateTime(trx.createdAt, lang)} · {trx.branchName}
-          {trx.vehiclePlate ? ` · ${trx.vehiclePlate}` : ""}
+          {trx.branchName}
+          {trx.vehiclePlate ? ` · ${trx.vehiclePlate}` : ""} ·{" "}
+          {dateTime(trx.createdAt, lang)}
         </p>
       </div>
 
       <div className="shrink-0 text-right">
         <p
-          className={`figure text-[15px] font-semibold ${
+          className={`text-sm font-bold ${
             primary > 0 ? "text-mint-600" : "text-ink-900"
           }`}
         >
@@ -56,7 +56,7 @@ export function TransactionItem({ trx }: { trx: Transaction }) {
             : `${bonus(primary, { sign: true })} ${t("transaction.bonusSuffix")}`}
         </p>
         {trx.amount !== 0 && trx.bonusDelta !== 0 && (
-          <p className="figure text-[11px] font-semibold text-sun-600">
+          <p className="text-[11px] font-medium text-sun-600">
             {bonus(trx.bonusDelta, { sign: true })}{" "}
             {t("transaction.bonusSuffix")}
           </p>

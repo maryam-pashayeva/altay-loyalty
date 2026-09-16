@@ -6,13 +6,9 @@ export function PageHeader({
   subtitle?: string;
 }) {
   return (
-    <header className="px-5 pb-5 pt-7">
-      <h1 className="text-[1.75rem] font-bold leading-none tracking-tight text-ink-950">
-        {title}
-      </h1>
-      {subtitle && (
-        <p className="mt-2 text-sm leading-relaxed text-ink-500">{subtitle}</p>
-      )}
+    <header className="px-5 pb-4 pt-6">
+      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      {subtitle && <p className="mt-1 text-sm text-ink-500">{subtitle}</p>}
     </header>
   );
 }

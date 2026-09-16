@@ -66,24 +66,31 @@ export default function HomePage() {
 
   return (
     <main>
-      {/* Başlıq paneli — dərin brend sahəsi.
-          Əvvəlki üç dayaqlı qradiyent və bulanıq ləkələr silinib: onlar
-          məzmuna heç nə qatmır, yalnız "hazır şablon" təəssüratı verirdi. */}
-      <div className="relative bg-linear-to-b from-blue-800 to-blue-600 px-5 pb-16 pt-[calc(env(safe-area-inset-top)+1.5rem)] text-white">
+      {/* Full-bleed gradient header */}
+      <div className="relative overflow-hidden bg-linear-to-br from-blue-700 via-blue-600 to-blue-500 px-5 pb-16 pt-[calc(env(safe-area-inset-top)+1.5rem)] text-white">
+        <div
+          className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-white/15 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-16 -left-16 size-56 rounded-full bg-cyan-400/20 blur-3xl"
+          aria-hidden
+        />
 
         <div className="relative flex items-center justify-between">
           <Link
             href="/profile"
             className="-m-1 flex items-center gap-3 rounded-2xl p-1"
           >
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-sm font-bold text-white ring-1 ring-white/25">
+            <span className="relative grid size-11 shrink-0 place-items-center rounded-full bg-white/20 text-sm font-bold text-white ring-2 ring-white/40 backdrop-blur">
               {initials}
+              <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-amber-400 ring-2 ring-blue-600" />
             </span>
             <span className="leading-tight">
-              <span className="eyebrow block text-white/60">
+              <span className="block text-xs text-white/80">
                 {t("home.greeting")}
               </span>
-              <span className="mt-1 block text-base font-bold tracking-tight">
+              <span className="block text-base font-bold tracking-tight">
                 {firstName}
               </span>
             </span>
@@ -91,12 +98,12 @@ export default function HomePage() {
           <button
             type="button"
             onClick={openNotifications}
-            className="relative grid size-11 place-items-center rounded-full bg-white/15 text-white transition active:scale-95"
+            className="relative grid size-11 place-items-center rounded-full bg-white/20 text-white backdrop-blur transition active:scale-95"
             aria-label={t("home.notifications")}
           >
             <BellIcon className="size-6" />
             {notifUnread && UNREAD_NOTIFICATIONS > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-blue-700">
+              <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-blue-600">
                 {UNREAD_NOTIFICATIONS}
               </span>
             )}
@@ -107,13 +114,11 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => multiCar && setVehicleOpen(true)}
-            className="relative mt-5 flex max-w-full items-center gap-2 rounded-lg bg-white/10 py-1.5 pl-1.5 pr-3 text-xs text-white transition active:scale-[0.98]"
+            className="relative mt-4 flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs text-white backdrop-blur transition active:scale-[0.98]"
           >
-            <span className="plate shrink-0 rounded bg-white px-2 py-1 text-[13px] leading-none text-ink-950">
-              {activeVehicle.plate}
-            </span>
-            <CarIcon className="size-4 shrink-0 text-white/70" />
-            <span className="truncate text-white/80">{activeVehicle.model}</span>
+            <CarIcon className="size-4 shrink-0" />
+            <span className="truncate font-semibold">{activeVehicle.plate}</span>
+            <span className="truncate text-white/70">{activeVehicle.model}</span>
             {multiCar && (
               <ChevronDownIcon className="size-4 shrink-0 text-white/70" />
             )}
@@ -126,7 +131,7 @@ export default function HomePage() {
       </div>
 
       {/* Ağ məzmun vərəqi — gradientin üstünə qıvrılır */}
-      <div className="content-sheet relative -mt-8 rounded-t-[28px] bg-canvas px-5 pt-6">
+      <div className="content-sheet relative -mt-8 rounded-t-[28px] bg-ink-100 px-5 pt-6">
         <StreakCard />
 
         <div className="mt-3">

@@ -193,16 +193,6 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     ru: "осталось {n} моек",
     en: "{n} washes to go",
   },
-  "balance.gaugeToNext": {
-    az: "{tier} səviyyəsinə {n} yuma qalıb",
-    ru: "До уровня {tier} осталось {n} моек",
-    en: "{n} washes to {tier}",
-  },
-  "balance.gaugeTop": {
-    az: "Ən yüksək səviyyədəsiniz",
-    ru: "У вас высший уровень",
-    en: "You are at the top tier",
-  },
   "balance.myPackage": { az: "Paketim", ru: "Мой пакет", en: "My package" },
   "balance.washesLeft": {
     az: "{n} yuma qalıb",

@@ -5,7 +5,6 @@ import { allTiers, tierOf, tierProgress } from "@/lib/tier";
 import { useT, TIER_BENEFITS_I18N } from "@/lib/i18n";
 import type { TierCode } from "@/lib/types";
 import { Sheet } from "@/components/ui/Sheet";
-import { CrownIcon } from "@/components/Icons";
 
 const accent: Record<TierCode, string> = {
   bronze: "from-amber-700 to-orange-800",
@@ -67,8 +66,10 @@ export function TierSheet({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CrownIcon className="size-5" />
-            <span className="text-lg font-bold tracking-tight">{sel.name}</span>
+            <span aria-hidden className="text-xl">
+              👑
+            </span>
+            <span className="text-lg font-bold">{sel.name}</span>
             {isCurrent && (
               <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-semibold backdrop-blur">
                 {t("tier.current")}

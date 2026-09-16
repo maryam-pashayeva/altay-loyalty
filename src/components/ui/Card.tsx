@@ -19,7 +19,9 @@ export function SectionTitle({
 }) {
   return (
     <div className="mb-3 flex items-end justify-between">
-      <h2 className="eyebrow text-ink-500">{title}</h2>
+      <h2 className="text-[15px] font-semibold tracking-tight text-ink-900">
+        {title}
+      </h2>
       {action}
     </div>
   );
