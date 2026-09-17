@@ -250,3 +250,35 @@ export const PackageIcon = (p: P) => (
     <path d="m4 7.2 8 4 8-4M12 11.2v9.6" />
   </D>
 );
+
+/**
+ * Yuma seriyası — parıldayan maşın. Seriyanın sonunda gələn şey budur:
+ * təmiz, işıldayan avtomobil. (Əvvəl burada alov nişanı vardı — vərdiş
+ * tətbiqlərindən gələn klişe idi, yuma ilə əlaqəsi yox idi.)
+ */
+export const WashShineIcon = (p: P) => (
+  <D {...p}>
+    {/* kuza — aşağıda geniş, yuxarıda dar salon (mikroavtobus yox, avtomobil) */}
+    <Fill d="M2.6 16v-1.7a1.5 1.5 0 0 1 1.5-1.5h12.2a1.5 1.5 0 0 1 1.5 1.5V16a.8.8 0 0 1-.8.8H3.4a.8.8 0 0 1-.8-.8Z" />
+    <path d="M2.6 16v-1.7a1.5 1.5 0 0 1 1.5-1.5h12.2a1.5 1.5 0 0 1 1.5 1.5V16a.8.8 0 0 1-.8.8H3.4a.8.8 0 0 1-.8-.8Z" />
+    {/* salon */}
+    <Fill d="M5.1 12.8 6.7 9.9a1.9 1.9 0 0 1 1.7-1h3.6a1.9 1.9 0 0 1 1.7 1l1.6 2.9Z" o={0.3} />
+    <path d="M5.1 12.8 6.7 9.9a1.9 1.9 0 0 1 1.7-1h3.6a1.9 1.9 0 0 1 1.7 1l1.6 2.9" />
+    <path d="M10.2 8.9v3.9" />
+    {/* təkərlər */}
+    <circle cx="6.5" cy="17" r="1.5" fill="#fff" />
+    <circle cx="13.7" cy="17" r="1.5" fill="#fff" />
+    {/* parıltı — təmizliyin nişanı */}
+    <path
+      d="M19 3 19.8 5.2 22 6 19.8 6.8 19 9 18.2 6.8 16 6 18.2 5.2Z"
+      fill="currentColor"
+      stroke="none"
+    />
+    <path
+      d="M15.2 2.4 15.6 3.6 16.8 4 15.6 4.4 15.2 5.6 14.8 4.4 13.6 4 14.8 3.6Z"
+      fill="currentColor"
+      fillOpacity={0.45}
+      stroke="none"
+    />
+  </D>
+);

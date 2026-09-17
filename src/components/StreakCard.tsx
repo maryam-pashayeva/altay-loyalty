@@ -2,7 +2,8 @@
 
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
-import { TrophyIcon } from "@/components/Icons";
+import { TrophyIcon, WashShineIcon } from "@/components/Icons";
+import { IconTile } from "@/components/ui/IconTile";
 
 export function StreakCard() {
   const { customer } = useSession();
@@ -14,15 +15,18 @@ export function StreakCard() {
 
   return (
     <div className="card p-4">
-      <div className="min-w-0">
-        <p className="text-sm font-bold text-ink-900">
-          {t("streak.series", { n: current })}
-        </p>
-        <p className="mt-0.5 text-xs text-ink-500">
-          {remaining > 0
-            ? t("streak.toFree", { n: remaining })
-            : t("streak.ready")}
-        </p>
+      <div className="flex items-center gap-3">
+        <IconTile Icon={WashShineIcon} tone="blue" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-ink-900">
+            {t("streak.series", { n: current })}
+          </p>
+          <p className="text-xs text-ink-500">
+            {remaining > 0
+              ? t("streak.toFree", { n: remaining })
+              : t("streak.ready")}
+          </p>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between">
