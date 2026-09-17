@@ -4,7 +4,12 @@ import type { ComponentType } from "react";
 import { azn, bonus, dateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import type { Transaction } from "@/lib/types";
-import { DropIcon, GiftIcon, PlusIcon } from "@/components/Icons";
+import {
+  DropIcon,
+  GiftIcon,
+  PackageIcon,
+  WalletIcon,
+} from "@/components/Icons";
 import { IconTile, type Tone } from "@/components/ui/IconTile";
 
 type Meta = {
@@ -14,8 +19,8 @@ type Meta = {
 
 const meta: Record<Transaction["kind"], Meta> = {
   wash: { Icon: DropIcon, tone: "blue" },
-  topup: { Icon: PlusIcon, tone: "mint" },
-  package: { Icon: DropIcon, tone: "blue" },
+  topup: { Icon: WalletIcon, tone: "mint" },
+  package: { Icon: PackageIcon, tone: "blue" },
   bonus_earned: { Icon: GiftIcon, tone: "amber" },
   bonus_spent: { Icon: GiftIcon, tone: "amber" },
 };

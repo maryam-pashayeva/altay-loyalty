@@ -18,6 +18,34 @@ const S = ({
   </svg>
 );
 
+/**
+ * İki qatlı (duotone) baza: alt qatda yumşaq dolğu, üstdə dəqiq xətt.
+ * Yalnız xətdən ibarət ikonlar plitənin içində boş və hazır-şablon görünürdü;
+ * dolğu onlara həcm verir və hər ikonun öz xarakteri olur.
+ */
+const D = ({
+  children,
+  className = "size-6",
+}: P & { children: React.ReactNode }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden
+  >
+    {children}
+  </svg>
+);
+
+/** Duotone dolğu qatı */
+const Fill = ({ d, o = 0.18 }: { d: string; o?: number }) => (
+  <path d={d} fill="currentColor" fillOpacity={o} stroke="none" />
+);
+
 export const HomeIcon = (p: P) => (
   <S {...p}>
     <path d="M3 10.5 12 3l9 7.5" />
@@ -42,11 +70,14 @@ export const HistoryIcon = (p: P) => (
 );
 
 export const GiftIcon = (p: P) => (
-  <S {...p}>
-    <rect x="3" y="8.5" width="18" height="12" rx="2" />
-    <path d="M3 13h18M12 8.5V20.5" />
-    <path d="M12 8.5C10 8.5 7.5 8 7.5 5.9A2.4 2.4 0 0 1 12 5a2.4 2.4 0 0 1 4.5.9C16.5 8 14 8.5 12 8.5Z" />
-  </S>
+  <D {...p}>
+    <Fill d="M3.5 8.6h17v11.6a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z" />
+    <rect x="3.5" y="8.6" width="17" height="12.6" rx="2" />
+    {/* lent */}
+    <path d="M3.5 13.2h17M12 8.6v12.6" strokeWidth={1.7} />
+    {/* bant */}
+    <path d="M12 8.6C10 8.6 7.6 8.1 7.6 6.1A2.3 2.3 0 0 1 12 5.2a2.3 2.3 0 0 1 4.4.9c0 2-2.4 2.5-4.4 2.5Z" />
+  </D>
 );
 
 export const UserIcon = (p: P) => (
@@ -57,10 +88,11 @@ export const UserIcon = (p: P) => (
 );
 
 export const PinIcon = (p: P) => (
-  <S {...p}>
-    <path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </S>
+  <D {...p}>
+    <Fill d="M12 21.2s7.2-5.9 7.2-11.3a7.2 7.2 0 1 0-14.4 0c0 5.4 7.2 11.3 7.2 11.3Z" />
+    <path d="M12 21.2s7.2-5.9 7.2-11.3a7.2 7.2 0 1 0-14.4 0c0 5.4 7.2 11.3 7.2 11.3Z" />
+    <circle cx="12" cy="9.8" r="2.6" fill="#fff" />
+  </D>
 );
 
 export const PlusIcon = (p: P) => (
@@ -70,18 +102,25 @@ export const PlusIcon = (p: P) => (
 );
 
 export const CarIcon = (p: P) => (
-  <S {...p}>
-    <path d="M4 16v2.5M20 16v2.5" />
-    <path d="M3 15.5v-3l1.8-4.2A2 2 0 0 1 6.6 7h10.8a2 2 0 0 1 1.8 1.3L21 12.5v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
-    <path d="M4.5 12.5h15M7.5 14.5h.01M16.5 14.5h.01" />
-  </S>
+  <D {...p}>
+    <Fill d="M3 15.4v-3l1.8-4.1A2 2 0 0 1 6.6 7h10.8a2 2 0 0 1 1.8 1.3L21 12.4v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
+    <path d="M3 15.4v-3l1.8-4.1A2 2 0 0 1 6.6 7h10.8a2 2 0 0 1 1.8 1.3L21 12.4v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
+    {/* şüşə xətti və orta dayaq */}
+    <path d="M4.6 12.4h14.8M12 7.2v5.2" />
+    {/* təkərlər */}
+    <circle cx="7.4" cy="16.4" r="1.7" fill="#fff" />
+    <circle cx="16.6" cy="16.4" r="1.7" fill="#fff" />
+  </D>
 );
 
 export const DropIcon = (p: P) => (
-  <S {...p}>
-    <path d="M12 3c-3.2 4.2-5.2 6.9-5.2 9.4a5.2 5.2 0 0 0 10.4 0C17.2 9.9 15.2 7.2 12 3Z" />
-    <path d="M10 13.5a2.2 2.2 0 0 0 2.2 2.2" />
-  </S>
+  <D {...p}>
+    <Fill d="M12 2.6c-3.4 4.4-5.5 7.3-5.5 9.9a5.5 5.5 0 0 0 11 0c0-2.6-2.1-5.5-5.5-9.9Z" />
+    <path d="M12 2.6c-3.4 4.4-5.5 7.3-5.5 9.9a5.5 5.5 0 0 0 11 0c0-2.6-2.1-5.5-5.5-9.9Z" />
+    {/* parıltı — suyun üzərindəki işıq */}
+    <path d="M9.2 12.9a2.9 2.9 0 0 0 2.9 2.9" strokeWidth={1.8} />
+    <circle cx="14.6" cy="9.4" r="0.8" fill="currentColor" stroke="none" />
+  </D>
 );
 
 export const ChevronDownIcon = (p: P) => (
@@ -160,10 +199,11 @@ export const FlameIcon = ({ className = "size-6" }: P) => (
 );
 
 export const TrophyIcon = (p: P) => (
-  <S {...p}>
+  <D {...p}>
+    <Fill d="M7 4h10v5a5 5 0 0 1-10 0Z" o={0.22} />
     <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z" />
     <path d="M17 5h2.5A1.5 1.5 0 0 1 21 6.5C21 9 19 10.5 17 10.5M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 9 5 10.5 7 10.5" />
-  </S>
+  </D>
 );
 
 export const ChevronIcon = (p: P) => (
@@ -180,8 +220,33 @@ export const LogoutIcon = (p: P) => (
 );
 
 export const CardIcon = (p: P) => (
-  <S {...p}>
-    <rect x="3" y="5" width="18" height="14" rx="2.5" />
-    <path d="M3 9.5h18M6.5 15.5h4" />
-  </S>
+  <D {...p}>
+    <Fill d="M3 5.2h18v13.6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />
+    <rect x="3" y="5.2" width="18" height="14.6" rx="2.5" />
+    {/* maqnit zolağı */}
+    <path d="M3 9.4h18" strokeWidth={2.2} />
+    {/* çip və nömrə */}
+    <rect x="6" y="12.4" width="3.6" height="2.8" rx="0.8" />
+    <path d="M13 15.2h5" />
+  </D>
+);
+
+/** Balansın artırılması — pul kisəsi (siyahıda "+" işarəsindən aydındır) */
+export const WalletIcon = (p: P) => (
+  <D {...p}>
+    <Fill d="M3.4 7.8h17.2v11a1.4 1.4 0 0 1-1.4 1.4H4.8a1.4 1.4 0 0 1-1.4-1.4Z" />
+    <path d="M3.4 9.2V7.4A1.6 1.6 0 0 1 5 5.8h11.2a1.2 1.2 0 0 1 1.2 1.2v1" />
+    <rect x="3.4" y="7.8" width="17.2" height="12.4" rx="2" />
+    <path d="M20.6 12.4h-3.4a1.9 1.9 0 0 0 0 3.8h3.4" />
+    <circle cx="17.6" cy="14.3" r="0.8" fill="currentColor" stroke="none" />
+  </D>
+);
+
+/** Yuma paketi — üst-üstə yığılmış yuma sayı */
+export const PackageIcon = (p: P) => (
+  <D {...p}>
+    <Fill d="m12 3.2 8 4v9.6l-8 4-8-4V7.2Z" />
+    <path d="m12 3.2 8 4v9.6l-8 4-8-4V7.2Z" />
+    <path d="m4 7.2 8 4 8-4M12 11.2v9.6" />
+  </D>
 );
