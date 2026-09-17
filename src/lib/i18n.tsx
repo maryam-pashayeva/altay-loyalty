@@ -297,6 +297,11 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     ru: "Успешно принято — мы скоро свяжемся с вами.",
     en: "Successfully registered — we'll contact you soon.",
   },
+  "campaign.codeCopied": {
+    az: "Kod kopyalandı",
+    ru: "Код скопирован",
+    en: "Code copied",
+  },
   "campaign.shareText": {
     az: "Altaywash-a qoşul, ilk yumanda hər ikimiz 10 ₼ qazanaq! Kodum: {code}",
     ru: "Присоединяйся к Altaywash — за первую мойку мы оба получим 10 ₼! Мой код: {code}",

@@ -11,6 +11,7 @@ import type { Campaign } from "@/lib/types";
 import { BalanceCard } from "@/components/BalanceCard";
 import { BranchesQuickCard } from "@/components/BranchesQuickCard";
 import { CampaignCard } from "@/components/CampaignCard";
+import { ReferralCard } from "@/components/ReferralCard";
 import { CampaignSheet } from "@/components/CampaignSheet";
 import { StreakCard } from "@/components/StreakCard";
 import { TransactionItem } from "@/components/TransactionItem";
@@ -142,12 +143,14 @@ export default function HomePage() {
           <SectionTitle
             title={t("home.campaigns")}
             action={
-              <Link
-                href="/campaigns"
-                className="flex items-center gap-0.5 text-xs text-blue-600"
-              >
-                {t("home.seeAll")} <ChevronIcon className="size-4" />
-              </Link>
+              campaigns && campaigns.length > 1 ? (
+                <Link
+                  href="/campaigns"
+                  className="flex items-center gap-0.5 text-xs text-blue-600"
+                >
+                  {t("home.seeAll")} <ChevronIcon className="size-4" />
+                </Link>
+              ) : undefined
             }
           />
           {campaigns ? (
@@ -166,11 +169,15 @@ export default function HomePage() {
                       campaigns.length > 1 ? "w-[85%]" : "w-full"
                     }`}
                   >
-                    <CampaignCard
-                      campaign={c}
-                      index={i}
-                      onClick={() => setSelected({ campaign: c, index: i })}
-                    />
+                    {c.share ? (
+                      <ReferralCard campaign={c} />
+                    ) : (
+                      <CampaignCard
+                        campaign={c}
+                        index={i}
+                        onClick={() => setSelected({ campaign: c, index: i })}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
