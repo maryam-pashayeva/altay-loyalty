@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { AddVehicleSheet } from "@/components/AddVehicleSheet";
 import { AddCardSheet } from "@/components/AddCardSheet";
 import { Card, SectionTitle } from "@/components/ui/Card";
+import { IconTile } from "@/components/ui/IconTile";
 import {
   CardIcon,
   CarIcon,
@@ -159,9 +160,9 @@ export default function ProfilePage() {
           <Card>
             {customer.birthDate ? (
               <div className="flex items-center gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sun-400/15 text-lg">
-                  🎂
-                </span>
+                <IconTile tone="amber" size="sm">
+                  <span className="text-lg">🎂</span>
+                </IconTile>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">
                     {birthdayLabel(customer.birthDate, lang)}
@@ -217,9 +218,7 @@ export default function ProfilePage() {
           <Card className="space-y-1 p-2">
             {customer.vehicles.map((v) => (
               <div key={v.id} className="flex items-center gap-3 rounded-xl p-2">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600">
-                  <CarIcon className="size-5" />
-                </span>
+                <IconTile Icon={CarIcon} tone="ink" size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{v.plate}</p>
                   <p className="truncate text-[11px] text-ink-500">{v.model}</p>
@@ -266,9 +265,7 @@ export default function ProfilePage() {
                   key={c.id}
                   className="flex items-center gap-3 rounded-xl p-2"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-ink-100 text-ink-600">
-                    <CardIcon className="size-5" />
-                  </span>
+                  <IconTile Icon={CardIcon} tone="ink" size="sm" />
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2 text-sm font-medium">
                       <span className="grid h-5 w-8 shrink-0 place-items-center rounded bg-ink-900 text-[9px] font-bold tracking-wide text-white">

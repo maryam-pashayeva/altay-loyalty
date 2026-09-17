@@ -101,8 +101,19 @@ export interface Campaign {
   ctaLabel?: string;
   /** Möhür-kart tipli kampaniya üçün irəliləyiş (məs. 5+1) */
   stamps?: { done: number; total: number };
-  /** Dəvət/referral kampaniyası — paylaşılacaq kod */
-  share?: { code: string };
+  /**
+   * Dəvət/referral kampaniyası. Statistika müştəriyə öz nəticəsini göstərir —
+   * kod tək başına nə qədər işlədiyini bildirmir.
+   */
+  share?: {
+    code: string;
+    /** Linki açıb tətbiqi yükləyənlər */
+    joined: number;
+    /** İlk yumasını edib bonusu təsdiqləyənlər */
+    activated: number;
+    /** Bu dəvətlərdən qazanılan ümumi bonus */
+    earned: number;
+  };
 }
 
 export interface WashPackage {

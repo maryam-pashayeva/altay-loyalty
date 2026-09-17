@@ -174,7 +174,6 @@ export default function HomePage() {
                     ) : (
                       <CampaignCard
                         campaign={c}
-                        index={i}
                         onClick={() => setSelected({ campaign: c, index: i })}
                       />
                     )}

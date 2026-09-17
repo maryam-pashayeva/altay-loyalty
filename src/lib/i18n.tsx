@@ -297,6 +297,44 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     ru: "Успешно принято — мы скоро свяжемся с вами.",
     en: "Successfully registered — we'll contact you soon.",
   },
+  // Dəvət kartı
+  "referral.title": {
+    az: "Dostunu dəvət et, birlikdə qazan",
+    ru: "Пригласи друга — выиграете оба",
+    en: "Invite a friend, you both win",
+  },
+  "referral.joined": {
+    az: "Qoşulub",
+    ru: "Присоединились",
+    en: "Joined",
+  },
+  "referral.activated": {
+    az: "İlk yumasını edib",
+    ru: "Сделали первую мойку",
+    en: "Made first wash",
+  },
+  "referral.earned": {
+    az: "Qazandığınız",
+    ru: "Вы заработали",
+    en: "You earned",
+  },
+  "referral.share": { az: "Paylaş", ru: "Поделиться", en: "Share" },
+  "referral.linkCopied": {
+    az: "Link kopyalandı",
+    ru: "Ссылка скопирована",
+    en: "Link copied",
+  },
+  "referral.qrTitle": {
+    az: "Dəvət QR-ı",
+    ru: "QR приглашения",
+    en: "Invite QR",
+  },
+  "referral.qrHint": {
+    az: "Dostunuz bu QR-ı telefonunun kamerası ilə oxutsun — dəvət linki açılacaq.",
+    ru: "Пусть друг отсканирует этот QR камерой телефона — откроется ссылка-приглашение.",
+    en: "Have your friend scan this QR with their camera — the invite link opens.",
+  },
+
   "campaign.codeCopied": {
     az: "Kod kopyalandı",
     ru: "Код скопирован",

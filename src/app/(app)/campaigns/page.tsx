@@ -38,7 +38,6 @@ export default function CampaignsPage() {
                 <CampaignCard
                   key={c.id}
                   campaign={c}
-                  index={i}
                   onClick={() => setSelected({ campaign: c, index: i })}
                 />
               ),

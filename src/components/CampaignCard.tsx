@@ -1,18 +1,16 @@
 "use client";
 
 import { shortDate } from "@/lib/format";
-import { accentAt } from "@/lib/accents";
 import { useT } from "@/lib/i18n";
 import type { Campaign } from "@/lib/types";
 import { ChevronIcon, GiftIcon } from "@/components/Icons";
+import { IconTile } from "@/components/ui/IconTile";
 
 export function CampaignCard({
   campaign,
-  index = 0,
   onClick,
 }: {
   campaign: Campaign;
-  index?: number;
   onClick?: () => void;
 }) {
   const { t, lang } = useT();
@@ -22,13 +20,9 @@ export function CampaignCard({
       onClick={onClick}
       className="card flex w-full items-center gap-3 p-4 pr-3 text-left transition active:scale-[0.99]"
     >
-      <div
-        className={`grid size-14 shrink-0 place-items-center rounded-2xl bg-linear-to-br ${accentAt(
-          index,
-        )} text-sm font-bold text-white shadow-sm`}
-      >
-        {campaign.badge ?? "AW"}
-      </div>
+      <IconTile tone="amber" size="lg">
+        <span className="text-sm font-bold">{campaign.badge ?? "AW"}</span>
+      </IconTile>
       <div className="min-w-0 flex-1 pr-1">
         <h3 className="truncate text-sm font-semibold">{campaign.title}</h3>
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-500">

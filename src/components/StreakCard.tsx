@@ -3,6 +3,7 @@
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
 import { FlameIcon, TrophyIcon } from "@/components/Icons";
+import { IconTile } from "@/components/ui/IconTile";
 
 export function StreakCard() {
   const { customer } = useSession();
@@ -15,9 +16,7 @@ export function StreakCard() {
   return (
     <div className="card p-4">
       <div className="flex items-center gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-orange-100 text-orange-500">
-          <FlameIcon className="size-6" />
-        </span>
+        <IconTile Icon={FlameIcon} tone="amber" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-ink-900">
             {t("streak.series", { n: current })}

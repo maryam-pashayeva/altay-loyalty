@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { distanceKm } from "@/lib/geo";
 import { useT } from "@/lib/i18n";
 import { ArrowUpRightIcon, PinIcon } from "@/components/Icons";
+import { IconTile } from "@/components/ui/IconTile";
 
 /** Ana səhifədəki "Filiallar" qısayolu — icazə verilərsə ən yaxın filialı və
  *  məsafəni göstərir; əks halda sadəcə "Filiallar" qalır. */
@@ -50,9 +51,7 @@ export function BranchesQuickCard() {
 
   return (
     <Link href="/branches" className="card flex items-center gap-3 p-4">
-      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-linear-to-br from-teal-500 to-cyan-500 text-white shadow-sm">
-        <PinIcon className="size-5" />
-      </span>
+      <IconTile Icon={PinIcon} tone="blue" />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-medium">
           {t("branchesQuick.title")}
@@ -66,8 +65,8 @@ export function BranchesQuickCard() {
             : t("branchesQuick.subtitle")}
         </span>
       </span>
-      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-600">
-        <ArrowUpRightIcon className="size-4" />
+      <span className="grid size-8 shrink-0 place-items-center rounded-full text-ink-400">
+        <ArrowUpRightIcon className="size-[18px]" />
       </span>
     </Link>
   );

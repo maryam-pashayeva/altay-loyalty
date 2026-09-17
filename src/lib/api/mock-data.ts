@@ -117,7 +117,7 @@ export const mockCampaigns: Campaign[] = [
     badge: "10 ₼",
     validUntil: "2026-11-30T23:59:59Z",
     ctaLabel: "Dostunu dəvət et",
-    share: { code: "ALTAY-ELVIN10" },
+    share: { code: "ALTAY-ELVIN10", joined: 3, activated: 1, earned: 10 },
   },
 ];
 
