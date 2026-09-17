@@ -217,9 +217,9 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: "{n}-wash streak",
   },
   "streak.toFree": {
-    az: "{n} yumaya pulsuz yuma",
-    ru: "ещё {n} моек до бесплатной",
-    en: "{n} washes to a free wash",
+    az: "Pulsuz yumaya {n} yuma qalıb",
+    ru: "До бесплатной мойки осталось {n}",
+    en: "{n} more washes to a free one",
   },
   "streak.ready": {
     az: "Pulsuz yuma hazırdır!",
