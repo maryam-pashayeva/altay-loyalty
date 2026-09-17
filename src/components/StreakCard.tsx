@@ -2,8 +2,7 @@
 
 import { useSession } from "@/lib/session";
 import { useT } from "@/lib/i18n";
-import { FlameIcon, TrophyIcon } from "@/components/Icons";
-import { IconTile } from "@/components/ui/IconTile";
+import { TrophyIcon } from "@/components/Icons";
 
 export function StreakCard() {
   const { customer } = useSession();
@@ -15,18 +14,15 @@ export function StreakCard() {
 
   return (
     <div className="card p-4">
-      <div className="flex items-center gap-3">
-        <IconTile Icon={FlameIcon} tone="amber" />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-ink-900">
-            {t("streak.series", { n: current })}
-          </p>
-          <p className="text-xs text-ink-500">
-            {remaining > 0
-              ? t("streak.toFree", { n: remaining })
-              : t("streak.ready")}
-          </p>
-        </div>
+      <div className="min-w-0">
+        <p className="text-sm font-bold text-ink-900">
+          {t("streak.series", { n: current })}
+        </p>
+        <p className="mt-0.5 text-xs text-ink-500">
+          {remaining > 0
+            ? t("streak.toFree", { n: remaining })
+            : t("streak.ready")}
+        </p>
       </div>
 
       <div className="mt-4 flex items-center justify-between">
@@ -52,8 +48,15 @@ export function StreakCard() {
             </span>
           );
         })}
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-500">
-          <TrophyIcon className="size-5" />
+        {/* Mükafat — sıranın hədəfi; qalanlardan bir az iri və halqalıdır */}
+        <span
+          className={`ml-1 grid size-9 shrink-0 place-items-center rounded-full ring-2 transition ${
+            remaining === 0
+              ? "bg-sun-400 text-amber-950 ring-sun-400/40 soft-pulse"
+              : "bg-sun-400/15 text-sun-600 ring-sun-400/30"
+          }`}
+        >
+          <TrophyIcon className="size-[21px]" />
         </span>
       </div>
     </div>
